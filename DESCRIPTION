@@ -1,11 +1,10 @@
 Package: cesdata
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Stores CES Data Files for Simon Kiss' Private Use
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Simon Kiss
+Maintainer: Simon Kiss <skiss@wlu.ca>
+Description: I am trying to find a way to store all these CES data files that I always use in an efficient way. 
+License: GPU
 Encoding: UTF-8
 LazyData: true
