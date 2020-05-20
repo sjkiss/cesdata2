@@ -26,15 +26,6 @@ ces19web<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politi
 
 library(labelled)
 library(tidyverse)
-look_for(ces19web, "occupation")
-ces19phone %>%
-  group_by(p52) %>%
-  summarise(n=n()) %>%
-  View()
-ces19web %>%
-  group_by(pes19_occ_text) %>%
-  summarise(n=n()) %>%
-View()
 
 #Combine 1972 files
 # #Rename respondent idea variables for continuity
@@ -52,8 +43,8 @@ View()
 # names(ces72_nov)[1]
 
 #use_data(ces65, ces68,  overwrite=T)
-use_data(ces74, overwrite=T)
+#use_data(ces74, overwrite=T)
 #use_data(ces79, overwrite=T)
-use_data(ces19phone, overwrite=T)
-use_data(ces19web, overwrite = T)
-use_data(ces7980)
+#use_data(ces19phone, overwrite=T)
+#use_data(ces19web, overwrite = T)
+#use_data(ces7980)
