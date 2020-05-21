@@ -42,9 +42,6 @@ library(tidyverse)
 # names(ces72_sept)[1]
 # names(ces72_nov)[1]
 
-#use_data(ces65, ces68,  overwrite=T)
-#use_data(ces74, overwrite=T)
-#use_data(ces79, overwrite=T)
-#use_data(ces19phone, overwrite=T)
-#use_data(ces19web, overwrite = T)
-#use_data(ces7980)
+
+use_data(ces65, ces68, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces15web, ces19phone, ces19web, overwrite=T)
+tail(names(ces7980))
