@@ -80,16 +80,36 @@
 #### Add Occupations to 2019 Web####
 # data("ces19web")
 # library(readxl)
+# #Load the unique occupation codes Kristin did
 # noc<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/unique-occupations-updated.xls", col_names=T)
+# #check
 # head(noc)
-# data("ces19web")
-# ces19web$pes19_occ_text
-#  noc %>%
-#    rename(pes19_occ_text=p52) %>%
-#   select(pes19_occ_text, NOC) %>%
-#   full_join(ces19web, ., by="pes19_occ_text")->out
-# table(out$NOC, useNA = "ifany")
 #
+#
+#
+# table(is.na(ces19web$pes19_occ_cat_28_TEXT))
+# table(is.na(ces19web$pes19_occ_text))
+# #Combine the text occupation responses
+#  ces19web %>%
+#    #create the occ_text_joint variable
+#    mutate(pes19_occ_text_joint=case_when(
+#      #because pes19_occ_text came first in the survey, when nchar > 0 return it
+#           nchar(ces19web$pes19_occ_text)>0 ~ tolower(ces19web$pes19_occ_text),
+#      #when pes19_occ_text is empty (nchar==0), return the follow-up question
+#      nchar(ces19web$pes19_occ_text)==0 ~ tolower(ces19web$pes19_occ_cat_28_TEXT)
+#
+#    ))->ces19web
+#  #take Kristin's file
+#  noc %>%
+#    #rename the p52 variable which comes from the phone survey to match what we just made above
+#    rename(pes19_occ_text_joint=p52) %>%
+#    #only select those two variables to get rid of superfluous stuff
+#   select(pes19_occ_text_joint, NOC) %>%
+#    #join ces19web to noc by the joint text variable
+#   full_join(ces19web, ., by="pes19_occ_text_joint")->out
+#
+#  #Check how many are missing
+# table(is.na(out$NOC))
 # # #Provide Check
 # #Jobs uNique to Government program
 # out %>%
@@ -105,4 +125,14 @@
 #   filter(NOC==7271) %>%
 #     select(pes19_occ_text)%>%
 #   print(n=100)
+# names(out)
+# #keyword search
+# out %>%
+#   filter(str_detect(pes19_occ_text_joint, "customer service")) %>%
+#   select(pes19_occ_text_joint, NOC)
+#
+# out %>%
+#   select(-occ_text_joint, -noc_code) -> out
+#
+# ces19web<-out
 # save(ces19web, file="data/ces19web.rda")
