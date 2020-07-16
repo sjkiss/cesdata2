@@ -77,4 +77,32 @@
 #tail(names(ces7980))
 
 #save(ces19phone, file="data/ces19phone.rda")
-
+#### Add Occupations to 2019 Web####
+# data("ces19web")
+# library(readxl)
+# noc<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/unique-occupations-updated.xls", col_names=T)
+# head(noc)
+# data("ces19web")
+# ces19web$pes19_occ_text
+#  noc %>%
+#    rename(pes19_occ_text=p52) %>%
+#   select(pes19_occ_text, NOC) %>%
+#   full_join(ces19web, ., by="pes19_occ_text")->out
+# table(out$NOC, useNA = "ifany")
+#
+# # #Provide Check
+# #Jobs uNique to Government program
+# out %>%
+#   filter(NOC==4168) %>%
+#   select(pes19_occ_text)
+# #Teachers
+# out %>%
+#   filter(NOC==4031) %>%
+#     select(pes19_occ_text)%>%
+#   print(n=100)
+# #Carpenters
+# out %>%
+#   filter(NOC==7271) %>%
+#     select(pes19_occ_text)%>%
+#   print(n=100)
+# save(ces19web, file="data/ces19web.rda")
