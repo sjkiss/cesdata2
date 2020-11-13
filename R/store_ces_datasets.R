@@ -81,8 +81,8 @@ ces19phone[3059,'NOC']
 #tail(names(ces7980))
 
 save(ces19phone, file="data/ces19phone.rda", version=2)
-save(ces19phone, file="data/ces19web.rda", version=2)
-save(ces19_kiss, file="data/ces19_kiss.rda", version=2)
+#save(ces19phone, file="data/ces19web.rda")
+#save(ces19_kiss, file="data/ces19_kiss.rda")
 #use_data(ces19phone, overwrite=T)
 #### Add Occupations to 2019 Web####
 # data("ces19web")
