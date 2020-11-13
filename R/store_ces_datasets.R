@@ -1,5 +1,5 @@
 #
-# library(usethis)
+library(usethis)
 
 
 ##load data files
@@ -21,38 +21,41 @@ library(labelled)
 # ces0411<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces.merged/CES_04060811_ISR_revised.sav')
 # ces15phone<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/CES2015-phone-release/CES2015_CPS-PES-MBS_complete.sav')
 # ces15web<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/web/CES15_CPS+PES_Web_SSI Full.SAV')
-#ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Phone Survey v1.0.dta', encoding="utf-8")
-#ces19web<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Online Survey v1.0.dta', encoding="")
- ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES2019 Campaign Period Survey Kiss module data 2020-01-28.dta', encoding="")
+ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Phone Survey v1.0.dta', encoding="utf-8")
+ces19web<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Online Survey v1.0.dta', encoding="")
+ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES2019 Campaign Period Survey Kiss module data 2020-01-28.dta', encoding="")
 
 #### Add Occupations to 2019 phone####
 # data("ces19phone")
-# library(readxl)
-# noc<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/unique-occupations-updated.xls", col_names=T)
-# head(noc)
-# ces19phone$p52<-tolower(ces19phone$p52)
-# library(tidyverse)
-# noc %>%
-#   select(p52, NOC) %>%
-#   full_join(ces19phone, ., by="p52")->out
-# out$NOC
-# #Provide Check
-# #Jobs uNique to Government program
-# out %>%
-#   filter(NOC==4168) %>%
-#   select(p52)
-# #Teachers
-# out %>%
-#   filter(NOC==4031) %>%
-#   select(p52) %>%
-#   print(n=100)
-# #Carpenters
-# out %>%
-#   filter(NOC==7271) %>%
-#   select(p52) %>%
-#   print(n=100)
-# #replace ces19phone with out
-# ces19phone<-out
+library(readxl)
+noc<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/unique-occupations-updated.xls", col_names=T)
+head(noc)
+ces19phone$p52<-tolower(ces19phone$p52)
+library(tidyverse)
+noc %>%
+  select(p52, NOC) %>%
+  full_join(ces19phone, ., by="p52")->out
+out$NOC
+#Provide Check
+#Jobs uNique to Government program
+out %>%
+  filter(NOC==4168) %>%
+  select(p52)
+#Teachers
+out %>%
+  filter(NOC==4031) %>%
+  select(p52) %>%
+  print(n=100)
+#Carpenters
+out %>%
+  filter(NOC==7271) %>%
+  select(p52) %>%
+  print(n=100)
+#Check that weird librarian
+out[3059,'NOC']
+#replace ces19phone with out
+ces19phone<-out
+ces19phone[3059,'NOC']
 # names(ces19phone)
 # tail(names(ces0411))
 # library(labelled)
@@ -77,7 +80,10 @@ library(labelled)
 #use_data(ces65, ces68, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces15web, ces19phone, ces19web, overwrite=T)
 #tail(names(ces7980))
 
-#save(ces19phone, file="data/ces19phone.rda")
+save(ces19phone, file="data/ces19phone.rda", version=2)
+save(ces19phone, file="data/ces19web.rda", version=2)
+save(ces19_kiss, file="data/ces19_kiss.rda", version=2)
+#use_data(ces19phone, overwrite=T)
 #### Add Occupations to 2019 Web####
 # data("ces19web")
 # library(readxl)
