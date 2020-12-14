@@ -24,7 +24,23 @@ ces15phone<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_poli
 ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Phone Survey v1.0.dta', encoding="utf-8")
 ces19web<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Online Survey v1.0.dta', encoding="")
 ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES2019 Campaign Period Survey Kiss module data 2020-01-28.dta', encoding="")
-#### Add Molly's Most Important Problem to 2019 Phone"
+
+####Combine 1972 files####
+# #Rename respondent idea variables for continuity
+# names(ces72_jul)[1]
+# names(ces72_sept)[1]
+# names(ces72_nov)[1]
+# ces72_jul %>%
+#   rename("CASEID"="RES_ID1A") ->ces72_jul
+# names(ces72_jul)[1]
+#
+# names(ces72_sept)[1]
+# ces72_sept %>%
+#   rename("CASEID"="RESPID1A")->ces72_sept
+# names(ces72_sept)[1]
+# names(ces72_nov)[1]
+
+#### Add Molly's Most Important Problem to 2019 Phone ####
 library(readxl)
 mip<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/mip.xlsx", col_names=T)
 names(mip)
@@ -93,30 +109,10 @@ ces19phone[3059,'NOC']
 # library(labelled)
 # library(tidyverse)
 
-#Combine 1972 files
-# #Rename respondent idea variables for continuity
-# names(ces72_jul)[1]
-# names(ces72_sept)[1]
-# names(ces72_nov)[1]
-# ces72_jul %>%
-#   rename("CASEID"="RES_ID1A") ->ces72_jul
-# names(ces72_jul)[1]
-#
-# names(ces72_sept)[1]
-# ces72_sept %>%
-#   rename("CASEID"="RESPID1A")->ces72_sept
-# names(ces72_sept)[1]
-# names(ces72_nov)[1]
 
+#### Save ces19phone after NOC and MIP###
 
-#use_data(ces65, ces68, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces15web, ces19phone, ces19web, overwrite=T)
-#tail(names(ces7980))
-
-save(ces19phone, file="data/ces19phone.rda", version=2)
-
-#save(ces19phone, file="data/ces19web.rda")
-#save(ces19_kiss, file="data/ces19_kiss.rda")
-#use_data(ces19phone, overwrite=T)
+use_data(ces19phone, overwrite=T)
 #### Add Occupations to 2019 Web####
 # data("ces19web")
 # library(readxl)
@@ -129,6 +125,8 @@ save(ces19phone, file="data/ces19phone.rda", version=2)
 #
 # table(is.na(ces19web$pes19_occ_cat_28_TEXT))
 # table(is.na(ces19web$pes19_occ_text))
+# look_for(ces19web, "occupation")
+#
 # #Combine the text occupation responses
 #  ces19web %>%
 #    #create the occ_text_joint variable
@@ -139,6 +137,8 @@ save(ces19phone, file="data/ces19phone.rda", version=2)
 #      nchar(ces19web$pes19_occ_text)==0 ~ tolower(ces19web$pes19_occ_cat_28_TEXT)
 #
 #    ))->ces19web
+#  ces19web$pes19_occ_text_joint
+#  names(noc)
 #  #take Kristin's file
 #  noc %>%
 #    #rename the p52 variable which comes from the phone survey to match what we just made above
@@ -171,10 +171,14 @@ save(ces19phone, file="data/ces19phone.rda", version=2)
 #   filter(str_detect(pes19_occ_text_joint, "customer service")) %>%
 #   select(pes19_occ_text_joint, NOC)
 #
-# out %>%
-#   select(-occ_text_joint, -noc_code) -> out
+# # out %>%
+# #   select(-occ_text_joint, -noc_code) -> out
 #
 # ces19web<-out
-# save(ces19web, file="data/ces19web.rda")
 
+#save(ces19web, file="data/ces19web.rda")
+
+#### Complete save command ###
+#use_data(ces65, ces68, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces15web, ces19phone, ces19web, overwrite=T)
+#tail(names(ces7980))
 
