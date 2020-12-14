@@ -19,9 +19,9 @@ library(labelled)
 # ces97<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES-E-1997/CES-E-1997_F1.sav')
 # ces00<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES-E-2000/CES-E-2000_F1.sav')
 # ces0411<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces.merged/CES_04060811_ISR_revised.sav')
-ces15phone<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/CES2015-phone-release/CES2015_CPS-PES-MBS_complete.sav')
+#ces15phone<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/CES2015-phone-release/CES2015_CPS-PES-MBS_complete.sav')
 # ces15web<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/web/CES15_CPS+PES_Web_SSI Full.SAV')
-ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Phone Survey v1.0.dta', encoding="utf-8")
+#ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Phone Survey v1.0.dta', encoding="utf-8")
 #ces19web<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Online Survey v1.0.dta', encoding="")
 #ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES2019 Campaign Period Survey Kiss module data 2020-01-28.dta', encoding="")
 
@@ -41,79 +41,80 @@ ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_poli
 # names(ces72_nov)[1]
 
 #### Add Molly's Most Important Problem to 2019 Phone ####
-library(readxl)
-mip<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/mip.xlsx", col_names=T)
-names(mip)
-look_for(ces19phone, "important")
-library(tidyverse)
-ces19phone$q7_lower<-str_to_lower(ces19phone$q7)
-names(mip)
-mip %>%
-  select(q7_lower, q7_out) %>%
-  full_join(ces19phone, ., by="q7_lower")->out
-
-#use names in mip$mip15 for the numbers in CPS15_1.
-#What I'm doing here is taking the same value labels from 2015 and applying them to 2019.
-mip %>%
-  #I'm dumping out all the excess rows of the spreadsheet that do not have a value for CPS15_1
-  #S'o I'm just keeping the rows that have the values and the value labels for the issues from 2015
-  filter(!is.na(CPS15_1)) %>%
-  #Now I'm just selecting those two variables and naming them label and value
-  select(label=mip15, CPS15_1) %>%
-  #This turns the CPS15_1 variable into a numeric variable
-  mutate(value=as.numeric(CPS15_1))->mip_labels
-#This takes the value labels in the value column and it makes them the names of the label variable
-names(mip_labels$value)<-mip_labels$label
-#This then turns out$mip into a labelled variable using the named mip_labels$value label that was justr created
-out$q7_out<-labelled(out$q7_out, labels=mip_labels$value)
-
-#This performs a check
-table(as_factor(out$q7_out))
-
-#Overwrite ces19phone with out
-ces19phone<-out
-#### Add Occupations to 2019 phone####
-# data("ces19phone")
-
-noc<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/unique-occupations-updated.xls", col_names=T)
-head(noc)
-ces19phone$p52<-tolower(ces19phone$p52)
-
-
-noc %>%
-  select(p52, NOC) %>%
-  full_join(ces19phone, ., by="p52")->out
-out$NOC
-#Provide Check
-#Jobs uNique to Government program
-out %>%
-  filter(NOC==4168) %>%
-  select(p52)
-#Teachers
-out %>%
-  filter(NOC==4031) %>%
-  select(p52) %>%
-  print(n=100)
-#Carpenters
-out %>%
-  filter(NOC==7271) %>%
-  select(p52) %>%
-  print(n=100)
-#Check that weird librarian
-out[3059,'NOC']
-#replace ces19phone with out
-ces19phone<-out
-ces19phone[3059,'NOC']
-# names(ces19phone)
-# tail(names(ces0411))
-# library(labelled)
+# library(readxl)
+# mip<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/mip.xlsx", col_names=T)
+# names(mip)
+# look_for(ces19phone, "important")
 # library(tidyverse)
+# ces19phone$q7_lower<-str_to_lower(ces19phone$q7)
+# names(mip)
+# mip %>%
+#   select(q7_lower, q7_out) %>%
+#   full_join(ces19phone, ., by="q7_lower")->out
+#
+# #use names in mip$mip15 for the numbers in CPS15_1.
+# #What I'm doing here is taking the same value labels from 2015 and applying them to 2019.
+# mip %>%
+#   #I'm dumping out all the excess rows of the spreadsheet that do not have a value for CPS15_1
+#   #S'o I'm just keeping the rows that have the values and the value labels for the issues from 2015
+#   filter(!is.na(CPS15_1)) %>%
+#   #Now I'm just selecting those two variables and naming them label and value
+#   select(label=mip15, CPS15_1) %>%
+#   #This turns the CPS15_1 variable into a numeric variable
+#   mutate(value=as.numeric(CPS15_1))->mip_labels
+# #This takes the value labels in the value column and it makes them the names of the label variable
+# names(mip_labels$value)<-mip_labels$label
+# #This then turns out$mip into a labelled variable using the named mip_labels$value label that was justr created
+# out$q7_out<-labelled(out$q7_out, labels=mip_labels$value)
+#
+# #This performs a check
+# table(as_factor(out$q7_out))
+#
+# #Overwrite ces19phone with out
+# ces19phone<-out
+# #### Add Occupations to 2019 phone####
+# # data("ces19phone")
+#
+# noc<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/unique-occupations-updated.xls", col_names=T)
+# head(noc)
+# ces19phone$p52<-tolower(ces19phone$p52)
+#
+#
+# noc %>%
+#   select(p52, NOC) %>%
+#   full_join(ces19phone, ., by="p52")->out
+# out$NOC
+# #Provide Check
+# #Jobs uNique to Government program
+# out %>%
+#   filter(NOC==4168) %>%
+#   select(p52)
+# #Teachers
+# out %>%
+#   filter(NOC==4031) %>%
+#   select(p52) %>%
+#   print(n=100)
+# #Carpenters
+# out %>%
+#   filter(NOC==7271) %>%
+#   select(p52) %>%
+#   print(n=100)
+# #Check that weird librarian
+# out[3059,'NOC']
+# #replace ces19phone with out
+# ces19phone<-out
+# ces19phone[3059,'NOC']
+# # names(ces19phone)
+# # tail(names(ces0411))
+# # library(labelled)
+# # library(tidyverse)
+#
+#
+# #### Save ces19phone after NOC and MIP###
+# names(out)
+#
 
-
-#### Save ces19phone after NOC and MIP###
-names(out)
-?use_data
-use_data(ces19phone, overwrite=T, version=2)
+#use_data(ces19phone, overwrite=T, version=2)
 
 #### Add Occupations to 2019 Web####
 # data("ces19web")
