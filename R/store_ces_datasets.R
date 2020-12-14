@@ -112,8 +112,9 @@ ces19phone[3059,'NOC']
 
 #### Save ces19phone after NOC and MIP###
 names(out)
-
+?use_data
 use_data(ces19phone, overwrite=T, version=2)
+
 #### Add Occupations to 2019 Web####
 # data("ces19web")
 # library(readxl)
