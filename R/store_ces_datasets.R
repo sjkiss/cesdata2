@@ -1,28 +1,28 @@
 
-library(usethis)
-
-library(tidyverse)
-##load data files
-library(haven)
-library(labelled)
-ces65<-read_dta(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1965.dta")
-ces68<-read_dta(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1968.dta")
-ces72_jul<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1972/CES-E-1972-jun-july_F1.sav")
-ces72_sept<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1972/CES-E-1972-sept_F1.sav")
-ces72_nov<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1972/CES-E-1972-nov_F1.sav")
-ces74<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES-E-1974/CES-E-1974_F1.sav")
-ces7980<-read_sav(file="/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/1974_1979_1980.sav")
-ces84<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/1984.sav")
-ces88<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES1988.sav")
-ces93<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/1993/CES-E-1993_F1.sav", user_na=T)
-ces97<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES-E-1997/CES-E-1997_F1.sav',user_na=T)
-ces00<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES-E-2000/CES-E-2000_F1.sav', user_na=T)
-ces0411<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces.merged/CES_04060811_ISR_revised.sav')
-ces15phone<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/CES2015-phone-release/CES2015_CPS-PES-MBS_complete.sav')
-ces15web<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/web/CES15_CPS+PES_Web_SSI Full.SAV')
-ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Phone Survey v1.0.dta', encoding="utf-8")
-ces19web<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Online Survey v1.0.dta')
-ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES2019 Campaign Period Survey Kiss module data 2020-01-28.dta', encoding="")
+# library(usethis)
+#
+# library(tidyverse)
+# ##load data files
+# library(haven)
+# library(labelled)
+# ces65<-read_dta(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1965.dta")
+# ces68<-read_dta(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1968.dta")
+# ces72_jul<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1972/CES-E-1972-jun-july_F1.sav")
+# ces72_sept<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1972/CES-E-1972-sept_F1.sav")
+# ces72_nov<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1972/CES-E-1972-nov_F1.sav")
+# ces74<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES-E-1974/CES-E-1974_F1.sav")
+# ces7980<-read_sav(file="/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/1974_1979_1980.sav")
+# ces84<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/1984.sav")
+# ces88<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES1988.sav")
+# ces93<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/1993/CES-E-1993_F1.sav", user_na=T)
+# ces97<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES-E-1997/CES-E-1997_F1.sav',user_na=T)
+# ces00<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES-E-2000/CES-E-2000_F1.sav', user_na=T)
+# ces0411<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces.merged/CES_04060811_ISR_revised.sav')
+# ces15phone<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/CES2015-phone-release/CES2015_CPS-PES-MBS_complete.sav')
+# ces15web<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/web/CES15_CPS+PES_Web_SSI Full.SAV')
+# ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Phone Survey v1.0.dta', encoding="utf-8")
+# ces19web<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Online Survey v1.0.dta')
+# ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES2019 Campaign Period Survey Kiss module data 2020-01-28.dta', encoding="")
 # library(usethis)
 # data('ces19web')
 # library(labelled)
@@ -54,7 +54,7 @@ ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/ca
 #   rename("CASEID"="RESPID1A")->ces72_sept
 # names(ces72_sept)[1]
 # names(ces72_nov)[1]
-#
+
 # # #### Add Molly's Most Important Problem to 2019 Phone ####
 # library(readxl)
 # mip<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/mip.xlsx", col_names=T)
@@ -92,7 +92,7 @@ ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/ca
 #
 # #Overwrite ces19phone with out
 # ces19phone<-out
-#
+
 # #### Add Occupations to 2019 phone####
 # # data("ces19phone")
 #
@@ -140,6 +140,7 @@ ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/ca
 # #
 # #### Add Occupations to 2019 Web####
 #
+# data("ces19web")
 # library(readxl)
 # #Load the unique occupation codes Kristin did
 # noc<-read_excel(path="/Users/skiss/OneDrive - Wilfrid Laurier University/projects_folder/CES_Folder/Data/unique-occupations-updated.xls", col_names=T)
@@ -172,7 +173,7 @@ ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/ca
 #   select(pes19_occ_text_joint, NOC) %>%
 #    #join ces19web to noc by the joint text variable
 #   full_join(ces19web, ., by="pes19_occ_text_joint")->out
-#
+# names(out)
 #  #Check how many are missing
 # table(is.na(out$NOC))
 # # #Provide Check
@@ -196,8 +197,8 @@ ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/ca
 #   filter(str_detect(pes19_occ_text_joint, "customer service")) %>%
 #   select(pes19_occ_text_joint, NOC)
 #
-# # out %>%
-# #   select(-occ_text_joint, -noc_code) -> out
+# out %>%
+#   select(-occ_text_joint, -noc_code) -> out
 # names(out)
 # ces19web<-out
 
@@ -205,7 +206,7 @@ ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/ca
 # #### Complete save command ###
 
 #library(usethis)
-# use_data(ces65, ces68, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces15web, ces19phone, ces19web,overwrite=T)
+#use_data(ces65, ces68, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces15web, ces19phone, ces19web,overwrite=T)
 #use_data(ces93,ces97, ces00, overwrite=T)
 # #tail(names(ces7980))
 # names(ces19phone)
