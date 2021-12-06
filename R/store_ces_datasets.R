@@ -1,10 +1,10 @@
 
-# library(usethis)
-#
-# library(tidyverse)
-# ##load data files
-# library(haven)
-# library(labelled)
+library(usethis)
+
+library(tidyverse)
+##load data files
+library(haven)
+library(labelled)
 # ces65<-read_dta(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1965.dta")
 # ces68<-read_dta(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1968.dta")
 # ces72_jul<-read_sav(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1972/CES-E-1972-jun-july_F1.sav")
@@ -23,6 +23,8 @@
 # ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Phone Survey v1.0.dta', encoding="utf-8")
 # ces19web<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Online Survey v1.0.dta')
 # ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES2019 Campaign Period Survey Kiss module data 2020-01-28.dta', encoding="")
+ces21<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces21.dta')
+
 # library(usethis)
 # data('ces19web')
 # library(labelled)
@@ -202,7 +204,10 @@
 # names(out)
 # ces19web<-out
 
-#
+#### Check out CES21 ####
+names(ces21)
+lookfor(ces21, "occupation")
+
 # #### Complete save command ###
 
 #library(usethis)
@@ -210,6 +215,4 @@
 #use_data(ces93,ces97, ces00, overwrite=T)
 # #tail(names(ces7980))
 # names(ces19phone)
-
-
-
+#use_data(ces21, overwrite=T)
