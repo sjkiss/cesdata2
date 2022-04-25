@@ -3,7 +3,7 @@
 #
 # library(tidyverse)
 # ##load data files
-# library(haven)
+library(haven)
 # library(labelled)
 # ces65<-read_dta(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1965.dta")
 # ces68<-read_dta(file="~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces1968.dta")
@@ -21,11 +21,14 @@
 # ces15phone<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/CES2015-phone-release/CES2015_CPS-PES-MBS_complete.sav')
 # ces15web<-read_sav(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES15/web/CES15_CPS+PES_Web_SSI Full.SAV')
 # ces19phone<-read_dta(file='~/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/2019 Canadian Election Study - Phone Survey v1.0.dta', encoding="utf-8")
-#ces19web<-read_sav(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES-E-2019-online/CES-E-2019-online_F1.sav', encoding='latin1')
+#ces19web<-haven::read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES-E-2019-online/2019 Canadian Election Study - Online Survey v1.0.dta', encoding="")
 #read_dta(file="/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES-E-2019-online_F1.dta")
 # ces19_kiss<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/CES19/CES2019 Campaign Period Survey Kiss module data 2020-01-28.dta', encoding="")
-#ces21<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces21.dta')
-
+#ces21<-read_dta(file='/Users/skiss/OneDrive - Wilfrid Laurier University/canadian_politics/canadian_election_studies/ces21.dta', encoding="utf-8")
+# library(tidyverse)
+# ces21 %>%
+#   select(pes21_occ_text) %>%
+#   View()
 # library(usethis)
 # data('ces19web')
 
@@ -208,13 +211,23 @@
 
 #### Check out CES21 ####
 #names(ces21)
-#lookfor(ces21, "occupation")
+# load("data/ces21.rda")
+# library(labelled)
+# lookfor(ces21, "occupation")
+# library(tidyverse)
+#Encoding(ces21$pes21_occ_text)<-'utf8'
+#ces21 %>%
+#   select(1109:1111) %>%
+#   mutate(pes21_occ_text_lower=str_to_lower(pes21_occ_text)) %>%
+# distinct(., pes21_occ_text_lower) %>%
+#   select(pes21_occ_text_lower) %>%
+# write_excel_csv("data/2021_occupations.csv")
 
 # #### Complete save command ###
 
 #library(usethis)
 #use_data(ces65, ces68, ces74, ces7980, ces84, ces88, ces93, ces97, ces00, ces0411, ces15phone, ces15web, ces19phone, ces19web,overwrite=T)
-#use_data(ces93,ces97, ces00, overwrite=T)
+#use_data(ces19web, overwrite=T)
 # #tail(names(ces7980))
 # names(ces19phone)
 #use_data(ces19web, overwrite=T)
