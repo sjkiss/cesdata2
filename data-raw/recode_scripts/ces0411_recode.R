@@ -820,7 +820,7 @@ ces0411$welfare04<-Recode(as.numeric(ces0411$ces04_PES_D1B), "1=0; 3=1; 5=0.5; 8
 #val_labels(ces0411$welfare04)<-NULL
 #### Postgrad (ces04_CPS_S3) ####
 # look_for(ces0411, "education")
-ces0411$postgrad04<-Recode(ces0411$ces04_CPS_S3, "10:11=1; 1:9=0; else=NA")
+ces0411$postgrad04<-Recode(as.numeric(ces0411$ces04_CPS_S3), "10:11=1; 1:9=0; else=NA")
 #checks
 # table(ces0411$postgrad04)
 
@@ -3144,7 +3144,7 @@ ces0411$immigration_rates11<-Recode(ces0411$PES11_28, "1=0; 3=1; 5=0.5; 8=0.5; e
 
 #### #recode Environment (MBS11_C14)####
 # look_for(ces0411, "env")
-ces0411$enviro11<-Recode(ces0411$MBS11_C14, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+ces0411$enviro11<-Recode(as.numeric(ces0411$MBS11_C14), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
 # table(ces0411$enviro11, useNA = "ifany" )
 
@@ -3501,7 +3501,7 @@ ces0411$welfare11<-Recode(as.numeric(ces0411$CPS11_33), "1=0; 3=1; 5=0.5; 8=0.5;
 
 #### recode Postgrad (CPS11_79) ####
 # look_for(ces0411, "education")
-ces0411$postgrad11<-Recode(ces0411$CPS11_79, "10:11=1; 1:9=0; else=NA")
+ces0411$postgrad11<-Recode(as.numeric(ces0411$CPS11_79), "10:11=1; 1:9=0; else=NA")
 #checks
 # table(ces0411$postgrad11, useNA = "ifany" )
 

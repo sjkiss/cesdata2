@@ -540,7 +540,7 @@ ces21$sector<-rep(NA, nrow(ces21))
 
 #recode Postgrad (cps21_education)
 look_for(ces21, "education")
-ces21$postgrad<-Recode(ces21$cps21_education, "10:11=1; 1:9=0; else=NA")
+ces21$postgrad<-Recode(as.numeric(ces21$cps21_education), "10:11=1; 1:9=0; else=NA")
 #checks
 table(ces21$postgrad)
 
