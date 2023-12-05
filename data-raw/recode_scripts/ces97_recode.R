@@ -5,12 +5,8 @@ library(labelled)
 library(here)
 library(haven)
 #load data
-if (!file.exists(here("data/ces97.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces97<-read_sav(file=here("data-raw/CES-E-1997_F1.sav"))
-} else {
-  load("data/ces97.rda")
-}
+ces97<-read_sav(file=here("data-raw/CES-E-1997_F1.sav"))
+
 #### #recode Gender (cpsrgen)####
 
 # (ces97, "gender")
@@ -60,7 +56,7 @@ val_labels(ces97$quebec)
 
 ####recode Age (cpsage) ####
 # (ces97, "age")
-ces97$yob<-Recode(ces97$cpsage, "9999=NA")
+ces97$yob<-Recode(as.numeric(ces97$cpsage), "9999=NA")
 ces97$age<-1997-ces97$yob
 #check
 # (ces97$age)
@@ -231,11 +227,12 @@ ces97$household<-Recode(ces97$cpshhwgt, "0.5056=0.5; 1.0111=1; 1.5167=1.5; 2.022
 # (ces97$household)
 
 #### recode income / household size ####
-ces97$inc<-Recode(ces97$cpsm16, "998:999=NA")
+ces97$inc<-Recode(as.numeric(ces97$cpsm16), "998:999=NA")
+
 # (ces97$inc)
 ces97$inc2<-ces97$inc/ces97$household
 # (ces97$inc2)
-ces97$inc3<-Recode(ces97$cpsm16a, "98:99=NA")
+ces97$inc3<-Recode(as.numeric(ces97$cpsm16a), "98:99=NA")
 # (ces97$inc3)
 ces97$inc4<-ces97$inc3/ces97$household
 # (ces97$inc4)
@@ -252,16 +249,16 @@ ces97 %>%
 
 ####recode Religiosity (pesm10b)####
 # (ces97, "relig")
-ces97$religiosity<-Recode(ces97$pesm10b, "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
-val_labels(ces97$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+ces97$religiosity<-Recode(as.numeric(ces97$pesm10b), "7=1; 5=2; 8=3; 3=4; 1=5; else=NA")
+val_labels(ces97$religiosity)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
-val_labels(ces97$religiosity)
+#val_labels(ces97$religiosity)
 # (ces97$religiosity)
 
 #### recode Redistribution (mbsa4)####
 # (ces97, "rich")
-val_labels(ces97$mbsa4)
-ces97$redistribution<-Recode(ces97$mbsa4, "; 1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces97$mbsa4)
+ces97$redistribution<-Recode(as.numeric(ces97$mbsa4), "; 1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
 #val_labels(ces97$redistribution)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
 #val_labels(ces97$redistribution)
@@ -271,14 +268,14 @@ ces97$redistribution<-Recode(ces97$mbsa4, "; 1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; el
 ces97$pro_redistribution<-Recode(ces97$mbsa4, "1:2=1; 3:4=0; else=NA", as.numeric=T)
 val_labels(ces97$pro_redistribution)<-c(Non_Pro=0, Pro=1)
 #checks
-val_labels(ces97$pro_redistribution)
+#val_labels(ces97$pro_redistribution)
 # (ces97$pro_redistribution)
 #### recode Market Liberalism (cpsf6 and pese19)####
 
 # (ces97, "private")
 # (ces97, "blame")
-ces97$market1<-Recode(ces97$cpsf6, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
-ces97$market2<-Recode(ces97$pese19, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces97$market1<-Recode(as.numeric(ces97$cpsf6), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces97$market2<-Recode(as.numeric(ces97$pese19), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 # (ces97$market1)
 # (ces97$market2)
@@ -319,32 +316,32 @@ ces97 %>%
 ####recode Immigration (cpsj18) ####
 
 # (ces97, "imm")
-ces97$immigration_rates<-Recode(ces97$cpsj18, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+ces97$immigration_rates<-Recode(as.numeric(ces97$cpsj18), "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 # (ces97$immigration_rates, useNA = "ifany")
 
 #### #recode Environment (mbsa6)####
 # (ces97, "env")
 # (ces97$mbsa6, useNA="ifany")
-ces97$enviro<-Recode(ces97$mbsa6, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+ces97$enviro<-Recode(as.numeric(ces97$mbsa6), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
 # (ces97$enviro, useNA="ifany")
 
 ####recode Capital Punishment (pese13) ####
 # (ces97, "punish")
-ces97$death_penalty<-Recode(ces97$pese13, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
+ces97$death_penalty<-Recode(as.numeric(ces97$pese13), "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
 #checks
 # (ces97$death_penalty)
 
 #recode Crime (cpsa2g)
 # (ces97, "crime")
-ces97$crime<-Recode(ces97$cpsa2g, "1=1; 2=0.5; 3=0; 8=0.5; else=NA")
+ces97$crime<-Recode(as.numeric(ces97$cpsa2g), "1=1; 2=0.5; 3=0; 8=0.5; else=NA")
 #checks
 # (ces97$crime)
 
 #recode Gay Rights (mbsg3)
 # (ces97, "homo")
-ces97$gay_rights<-Recode(ces97$mbsg3, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+ces97$gay_rights<-Recode(as.numeric(ces97$mbsg3), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
 # (ces97$gay_rights)
 #### #recode Abortion (pese5a pese5b pese5c)####
@@ -370,31 +367,31 @@ ces97 %>%
 #### #recode Lifestyle (mbsa7)####
 
 # (ces97, "lifestyle")
-ces97$lifestyles<-Recode(ces97$mbsa7, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+ces97$lifestyles<-Recode(as.numeric(ces97$mbsa7), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
 #checks
 # (ces97$lifestyles)
 #####recode Stay Home (cpsf3) ####
 
 # (ces97, "home")
-ces97$stay_home<-Recode(ces97$cpsf3, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+ces97$stay_home<-Recode(as.numeric(ces97$cpsf3), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
 #checks
 # (ces97$stay_home)
 #####recode Marriage Children (cpsf2) ####
 
 # (ces97, "children")
-ces97$marriage_children<-Recode(ces97$cpsf2, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+ces97$marriage_children<-Recode(as.numeric(ces97$cpsf2), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
 #checks
 # (ces97$marriage_children)
 #####recode Values (mbsa9) ####
 
 # (ces97, "traditional")
-ces97$values<-Recode(ces97$mbsa9, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+ces97$values<-Recode(as.numeric(ces97$mbsa9), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
 #checks
 # (ces97$values)
 #####recode Morals (mbsa8) ####
 
 # (ces97, "moral")
-ces97$morals<-Recode(ces97$mbsa8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+ces97$morals<-Recode(as.numeric(ces97$mbsa8), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
 # (ces97$morals)
 #### Moral traditionalism####
@@ -435,8 +432,8 @@ ces97 %>%
   select(starts_with("trad")) %>%
   head()
 #Check distribution of traditionalism
-qplot(ces97$traditionalism, geom="histogram")
-qplot(ces97$market_liberalism, geom="histogram")
+# qplot(ces97$traditionalism, geom="histogram")
+# qplot(ces97$market_liberalism, geom="histogram")
 
 # (ces97$traditionalism, useNA="ifany")
 
@@ -460,7 +457,7 @@ ces97 %>%
   select(starts_with("trad")) %>%
   summary()
 #Check distribution of traditionalism
-qplot(ces97$traditionalism2, geom="histogram")
+#qplot(ces97$traditionalism2, geom="histogram")
 # (ces97$traditionalism2, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -513,87 +510,87 @@ ces97 %>%
 
 #recode Quebec Accommodation (cpse3a) (Left=more accom)
 # (ces97, "quebec")
-ces97$quebec_accom<-Recode(ces97$cpse3a, "2=1; 1=0; 3=0.5; 8=0.5; else=NA")
+ces97$quebec_accom<-Recode(as.numeric(ces97$cpse3a), "2=1; 1=0; 3=0.5; 8=0.5; else=NA")
 #checks
 # (ces97$quebec_accom)
 
 
 #recode Liberal leader (cpsd1b)
 # (ces97, "Chretien")
-ces97$liberal_leader<-Recode(ces97$cpsd1b, "0=1; 997:999=NA")
+ces97$liberal_leader<-Recode(as.numeric(ces97$cpsd1b), "0=1; 997:999=NA")
 #checks
 # (ces97$liberal_leader)
 
 #recode conservative leader (cpsd1a)
 # (ces97, "Charest")
-ces97$conservative_leader<-Recode(ces97$cpsd1a, "0=1; 997:999=NA")
+ces97$conservative_leader<-Recode(as.numeric(ces97$cpsd1a), "0=1; 997:999=NA")
 #checks
 # (ces97$conservative_leader)
 
 #recode NDP leader (cpsd1c)
 # (ces97, "McDonough")
-ces97$ndp_leader<-Recode(ces97$cpsd1c, "0=1; 997:999=NA")
+ces97$ndp_leader<-Recode(as.numeric(ces97$cpsd1c), "0=1; 997:999=NA")
 #checks
 # (ces97$ndp_leader)
 
 #recode Bloc leader (cpsd1e)
 # (ces97, "Duceppe")
-ces97$bloc_leader<-Recode(ces97$cpsd1e, "0=1; 997:999=NA")
+ces97$bloc_leader<-Recode(as.numeric(ces97$cpsd1e), "0=1; 997:999=NA")
 #checks
 # (ces97$bloc_leader)
 
 #recode liberal rating (cpsd1h)
 # (ces97, "liberal")
-ces97$liberal_rating<-Recode(ces97$cpsd1h, "0=1; 997:999=NA")
+ces97$liberal_rating<-Recode(as.numeric(ces97$cpsd1h), "0=1; 997:999=NA")
 #checks
 # (ces97$liberal_rating)
 
 #recode conservative rating (cpsd1g)
 # (ces97, "conservative")
-ces97$conservative_rating<-Recode(ces97$cpsd1g, "0=1; 997:999=NA")
+ces97$conservative_rating<-Recode(as.numeric(ces97$cpsd1g), "0=1; 997:999=NA")
 #checks
 # (ces97$conservative_rating)
 
 #recode NDP rating (cpsd1i)
 # (ces97, "new democratic")
-ces97$ndp_rating<-Recode(ces97$cpsd1i, "0=1; 997:999=NA")
+ces97$ndp_rating<-Recode(as.numeric(ces97$cpsd1i), "0=1; 997:999=NA")
 #checks
 # (ces97$ndp_rating)
 
 #recode Bloc rating (cpsd1k)
 # (ces97, "bloc")
-ces97$bloc_rating<-Recode(ces97$cpsd1k, "0=1; 997:999=NA")
+ces97$bloc_rating<-Recode(as.numeric(ces97$cpsd1k), "0=1; 997:999=NA")
 #checks
 # (ces97$bloc_rating)
 
 #recode Education (pese6f)
 # (ces97, "edu")
-ces97$education<-Recode(ces97$pese6f, "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
+ces97$education<-Recode(as.numeric(ces97$pese6f), "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
 #checks
 # (ces97$education, ces97$pese6f , useNA = "ifany" )
 
 #recode Personal Retrospective (cpsc1)
 # (ces97, "financ")
-ces97$personal_retrospective<-Recode(ces97$cpsc1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces97$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces97$personal_retrospective<-Recode(as.numeric(ces97$cpsc1), "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces97$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
-val_labels(ces97$personal_retrospective)
+#val_labels(ces97$personal_retrospective)
 # (ces97$personal_retrospective, ces97$cpsc1 , useNA = "ifany" )
 
 #recode National Retrospective (cpsg1)
 # (ces97, "economy")
-ces97$national_retrospective<-Recode(ces97$cpsg1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces97$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces97$national_retrospective<-Recode(as.numeric(ces97$cpsg1), "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces97$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
-val_labels(ces97$national_retrospective)
+#val_labels(ces97$national_retrospective)
 # (ces97$national_retrospective, ces97$cpsg1 , useNA = "ifany" )
 
 #recode Ideology (mbsi16a)
 # (ces97, "the left")
-ces97$ideology<-Recode(ces97$mbsi16a , "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
-val_labels(ces97$ideology)<-c(Left=0, Right=1)
+ces97$ideology<-Recode(as.numeric(ces97$mbsi16a) , "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
+#val_labels(ces97$ideology)<-c(Left=0, Right=1)
 #checks
-val_labels(ces97$ideology)
+#val_labels(ces97$ideology)
 # (ces97$ideology, ces97$mbsi16a  , useNA = "ifany")
 
 #recode turnout (pesa2a & pesa2b)
@@ -616,28 +613,28 @@ val_labels(ces97$turnout)
 #### recode political efficacy ####
 #recode No Say (cpsb10b)
 # (ces97, "not have say")
-ces97$efficacy_internal<-Recode(ces97$cpsb10b, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces97$efficacy_internal)<-c(low=0, high=1)
+ces97$efficacy_internal<-Recode(as.numeric(ces97$cpsb10b), "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces97$efficacy_internal)<-c(low=0, high=1)
 #checks
-val_labels(ces97$efficacy_internal)
+#val_labels(ces97$efficacy_internal)
 # (ces97$efficacy_internal)
 # (ces97$efficacy_internal, ces97$cpsb10b , useNA = "ifany" )
 
 #recode MPs lose touch (cpsb10a)
 # (ces97, "lose touch")
-ces97$efficacy_external<-Recode(ces97$cpsb10a, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces97$efficacy_external)<-c(low=0, high=1)
+ces97$efficacy_external<-Recode(as.numeric(ces97$cpsb10a), "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces97$efficacy_external)<-c(low=0, high=1)
 #checks
-val_labels(ces97$efficacy_external)
+#val_labels(ces97$efficacy_external)
 # (ces97$efficacy_external)
 # (ces97$efficacy_external, ces97$cpsb10a , useNA = "ifany" )
 
 #recode Official Don't Care (cpsb10d)
 # (ces97, "cares what")
-ces97$efficacy_external2<-Recode(ces97$cpsb10d, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces97$efficacy_external2)<-c(low=0, high=1)
+ces97$efficacy_external2<-Recode(as.numeric(ces97$cpsb10d), "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces97$efficacy_external2)<-c(low=0, high=1)
 #checks
-val_labels(ces97$efficacy_external2)
+#val_labels(ces97$efficacy_external2)
 # (ces97$efficacy_external2)
 # (ces97$efficacy_external2, ces97$cpsb10d , useNA = "ifany" )
 
@@ -648,7 +645,7 @@ ces97 %>%
   select(starts_with("efficacy")) %>%
   summary()
 #Check distribution of political_efficacy
-qplot(ces97$political_efficacy, geom="histogram")
+#qplot(ces97$political_efficacy, geom="histogram")
 # (ces97$political_efficacy, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -673,51 +670,51 @@ val_labels(ces97$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
 
 # recode satisfaction with democracy (cpsb9, pesa5b)
 # (ces97, "dem")
-ces97$satdem<-Recode(ces97$pesa5b, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces97$satdem<-Recode(as.numeric(ces97$pesa5b), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 # (ces97$satdem, ces97$pesa5b, useNA = "ifany" )
 
-ces97$satdem2<-Recode(ces97$cpsb9, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces97$satdem2<-Recode(as.numeric(ces97$cpsb9), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 # (ces97$satdem2, ces97$cpsb9, useNA = "ifany" )
 
 #recode Quebec Sovereignty (pese10) (Quebec only & Right=more sovereignty)
 # (ces97, "sovereignty")
-ces97$quebec_sov<-Recode(ces97$pese10, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+ces97$quebec_sov<-Recode(as.numeric(ces97$pese10), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
 #checks
 # (ces97$quebec_sov, ces97$pese10, useNA = "ifany" )
 
 # recode provincial alienation (cpsj12)
 # (ces97, "treat")
-ces97$prov_alienation<-Recode(ces97$cpsj12, "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+ces97$prov_alienation<-Recode(as.numeric(ces97$cpsj12), "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 # (ces97$prov_alienation, ces97$cpsj12, useNA = "ifany" )
 
 # recode immigration society (mbsg4)
 # (ces97, "fit")
-ces97$immigration_soc<-Recode(ces97$mbsg4, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+ces97$immigration_soc<-Recode(as.numeric(ces97$mbsg4), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 # (ces97$immigration_soc, ces97$mbsg4, useNA = "ifany" )
 
 #recode welfare (pese6b)
 # (ces97, "welfare")
-ces97$welfare<-Recode(ces97$pese6b, "1=1; 3=0.5; 8=0.5; 5=0; else=NA")
+ces97$welfare<-Recode(as.numeric(ces97$pese6b), "1=1; 3=0.5; 8=0.5; 5=0; else=NA")
 #checks
 # (ces97$welfare)
 # (ces97$welfare, ces97$pese6b)
 
 #recode Postgrad (cpsm3)
 # (ces97, "education")
-ces97$postgrad<-Recode(ces97$cpsm3, "10:11=1; 1:9=0; else=NA")
+ces97$postgrad<-Recode(as.numeric(ces97$cpsm3), "10:11=1; 1:9=0; else=NA")
 #checks
 # (ces97$postgrad)
 
 #recode Break Promise (cpsj13)
 # (ces97, "promise")
-ces97$promise<-Recode(ces97$cpsj13, "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
-val_labels(ces97$promise)<-c(low=0, high=1)
+ces97$promise<-Recode(as.numeric(ces97$cpsj13), "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
+#val_labels(ces97$promise)<-c(low=0, high=1)
 #checks
-val_labels(ces97$promise)
+#val_labels(ces97$promise)
 # (ces97$promise)
 # (ces97$promise, ces97$cpsj13 , useNA = "ifany" )
 
@@ -725,7 +722,7 @@ val_labels(ces97$promise)
 
 # recode political interest (cpsb5)
 # (ces97, "interest")
-ces97$pol_interest<-Recode(ces97$cpsb5, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+ces97$pol_interest<-Recode(as.numeric(ces97$cpsb5), "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
 #checks
 # (ces97$pol_interest, ces97$cpsb5, useNA = "ifany" )
 
@@ -734,7 +731,7 @@ ces97$pol_interest<-Recode(ces97$cpsb5, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5;
 ces97$foreign<-Recode(ces97$cpsm11, "1=0; 2:97=1; 0=1; else=NA")
 val_labels(ces97$foreign)<-c(No=0, Yes=1)
 #checks
-val_labels(ces97$foreign)
+#val_labels(ces97$foreign)
 # (ces97$foreign, ces97$cpsm11, useNA="ifany")
 
 # Save the file

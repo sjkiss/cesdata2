@@ -5,12 +5,7 @@ library(labelled)
 library(here)
 library(haven)
 #load data
-if (!file.exists(here("data/ces93.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces93<-read_sav(file=here("data-raw/CES-E-1993_F1.sav"))
-} else {
-  load("data/ces93.rda")
-}
+ces93<-read_sav(file=here("data-raw/CES-E-1993_F1.sav"))
 
 #### gender####
 #recode Gender (CPSRGEN)
@@ -298,7 +293,7 @@ ces93 %>%
     RTYPE4==1 & (CPSO10==5 | REFN10==5)~ 2,
     RTYPE4==1 & (CPSO10==7 | REFN10==7)~ 1,
   ))->ces93
-val_labels(ces93$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces93$religiosity)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces93$religiosity)
 table(ces93$religiosity)
@@ -308,7 +303,7 @@ table(ces93$religiosity)
 look_for(ces93, "rich")
 val_labels(ces93$MBSA8)
 table(ces93$MBSA8, useNA = "ifany")
-ces93$redistribution<-Recode(ces93$MBSA8, "; 1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+ces93$redistribution<-Recode(as.numeric(ces93$MBSA8), "; 1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
 #val_labels(ces93$redistribution)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
 #val_labels(ces93$redistribution)
@@ -325,8 +320,8 @@ table(ces93$pro_redistribution)
 look_for(ces93, "private")
 look_for(ces93, "blame")
 table(ces93$PESE15, useNA = "ifany")
-ces93$market1<-Recode(ces93$PESE15, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
-ces93$market2<-Recode(ces93$MBSA2, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+ces93$market1<-Recode(as.numeric(ces93$PESE15), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+ces93$market2<-Recode(as.numeric(ces93$MBSA2), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
 #checks
 table(ces93$market1, ces93$PESE15, useNA = "ifany" )
 table(ces93$market2, ces93$MBSA2 , useNA = "ifany" )
@@ -374,7 +369,7 @@ look_for(ces93, "imm")
 ces93$immigration_rates<-Recode(ces93$CPSG5, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces93$immigration_rates, useNA = "ifany")
-
+val_labels(ces93$immigration_rates)<-NULL
 #recode Environment (MBSA12)
 look_for(ces93, "env")
 table(ces93$MBSA12, useNA = "ifany")
@@ -439,20 +434,20 @@ table(ces93$stay_home,useNA = "ifany")
 
 #recode Marriage Children (CPSG7E)
 look_for(ces93, "children")
-ces93$marriage_children<-Recode(ces93$CPSG7E, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+ces93$marriage_children<-Recode(as.numeric(ces93$CPSG7E), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
 #checks
 table(ces93$marriage_children, useNA = "ifany")
 
 #recode Values (MBSA17)
 look_for(ces93, "traditional")
 table(ces93$MBSA17)
-ces93$values<-Recode(ces93$MBSA17, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+ces93$values<-Recode(as.numeric(ces93$MBSA17), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
 #checks
 table(ces93$values, useNA = "ifany")
 
 #recode Individualism (MBSA7)
 look_for(ces93, "individual")
-ces93$individualism<-Recode(ces93$MBSA7, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+ces93$individualism<-Recode(as.numeric(ces93$MBSA7), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
 #checks
 table(ces93$individualism)
 
@@ -499,7 +494,7 @@ ces93 %>%
   select(starts_with("trad")) %>%
   summary()
 #Check distribution of traditionalism
-qplot(ces93$traditionalism, geom="histogram")
+#qplot(ces93$traditionalism, geom="histogram")
 table(ces93$traditionalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -572,7 +567,7 @@ ces93 %>%
   select(starts_with("author")) %>%
   summary()
 #Check distribution of traditionalism
-qplot(ces93$authoritarianism, geom="histogram")
+#qplot(ces93$authoritarianism, geom="histogram")
 table(ces93$authoritarianism, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -587,86 +582,86 @@ ces93 %>%
 
 #recode Quebec Accommodation (PRC4 & REFE10) (Left=more accom)
 look_for(ces93, "quebec")
-ces93$quebec_accom<-Recode(ces93$PRC4, "1=1; 5=0; 3=0.5; 8=0.5; else=NA")
+ces93$quebec_accom<-Recode(as.numeric(ces93$PRC4), "1=1; 5=0; 3=0.5; 8=0.5; else=NA")
 #checks
 table(ces93$quebec_accom)
 
 #recode Liberal leader (PESD2B)
 look_for(ces93, "Chretien")
-ces93$liberal_leader<-Recode(ces93$PESD2B, "0=1; 997:999=NA")
+ces93$liberal_leader<-Recode(as.numeric(ces93$PESD2B), "0=1; 997:999=NA")
 #checks
 table(ces93$liberal_leader)
 
 #recode conservative leader (PESD2A)
 look_for(ces93, "Campbell")
-ces93$conservative_leader<-Recode(ces93$PESD2A, "0=1; 997:999=NA")
+ces93$conservative_leader<-Recode(as.numeric(ces93$PESD2A), "0=1; 997:999=NA")
 #checks
 table(ces93$conservative_leader)
 
 #recode NDP leader (PESD2C)
 look_for(ces93, "McLaughlin")
-ces93$ndp_leader<-Recode(ces93$PESD2C, "0=1; 997:999=NA")
+ces93$ndp_leader<-Recode(as.numeric(ces93$PESD2C), "0=1; 997:999=NA")
 #checks
 table(ces93$ndp_leader)
 
 #recode Bloc leader (PESD2E)
 look_for(ces93, "Bouchard")
-ces93$bloc_leader<-Recode(ces93$PESD2E, "0=1; 997:999=NA")
+ces93$bloc_leader<-Recode(as.numeric(ces93$PESD2E), "0=1; 997:999=NA")
 #checks
 table(ces93$bloc_leader)
 
 #recode liberal rating (PESD2H)
 look_for(ces93, "liberal")
-ces93$liberal_rating<-Recode(ces93$PESD2H, "0=1; 997:999=NA")
+ces93$liberal_rating<-Recode(as.numeric(ces93$PESD2H), "0=1; 997:999=NA")
 #checks
 table(ces93$liberal_rating)
 
 #recode conservative rating (PESD2G)
 look_for(ces93, "conservative")
-ces93$conservative_rating<-Recode(ces93$PESD2G, "0=1; 997:999=NA")
+ces93$conservative_rating<-Recode(as.numeric(ces93$PESD2G), "0=1; 997:999=NA")
 #checks
 table(ces93$conservative_rating)
 
 #recode NDP rating (PESD2I)
 look_for(ces93, "new democratic")
-ces93$ndp_rating<-Recode(ces93$PESD2I, "0=1; 997:999=NA")
+ces93$ndp_rating<-Recode(as.numeric(ces93$PESD2I), "0=1; 997:999=NA")
 #checks
 table(ces93$ndp_rating)
 
 #recode Bloc rating (PESD2K)
 look_for(ces93, "new democratic")
-ces93$bloc_rating<-Recode(ces93$PESD2K, "0=1; 997:999=NA")
+ces93$bloc_rating<-Recode(as.numeric(ces93$PESD2K), "0=1; 997:999=NA")
 #checks
 table(ces93$bloc_rating)
 
 #recode Education (CPSL7F)
 look_for(ces93, "edu")
-ces93$education<-Recode(ces93$CPSL7F, "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
+ces93$education<-Recode(as.numeric(ces93$CPSL7F), "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
 #checks
 table(ces93$education, ces93$CPSL7F , useNA = "ifany" )
 
 #recode Personal Retrospective (CPSC1)
 look_for(ces93, "financ")
-ces93$personal_retrospective<-Recode(ces93$CPSC1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces93$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces93$personal_retrospective<-Recode(as.numeric(ces93$CPSC1), "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces93$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
 val_labels(ces93$personal_retrospective)
 table(ces93$personal_retrospective, ces93$CPSC1 , useNA = "ifany" )
 
 #recode National Retrospective (CPSH1)
 look_for(ces93, "economy")
-ces93$national_retrospective<-Recode(ces93$CPSH1, "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces93$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces93$national_retrospective<-Recode(as.numeric(ces93$CPSH1), "1=1; 3=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces93$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
 val_labels(ces93$national_retrospective)
 table(ces93$national_retrospective, ces93$CPSH1 , useNA = "ifany" )
 
 #recode Ideology (REFH211)
 look_for(ces93, "self")
-ces93$ideology<-Recode(ces93$REFH21 , "1=0; 3=1; 5=0.5; else=NA")
-val_labels(ces93$ideology)<-c(Left=0, Right=1)
+ces93$ideology<-Recode(as.numeric(ces93$REFH21) , "1=0; 3=1; 5=0.5; else=NA")
+#val_labels(ces93$ideology)<-c(Left=0, Right=1)
 #checks
-val_labels(ces93$ideology)
+#val_labels(ces93$ideology)
 table(ces93$ideology, ces93$REFH21  , useNA = "ifany")
 
 #recode turnout (PESA2)
@@ -681,8 +676,10 @@ table(ces93$turnout, ces93$vote)
 #### recode political efficacy ####
 #recode No Say (MBSD8)
 look_for(ces93, "have any say")
-ces93$efficacy_internal<-Recode(ces93$MBSD8, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces93$efficacy_internal)<-c(low=0, high=1)
+ces93$efficacy_internal<-Recode(as.numeric(ces93$MBSD8), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces93$efficacy_internal)<-c(low=0, high=1)
+#val_labels(ces93$efficacy_internal)<-NULL
+
 #checks
 val_labels(ces93$efficacy_internal)
 table(ces93$efficacy_internal)
@@ -690,19 +687,21 @@ table(ces93$efficacy_internal, ces93$MBSD8 , useNA = "ifany" )
 
 #recode MPs lose touch (MBSD1)
 look_for(ces93, "touch")
-ces93$efficacy_external<-Recode(ces93$MBSD1, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces93$efficacy_external)<-c(low=0, high=1)
+ces93$efficacy_external<-Recode(as.numeric(ces93$MBSD1), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces93$efficacy_external)<-c(low=0, high=1)
 #checks
-val_labels(ces93$efficacy_external)
+#val_labels(ces93$efficacy_external)<-NULL
 table(ces93$efficacy_external)
 table(ces93$efficacy_external, ces93$MBSD1 , useNA = "ifany" )
 
 #recode Official Don't Care (MBSD5)
 look_for(ces93, "cares what")
-ces93$efficacy_external2<-Recode(ces93$MBSD5, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces93$efficacy_external2)<-c(low=0, high=1)
+ces93$efficacy_external2<-Recode(as.numeric(ces93$MBSD5), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces93$efficacy_external2)<-c(low=0, high=1)
+#val_labels(ces93$efficacy_external2)<-NULL
+
 #checks
-val_labels(ces93$efficacy_external2)
+#val_labels(ces93$efficacy_external2)
 table(ces93$efficacy_external2)
 table(ces93$efficacy_external2, ces93$MBSD5 , useNA = "ifany" )
 
@@ -713,7 +712,7 @@ ces93 %>%
   select(starts_with("efficacy")) %>%
   summary()
 #Check distribution of political_efficacy
-qplot(ces93$political_efficacy, geom="histogram")
+#qplot(ces93$political_efficacy, geom="histogram")
 table(ces93$political_efficacy, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -737,29 +736,37 @@ table(ces93$mip)
 
 # recode satisfaction with democracy (PESL5)
 look_for(ces93, "dem")
-ces93$satdem<-Recode(ces93$PESL5, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces93$satdem<-Recode(as.numeric(ces93$PESL5), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces93$satdem)<-NULL
 #checks
 table(ces93$satdem, ces93$PESL5, useNA = "ifany" )
 
-ces93$satdem2<-Recode(ces93$PESL5, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces93$satdem2<-Recode(as.numeric(ces93$PESL5), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces93$satdem2)<-NULL
+
 #checks
 table(ces93$satdem2, ces93$PESL5, useNA = "ifany" )
 
 #recode Quebec Sovereignty (CPSG11) (Quebec only & Right=more sovereignty)
 look_for(ces93, "sovereignty")
-ces93$quebec_sov<-Recode(ces93$CPSG11, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+ces93$quebec_sov<-Recode(as.numeric(ces93$CPSG11), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#val_labels(ces93$quebec_sov)<-NULL
+
 #checks
 table(ces93$quebec_sov, ces93$CPSG11, useNA = "ifany" )
 
 # recode immigration society (MBSG6)
 look_for(ces93, "fit")
-ces93$immigration_soc<-Recode(ces93$MBSG6, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+ces93$immigration_soc<-Recode(as.numeric(ces93$MBSG6), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces93$immigration_soc)<-NULL
+
 #checks
 table(ces93$immigration_soc, ces93$MBSG6, useNA = "ifany" )
 
 #recode welfare (CPSL7B)
 look_for(ces93, "welfare")
-ces93$welfare<-Recode(ces93$CPSL7B, "1=1; 3=0.5; 8=0.5; 5=0; else=NA")
+ces93$welfare<-Recode(as.numeric(ces93$CPSL7B), "1=1; 3=0.5; 8=0.5; 5=0; else=NA")
+#val_labels(ces93$welfare)<-NULL
 #checks
 table(ces93$welfare)
 table(ces93$welfare, ces93$CPSL7B)
@@ -785,10 +792,10 @@ table(ces93$postgrad)
 
 # recode political interest (CPSB1)
 look_for(ces93, "interest")
-ces93$pol_interest<-Recode(ces93$CPSB1, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
+ces93$pol_interest<-Recode(as.numeric(ces93$CPSB1), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 table(ces93$pol_interest, ces93$CPSB1, useNA = "ifany" )
-
+#val_labels(ces93$pol_interest)<-NULL
 #recode foreign born (CPSO11)
 look_for(ces93, "birth")
 ces93$foreign<-Recode(ces93$CPSO11, "1=0; 2:22=1; 0=1; else=NA")

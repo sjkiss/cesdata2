@@ -5,12 +5,9 @@ library(labelled)
 library(here)
 library(haven)
 #load data
-if (!file.exists(here("data/ces7980.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces7980<-read_sav(file=here("data-raw/1974_1979_1980.sav"))
-} else {
-  load("data/ces7980.rda")
-}
+
+ces7980<-read_sav(file=here("data-raw/1974_1979_1980.sav"))
+
 #recode Gender (V2156)
 # look_for(ces7980, "sex")
 ces7980$male80<-Recode(ces7980$V2156, "1=1; 2=0; 0=NA")

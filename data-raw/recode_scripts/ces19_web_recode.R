@@ -4,14 +4,19 @@ library(car)
 library(labelled)
 library(here)
 #load data
-if (!file.exists(here("data/ces19web.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces19web<-read_sav(file=here("data-raw/CES-E-2019-online_F1_character_encodings_fixed.sav"))
-  #Note, if this is the case, the entire Recode script must be uncommented and run
-  return(ces19web)
-} else {
-  load("data/ces19web.rda")
-}
+ces19web <- read_sav(file=here("data-raw/CES-E-2019-online_F1.sav"), encoding="latin1")
+#there is a problem with French accented characters int he original data file of the 2019
+# web survey.
+#This script repairs those.
+source("data-raw/recode_scripts/ces19_web_problem_with_encodings.R")
+
+ces19web %>%
+  filter(str_detect(pes19_occ_text,"assembleur-m")) %>%
+  select(cps19_ResponseId, pes19_occ_text)
+lookfor(ces19web, "occupation")
+#Add 2016 NOC and 2021 NOC
+source("data-raw/recode_scripts/ces19web_noc_recode.R")
+#Note this creates the occupation variable FROM THE 2016 NOC CODES
 
 ces19web$occupation<-Recode(as.numeric(ces19web$NOC), "0:1099=2;
 1100:1199=1;
@@ -86,8 +91,8 @@ prop.table(table(ces19web$vismin))
 #### recode political efficacy ####
 #recode No Say (cps19_govt_say)
 look_for(ces19web, "have any say")
-ces19web$efficacy_internal<-Recode(ces19web$cps19_govt_say, "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
-val_labels(ces19web$efficacy_internal)<-c(low=0, high=1)
+ces19web$efficacy_internal<-Recode(as.numeric(ces19web$cps19_govt_say), "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+#val_labels(ces19web$efficacy_internal)<-c(low=0, high=1)
 #checks
 val_labels(ces19web$efficacy_internal)
 table(ces19web$efficacy_internal)
@@ -95,21 +100,21 @@ table(ces19web$efficacy_internal, ces19web$cps19_govt_say , useNA = "ifany" )
 
 #recode MPs lose touch (pes19_losetouch)
 look_for(ces19web, "lose touch")
-ces19web$efficacy_external<-Recode(ces19web$pes19_losetouch, "1=1; 2=0.25; 3=0.5; 4=0.75; 5=0; 6=0.5; else=NA", as.numeric=T)
-val_labels(ces19web$efficacy_external)<-c(low=0, high=1)
+ces19web$efficacy_external<-Recode(as.numeric(ces19web$pes19_losetouch), "1=1; 2=0.25; 3=0.5; 4=0.75; 5=0; 6=0.5; else=NA", as.numeric=T)
+#val_labels(ces19web$efficacy_external)<-c(low=0, high=1)
 #checks
-val_labels(ces19web$efficacy_external)
+#val_labels(ces19web$efficacy_external)
 table(ces19web$efficacy_external)
 table(ces19web$efficacy_external, ces19web$pes19_losetouch , useNA = "ifany" )
 
 #recode Official Don't Care (pes19_govtcare)
 look_for(ces19web, "care much")
-ces19web$efficacy_external2<-Recode(ces19web$pes19_govtcare, "1=1; 2=0.25; 3=0.5; 4=0.75; 5=0; 6=0.5; else=NA", as.numeric=T)
-val_labels(ces19web$efficacy_external2)<-c(low=0, high=1)
+ces19web$efficacy_external2<-Recode(as.numeric(ces19web$pes19_govtcare), "1=1; 2=0.25; 3=0.5; 4=0.75; 5=0; 6=0.5; else=NA", as.numeric=T)
+#val_labels(ces19web$efficacy_external2)<-c(low=0, high=1)
 #checks
-val_labels(ces19web$efficacy_external2)
-table(ces19web$efficacy_external2)
-table(ces19web$efficacy_external2, ces19web$pes19_govtcare , useNA = "ifany" )
+#val_labels(ces19web$efficacy_external2)
+#table(ces19web$efficacy_external2)
+#table(ces19web$efficacy_external2, ces19web$pes19_govtcare , useNA = "ifany" )
 
 ces19web %>%
   mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces19web
@@ -118,7 +123,7 @@ ces19web %>%
   select(starts_with("efficacy")) %>%
   summary()
 #Check distribution of political_efficacy
-qplot(ces19web$political_efficacy, geom="histogram")
+#qplot(ces19web$political_efficacy, geom="histogram")
 table(ces19web$political_efficacy, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -133,28 +138,28 @@ ces19web %>%
 
 #recode efficacy rich (pes19_populism_8)
 look_for(ces19web, "rich")
-ces19web$efficacy_rich<-Recode(ces19web$pes19_populism_8, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 6=0.5; else=NA")
+ces19web$efficacy_rich<-Recode(as.numeric(ces19web$pes19_populism_8), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 6=0.5; else=NA")
 #checks
-table(ces19web$efficacy_rich)
+#table(ces19web$efficacy_rich)
 table(ces19web$efficacy_rich, ces19web$pes19_populism_8)
 
 #recode Break Promise (pes19_keepromises)
 look_for(ces19web, "promise")
-ces19web$promise<-Recode(ces19web$pes19_keepromises, "1=0; 2=0.5; 3=1; 4=1; 5=0.5; else=NA", as.numeric=T)
-val_labels(ces19web$promise)<-c(low=0, high=1)
+ces19web$promise<-Recode(as.numeric(ces19web$pes19_keepromises), "1=0; 2=0.5; 3=1; 4=1; 5=0.5; else=NA", as.numeric=T)
+#val_labels(ces19web$promise)<-c(low=0, high=1)
 #checks
-val_labels(ces19web$promise)
-table(ces19web$promise)
-table(ces19web$promise, ces19web$pes19_keepromises , useNA = "ifany" )
+#val_labels(ces19web$promise)
+#table(ces19web$promise)
+#table(ces19web$promise, ces19web$pes19_keepromises , useNA = "ifany" )
 
 #recode Trust (pes19_trust)
 look_for(ces19web, "trust")
 ces19web$trust<-Recode(ces19web$pes19_trust, "1=1; 2=0; else=NA", as.numeric=T)
 val_labels(ces19web$trust)<-c(no=0, yes=1)
 #checks
-val_labels(ces19web$trust)
+#val_labels(ces19web$trust)
 # table(ces19web$trust)
 # table(ces19web$trust, ces19web$pes19_trust , useNA = "ifany" )
 
 # Save the file
-save(ces0411, file=here("data/ces0411.rda"))
+save(ces19web, file=here("data/ces19web.rda"))

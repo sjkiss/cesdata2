@@ -1,10 +1,13 @@
 Package: cesdata2
 Type: Package
-Title: Stores CES Data Files for Simon Kiss' Private Use
-Version: 0.1.0
-Author: Simon Kiss
+Title: CESDATA2
+Authors@R: c(
+    person("Simon", "Kiss", email = "skiss@wlu.ca", role = "cre"),
+    person("Matthew", "Polacko", email = "matt.polacko@utoronto.ca", role = "aut"),
+    person("Peter Graefe", role = c("aut")))
 Maintainer: Simon Kiss <skiss@wlu.ca>
-Description: I am trying to find a way to store all these CES data files that I always use in an efficient way. 
+Description: Test.
+Version: 0.0.1
 License: GPU
 Encoding: UTF-8
 LazyData: true

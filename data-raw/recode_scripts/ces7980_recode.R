@@ -5,18 +5,14 @@ library(labelled)
 library(here)
 library(haven)
 #load data
-if (!file.exists(here("data/ces7980.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces7980<-read_sav(file=here("data-raw/1974_1979_1980.sav"))
-} else {
-  load("data/ces7980.rda")
-}
+ces7980<-read_sav(file=here("data-raw/1974_1979_1980.sav"))
+
 #recode Gender (V1537)
 # look_for(ces7980, "sex")
-# table(ces7980$V1537, ces7980$V4008)
+table(ces7980$V1537, ces7980$V4008)
 ces7980$male<-Recode(ces7980$V1537, "1=1; 2=0; 0=NA")
 val_labels(ces7980$male)<-c(Female=0, Male=1)
-
+table(ces7980$male)
 #checks
 val_labels(ces7980$male)
 # table(ces7980$male)
@@ -76,7 +72,7 @@ val_labels(ces7980$quebec)
 
 #recode Age (V1535)
 # look_for(ces7980, "age")
-ces7980$age<-ces7980$V1535
+#ces7980$age<-ces7980$V1535
 ces7980$age<-Recode(ces7980$V1535, "0=NA")
 #check
 # table(ces7980$age)
@@ -199,52 +195,52 @@ val_labels(ces7980$income_tertile)
 #recode Religiosity (V1507)
 # look_for(ces7980, "church")
 ces7980$religiosity<-Recode(ces7980$V1507, "5:9=1; 4=2; 3=3; 2=4; 1=5; else=NA")
-val_labels(ces7980$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces7980$religiosity)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces7980$religiosity)
 # table(ces7980$religiosity)
 
 #recode Liberal leader (V1261)
 # look_for(ces7980, "Trudeau")
-ces7980$liberal_leader<-Recode(ces7980$V1261, "0=NA")
+ces7980$liberal_leader<-Recode(as.numeric(ces7980$V1261), "0=NA")
 #checks
 # table(ces7980$liberal_leader)
 
 #recode conservative leader (V1264)
 # look_for(ces7980, "Clark")
 
-ces7980$conservative_leader<-Recode(ces7980$V1264, "0=NA")
+ces7980$conservative_leader<-Recode(as.numeric(ces7980$V1264), "0=NA")
 #checks
 # table(ces7980$conservative_leader)
 
 #recode NDP leader (V1267)
 # look_for(ces7980, "Broadbent")
-ces7980$ndp_leader<-Recode(ces7980$V1267, "0=NA")
+ces7980$ndp_leader<-Recode(as.numeric(ces7980$V1267), "0=NA")
 #checks
 # table(ces7980$ndp_leader)
 
 #recode liberal rating (V1263)
 # look_for(ces7980, "therm")
-ces7980$liberal_rating<-Recode(ces7980$V1263, "0=NA")
+ces7980$liberal_rating<-Recode(as.numeric(ces7980$V1263), "0=NA")
 #checks
 # table(ces7980$liberal_rating)
 
 #recode conservative rating (V1266)
 # look_for(ces7980, "therm")
-ces7980$conservative_rating<-Recode(ces7980$V1266, "0=NA")
+ces7980$conservative_rating<-Recode(as.numeric(ces7980$V1266), "0=NA")
 #checks
 # table(ces7980$conservative_rating)
 
 #recode NDP rating (V1269)
 # look_for(ces7980, "therm")
-ces7980$ndp_rating<-Recode(ces7980$V1269, "0=NA")
+ces7980$ndp_rating<-Recode(as.numeric(ces7980$V1269), "0=NA")
 #checks
 # table(ces7980$ndp_rating)
 
 #recode Ideology (V1406)
 # look_for(ces7980, "self")
-ces7980$ideology<-Recode(ces7980$V1406 , "1=0; 2=0.125; 3=0.25; 4=0.375; 5=0.5; 6=0.625; 7=0.75; 8=0.875; 9=1; else=NA")
-val_labels(ces7980$ideology)<-c(Left=0, Right=1)
+ces7980$ideology<-Recode(as.numeric(ces7980$V1406) , "1=0; 2=0.125; 3=0.25; 4=0.375; 5=0.5; 6=0.625; 7=0.75; 8=0.875; 9=1; else=NA")
+#val_labels(ces7980$ideology)<-c(Left=0, Right=1)
 #checks
 val_labels(ces7980$ideology)
 # table(ces7980$ideology, ces7980$V1406  , useNA = "ifany")
@@ -261,17 +257,17 @@ val_labels(ces7980$turnout)
 #### recode political efficacy ####
 #recode No Say (V1044)
 # look_for(ces7980, "no say")
-ces7980$efficacy_internal<-Recode(ces7980$V1044, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
-val_labels(ces7980$efficacy_internal)<-c(low=0, high=1)
+ces7980$efficacy_internal<-Recode(as.numeric(ces7980$V1044), "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+#val_labels(ces7980$efficacy_internal)<-c(low=0, high=1)
 #checks
-val_labels(ces7980$efficacy_internal)
+#val_labels(ces7980$efficacy_internal)
 # table(ces7980$efficacy_internal)
 # table(ces7980$efficacy_internal, ces7980$V24 , useNA = "ifany" )
 
 #recode MPs lose touch (V1041)
 # look_for(ces7980, "lose touch")
-ces7980$efficacy_external<-Recode(ces7980$V1041, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
-val_labels(ces7980$efficacy_external)<-c(low=0, high=1)
+ces7980$efficacy_external<-Recode(as.numeric(ces7980$V1041), "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+#val_labels(ces7980$efficacy_external)<-c(low=0, high=1)
 #checks
 val_labels(ces7980$efficacy_external)
 # table(ces7980$efficacy_external)
@@ -279,10 +275,10 @@ val_labels(ces7980$efficacy_external)
 
 #recode Official Don't Care (V1042)
 # look_for(ces7980, "doesn't care")
-ces7980$efficacy_external2<-Recode(ces7980$V1042, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
-val_labels(ces7980$efficacy_external2)<-c(low=0, high=1)
+ces7980$efficacy_external2<-Recode(as.numeric(ces7980$V1042), "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+#val_labels(ces7980$efficacy_external2)<-c(low=0, high=1)
 #checks
-val_labels(ces7980$efficacy_external2)
+#val_labels(ces7980$efficacy_external2)
 # table(ces7980$efficacy_external2)
 # table(ces7980$efficacy_external2, ces7980$V22 , useNA = "ifany" )
 
@@ -293,7 +289,7 @@ ces7980 %>%
   select(starts_with("efficacy")) %>%
   summary()
 #Check distribution of political_efficacy
-qplot(ces7980$political_efficacy, geom="histogram")
+#qplot(ces7980$political_efficacy, geom="histogram")
 # table(ces7980$political_efficacy, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -408,37 +404,37 @@ val_labels(ces7980$vote80)
 
 #recode Liberal leader (V2080)
 # look_for(ces7980, "Trudeau")
-ces7980$liberal_leader80<-Recode(ces7980$V2080, "0=NA")
+ces7980$liberal_leader80<-Recode(as.numeric(ces7980$V2080), "0=NA")
 #checks
 # table(ces7980$liberal_leader80)
 
 #recode conservative leader (V2083)
 # look_for(ces7980, "Clark")
-ces7980$conservative_leader80<-Recode(ces7980$V2083, "0=NA")
+ces7980$conservative_leader80<-Recode(as.numeric(ces7980$V2083), "0=NA")
 #checks
 # table(ces7980$conservative_leader80)
 
 #recode NDP leader (V2086)
 # look_for(ces7980, "Broadbent")
-ces7980$ndp_leader80<-Recode(ces7980$V2086, "0=NA")
+ces7980$ndp_leader80<-Recode(as.numeric(ces7980$V2086), "0=NA")
 #checks
 # table(ces7980$ndp_leader80)
 
 #recode liberal rating (V2082)
 # look_for(ces7980, "therm")
-ces7980$liberal_rating80<-Recode(ces7980$V2082, "0=NA")
+ces7980$liberal_rating80<-Recode(as.numeric(ces7980$V2082), "0=NA")
 #checks
 # table(ces7980$liberal_rating80)
 
 #recode conservative rating (V2085)
 # look_for(ces7980, "therm")
-ces7980$conservative_rating80<-Recode(ces7980$V2085, "0=NA")
+ces7980$conservative_rating80<-Recode(as.numeric(ces7980$V2085), "0=NA")
 #checks
 # table(ces7980$conservative_rating80)
 
 #recode NDP rating (V2088)
 # look_for(ces7980, "therm")
-ces7980$ndp_rating80<-Recode(ces7980$V2088, "0=NA")
+ces7980$ndp_rating80<-Recode(as.numeric(ces7980$V2088), "0=NA")
 #checks
 # table(ces7980$ndp_rating80)
 
@@ -447,7 +443,7 @@ ces7980$ndp_rating80<-Recode(ces7980$V2088, "0=NA")
 ces7980$turnout80<-Recode(ces7980$V2061, "1=1; 2=0;  8=0; else=NA")
 val_labels(ces7980$turnout80)<-c(No=0, Yes=1)
 #checks
-val_labels(ces7980$turnout80)
+#val_labels(ces7980$turnout80)
 # table(ces7980$turnout80)
 # table(ces7980$turnout80, ces7980$vote80)
 
@@ -480,4 +476,5 @@ ces7980$redistribution<-rep(NA, nrow(ces7980))
 ces7980$market_liberalism<-rep(NA, nrow(ces7980))
 ces7980$traditionalism2<-rep(NA, nrow(ces7980))
 ces7980$immigration_rates<-rep(NA, nrow(ces7980))
+
 save(ces7980, file=here("data/ces7980.rda"))

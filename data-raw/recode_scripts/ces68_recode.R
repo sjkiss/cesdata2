@@ -5,12 +5,9 @@ library(labelled)
 library(here)
 library(haven)
 #load data
-if (!file.exists(here("data/ces68.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces68<-read_dta(file=here("data-raw/ces1968.dta"))
-} else {
-  load("data/ces68.rda")
-}
+
+ces68<-read_dta(file=here("data-raw/ces1968.dta"))
+
 
 #recode Gender (var401)
 # look_for(ces68, "sex")
@@ -155,7 +152,7 @@ val_labels(ces68$occupation)
 
 # look_for(ces68, "income")
 ces68$income<-Recode(ces68$var404, "1:3=1; 4:5=2; 6:7=3; 8:9=4; 0=5; else=NA")
-val_labels(ces68$income)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces68$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces68$income)
 # table(ces68$income)
@@ -202,53 +199,53 @@ val_labels(ces68$size)
 #recode Religiosity (var341)
 # look_for(ces68, "church")
 ces68$religiosity<-Recode(ces68$var341, "5=1; 4=2; 3=3; 2=4; 1=5; else=NA")
-val_labels(ces68$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces68$religiosity)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces68$religiosity)
 # table(ces68$religiosity)
 
 #recode Liberal leader (var208)
 # look_for(ces68, "Trudeau")
-ces68$liberal_leader<-Recode(ces68$var208, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+ces68$liberal_leader<-Recode(as.numeric(ces68$var208), "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
 #checks
 # table(ces68$liberal_leader)
 
 #recode conservative leader (var209)
 # look_for(ces68, "Stanfield")
-ces68$conservative_leader<-Recode(ces68$var209, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+ces68$conservative_leader<-Recode(as.numeric(ces68$var209), "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
 #checks
 # table(ces68$conservative_leader)
 
 #recode NDP leader (var210)
 # look_for(ces68, "Douglas")
-ces68$ndp_leader<-Recode(ces68$var210, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+ces68$ndp_leader<-Recode(as.numeric(ces68$var210), "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
 #checks
 # table(ces68$ndp_leader)
 
 #recode liberal rating (var223)
 # look_for(ces68, "liberal")
-ces68$liberal_rating<-Recode(ces68$var223, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+ces68$liberal_rating<-Recode(as.numeric(ces68$var223), "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
 #checks
 # table(ces68$liberal_rating)
 
 #recode conservative rating (var224)
 # look_for(ces68, "conservative")
-ces68$conservative_rating<-Recode(ces68$var224, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+ces68$conservative_rating<-Recode(as.numeric(ces68$var224), "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
 #checks
 # table(ces68$conservative_rating)
 
 #recode NDP rating (var225)
 # look_for(ces68, "ndp")
-ces68$ndp_rating<-Recode(ces68$var225, "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
+ces68$ndp_rating<-Recode(as.numeric(ces68$var225), "2=10; 3=20; 4=30; 5=40; 6=50; 7=60; 8=70; 9=80; 10=90; 11=100; else=NA")
 #checks
 # table(ces68$ndp_rating)
 
 #recode Personal Retrospective (var113)
 # look_for(ces68, "financial")
-ces68$personal_retrospective<-Recode(ces68$var113, "1=1; 2=0; 3=0.5; 4=0.5; else=NA", as.numeric=T)
-val_labels(ces68$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces68$personal_retrospective<-Recode(as.numeric(ces68$var113), "1=1; 2=0; 3=0.5; 4=0.5; else=NA", as.numeric=T)
+#val_labels(ces68$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
-val_labels(ces68$personal_retrospective)
+#val_labels(ces68$personal_retrospective)
 # table(ces68$personal_retrospective, ces68$var113 , useNA = "ifany" )
 
 #recode turnout (var179)
@@ -263,8 +260,8 @@ val_labels(ces68$turnout)
 #### recode political efficacy ####
 #recode No Say (var089)
 # look_for(ces68, "no say")
-ces68$efficacy_internal<-Recode(ces68$var089, "1=0; 2=1; 3=0.5; else=NA", as.numeric=T)
-val_labels(ces68$efficacy_internal)<-c(low=0, high=1)
+ces68$efficacy_internal<-Recode(as.numeric(ces68$var089), "1=0; 2=1; 3=0.5; else=NA", as.numeric=T)
+#val_labels(ces68$efficacy_internal)<-c(low=0, high=1)
 #checks
 val_labels(ces68$efficacy_internal)
 # table(ces68$efficacy_internal)
@@ -272,19 +269,19 @@ val_labels(ces68$efficacy_internal)
 
 #recode MPs lose touch (var090)
 # look_for(ces68, "touch")
-ces68$efficacy_external<-Recode(ces68$var090, "1=0; 2=1; 3=0.5; else=NA", as.numeric=T)
-val_labels(ces68$efficacy_external)<-c(low=0, high=1)
+ces68$efficacy_external<-Recode(as.numeric(ces68$var090), "1=0; 2=1; 3=0.5; else=NA", as.numeric=T)
+#val_labels(ces68$efficacy_external)<-c(low=0, high=1)
 #checks
-val_labels(ces68$efficacy_external)
+#val_labels(ces68$efficacy_external)
 # table(ces68$efficacy_external)
 # table(ces68$efficacy_external, ces68$var090 , useNA = "ifany" )
 
 #recode Official Don't Care (var087)
 # look_for(ces68, "don't care")
-ces68$efficacy_external2<-Recode(ces68$var087, "1=0; 2=1; 3=0.5; else=NA", as.numeric=T)
-val_labels(ces68$efficacy_external2)<-c(low=0, high=1)
+ces68$efficacy_external2<-Recode(as.numeric(ces68$var087), "1=0; 2=1; 3=0.5; else=NA", as.numeric=T)
+#val_labels(ces68$efficacy_external2)<-c(low=0, high=1)
 #checks
-val_labels(ces68$efficacy_external2)
+#val_labels(ces68$efficacy_external2)
 # table(ces68$efficacy_external2)
 # table(ces68$efficacy_external2, ces68$var087 , useNA = "ifany" )
 
@@ -298,22 +295,12 @@ ces68 %>%
 # qplot(ces68$political_efficacy, geom="histogram")
 # table(ces68$political_efficacy, useNA="ifany")
 
-#Calculate Cronbach's alpha
-library(psych)
-ces68 %>%
-  select(efficacy_external, efficacy_external2, efficacy_internal) %>%
-  psych::alpha(.)
-#Check correlation
-ces68 %>%
-  select(efficacy_external, efficacy_external2, efficacy_internal) %>%
-  cor(., use="complete.obs")
-
 #recode foreign born (var352)
 # look_for(ces68, "born")
 ces68$foreign<-Recode(ces68$var352, "1=0; 2:11=1; else=NA")
 val_labels(ces68$foreign)<-c(No=0, Yes=1)
 #checks
-val_labels(ces68$foreign)
+#val_labels(ces68$foreign)
 # table(ces68$foreign, ces68$var352, useNA="ifany")
 
 #recode Most Important Question (var031)

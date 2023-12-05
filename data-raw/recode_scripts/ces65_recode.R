@@ -5,12 +5,8 @@ library(labelled)
 library(here)
 library(haven)
 #load data
-if (!file.exists(here("data/ces65.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces65<-read_dta(file=here("data-raw/ces1965.dta"))
-} else {
-  load("data/ces65.rda")
-}
+ces65<-read_dta(file=here("data-raw/ces1965.dta"))
+
 #recode Gender (v337)
 # look_for(ces65, "sex")
 ces65$male<-Recode(ces65$v337, "1=1; 2=0")
@@ -145,17 +141,17 @@ val_labels(ces65$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
 #recode Religiosity (v310)
 # look_for(ces65, "church")
 ces65$religiosity<-Recode(ces65$v310, "5=1; 4=2; 3=3; 2=4; 1=5; else=NA")
-val_labels(ces65$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces65$religiosity)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces65$religiosity)
 # table(ces65$religiosity)
 
 #recode Personal Retrospective (v49)
 # look_for(ces65, "situation")
-ces65$personal_retrospective<-Recode(ces65$v49, "1=1; 2=0; 3=0.5; else=NA", as.numeric=T)
-val_labels(ces65$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces65$personal_retrospective<-Recode(as.numeric(ces65$v49), "1=1; 2=0; 3=0.5; else=NA", as.numeric=T)
+#val_labels(ces65$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
-val_labels(ces65$personal_retrospective)
+#val_labels(ces65$personal_retrospective)
 # table(ces65$personal_retrospective, ces65$v49 , useNA = "ifany" )
 
 #recode turnout (v262)
@@ -170,28 +166,28 @@ val_labels(ces65$turnout)
 #### recode political efficacy ####
 #recode No Say (v45)
 # look_for(ces65, "political power")
-ces65$efficacy_internal<-Recode(ces65$v45, "1=0; 2=1; else=NA", as.numeric=T)
-val_labels(ces65$efficacy_internal)<-c(low=0, high=1)
+ces65$efficacy_internal<-Recode(as.numeric(ces65$v45), "1=0; 2=1; else=NA", as.numeric=T)
+#val_labels(ces65$efficacy_internal)<-c(low=0, high=1)
 #checks
-val_labels(ces65$efficacy_internal)
+#val_labels(ces65$efficacy_internal)
 # table(ces65$efficacy_internal)
 # table(ces65$efficacy_internal, ces65$v45 , useNA = "ifany" )
 
 #recode MPs lose touch (v46)
 # look_for(ces65, "lose touch")
-ces65$efficacy_external<-Recode(ces65$v46, "1=0; 2=1; else=NA", as.numeric=T)
-val_labels(ces65$efficacy_external)<-c(low=0, high=1)
+ces65$efficacy_external<-Recode(as.numeric(ces65$v46), "1=0; 2=1; else=NA", as.numeric=T)
+#val_labels(ces65$efficacy_external)<-c(low=0, high=1)
 #checks
-val_labels(ces65$efficacy_external)
+#val_labels(ces65$efficacy_external)
 # table(ces65$efficacy_external)
 # table(ces65$efficacy_external, ces65$v46 , useNA = "ifany" )
 
 #recode Official Don't Care (v43)
 # look_for(ces65, "don't care")
-ces65$efficacy_external2<-Recode(ces65$v43, "1=0; 2=1; else=NA", as.numeric=T)
-val_labels(ces65$efficacy_external2)<-c(low=0, high=1)
+ces65$efficacy_external2<-Recode(as.numeric(ces65$v43), "1=0; 2=1; else=NA", as.numeric=T)
+#val_labels(ces65$efficacy_external2)<-c(low=0, high=1)
 #checks
-val_labels(ces65$efficacy_external2)
+#val_labels(ces65$efficacy_external2)
 # table(ces65$efficacy_external2)
 # table(ces65$efficacy_external2, ces65$v43 , useNA = "ifany" )
 
@@ -202,7 +198,7 @@ ces65 %>%
   select(starts_with("efficacy")) %>%
   summary()
 #Check distribution of political_efficacy
-qplot(ces65$political_efficacy, geom="histogram")
+#qplot(ces65$political_efficacy, geom="histogram")
 # table(ces65$political_efficacy, useNA="ifany")
 
 #Calculate Cronbach's alpha

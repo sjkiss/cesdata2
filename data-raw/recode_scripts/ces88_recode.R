@@ -5,12 +5,8 @@ library(labelled)
 library(here)
 library(haven)
 #load data
-if (!file.exists(here("data/ces88.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces88<-read_sav(file=here("data-raw/CES1988.sav"))
-} else {
-  load("data/ces88.rda")
-}
+ces88<-read_sav(file=here("data-raw/CES1988.sav"))
+
 
 #recode Gender (rsex)
 # look_for(ces88, "sex")
@@ -37,7 +33,7 @@ val_labels(ces88$union_both)
 #recode Education (n3)
 # look_for(ces88, "education")
 ces88$degree<-Recode(ces88$n3, "9:11=1; 1:8=0; else=NA")
-val_labels(ces88$degree)<-c(`No degree`=0, degree=1)
+val_labels(ces88$degree)<-c(nodegree=0, degree=1)
 #checks
 val_labels(ces88$degree)
 # table(ces88$degree)
@@ -192,8 +188,8 @@ val_labels(ces88$religiosity)
 # look_for(ces88, "regulation")
 ces88$qc13
 ces88$qc2
-ces88$market1<-Recode(ces88$qc13, "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
-ces88$market2<-Recode(ces88$qc2, "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
+ces88$market1<-Recode(as.numeric(ces88$qc13), "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
+ces88$market2<-Recode(as.numeric(ces88$qc2), "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
 
 
 #checks
@@ -220,7 +216,7 @@ ces88 %>%
   select(starts_with("market")) %>%
   summary()
 #Check distribution of market_liberalism
-qplot(ces88$market_liberalism, geom="histogram")
+#qplot(ces88$market_liberalism, geom="histogram")
 # table(ces88$market_liberalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -239,9 +235,9 @@ qplot(ces88$market_liberalism, geom="histogram")
 ces88$xk2
 # table(ces88$xk2, useNA = "ifany")
 # table(ces88$qc16, useNA="ifany")
-val_labels(ces88$xk2)
-ces88$redistro1<-Recode(ces88$xk2, "1=1; 3=0.5; 5=0; 8=0.5; else=NA", as.numeric=T)
-ces88$redistro2<-Recode(ces88$qc16, "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces88$xk2)
+ces88$redistro1<-Recode(as.numeric(ces88$xk2), "1=1; 3=0.5; 5=0; 8=0.5; else=NA", as.numeric=T)
+ces88$redistro2<-Recode(as.numeric(ces88$qc16), "1=1; 2=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
 
 #checks
 # table(ces88$redistro1, ces88$xk2)
@@ -268,7 +264,7 @@ ces88 %>%
   select(starts_with("redistr")) %>%
   summary()
 #Check distribution of market_liberalism
-qplot(ces88$redistribution, geom="histogram")
+#qplot(ces88$redistribution, geom="histogram")
 # table(ces88$redistribution, useNA="ifany")
 
 # #Calculate Cronbach's alpha
@@ -290,9 +286,9 @@ val_labels(ces88$pro_redistribution)
 #recode Immigration (l5, qf2, gf10) (Left-Right)
 # look_for(ces88, "imm")
 ces88$l5
-ces88$immigration_rates<-Recode(ces88$l5, "1=0; 3=0.5; 5=1; 8=0.5; else=NA", as.numeric=T)
-ces88$immigration_better<-Recode(ces88$qf2, "1=0; 2=1; 8=0.5; else=NA", as.numeric=T)
-ces88$immigration_encourage<-Recode(ces88$qf10, "1=0; 2=1; 8=0.5; else=NA", as.numeric=T)
+ces88$immigration_rates<-Recode(as.numeric(ces88$l5), "1=0; 3=0.5; 5=1; 8=0.5; else=NA", as.numeric=T)
+ces88$immigration_better<-Recode(as.numeric(ces88$qf2), "1=0; 2=1; 8=0.5; else=NA", as.numeric=T)
+ces88$immigration_encourage<-Recode(as.numeric(ces88$qf10), "1=0; 2=1; 8=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces88$immigration_rates, ces88$l5 , useNA = "ifany" )
 # table(ces88$immigration_better, ces88$qf2 , useNA = "ifany" )
@@ -331,14 +327,14 @@ ces88 %>%
 
 #recode Environment (qf9) (Left-Right)
 # look_for(ces88, "env")
-ces88$enviro<-Recode(ces88$qf9, "1=0; 2=1; 8=0.5; else=NA")
+ces88$enviro<-Recode(as.numeric(ces88$qf9), "1=0; 2=1; 8=0.5; else=NA")
 #checks
 # table(ces88$enviro, ces88$qf9) #No one had 8
 
 #recode Capital Punishment (qf1) (Left-Right)
 # look_for(ces88, "punish")
 ces88$qf1
-ces88$death_penalty<-Recode(ces88$qf1, "1=0; 2=1; 8=0.5; else=NA")
+ces88$death_penalty<-Recode(as.numeric(ces88$qf1), "1=0; 2=1; 8=0.5; else=NA")
 #checks
 # table(ces88$death_penalty, ces88$qf1)
 
@@ -349,7 +345,7 @@ library(skpersonal)
 
 #ces88$crime<-skpersonal::revScale(as.numeric(ces88$qh11), reverse=T)
 #First reverse code item so that 12 is most important and 1 is least important
-ces88$crime<-Recode(ces88$qh11, "12=1;
+ces88$crime<-Recode(as.numeric(ces88$qh11), "12=1;
        11=2;
        10=3;
        9=4;
@@ -374,7 +370,7 @@ summary(ces88$qh11)
 
 #recode Gay Rights (qe9) (Left-Right)
 # look_for(ces88, "homo")
-ces88$gay_rights<-Recode(ces88$qe9, "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
+ces88$gay_rights<-Recode(as.numeric(ces88$qe9), "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
 #checks
 # table(ces88$gay_rights)
 
@@ -394,7 +390,7 @@ ces88 %>%
 
 #recode Censorship (qa10) (Left-Right)
 # look_for(ces88, "porn")
-ces88$censorship<-Recode(ces88$qa10, "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
+ces88$censorship<-Recode(as.numeric(ces88$qa10), "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
 #checks
 # table(ces88$censorship)
 
@@ -448,7 +444,7 @@ ces88 %>%
   select(starts_with("trad")) %>%
   summary()
 #Check distribution of traditionalism
-qplot(ces88$traditionalism2, geom="histogram")
+#qplot(ces88$traditionalism2, geom="histogram")
 # table(ces88$traditionalism2, useNA="ifany")
 
 # #Calculate Cronbach's alpha
@@ -489,7 +485,7 @@ ces88 %>%
   select(starts_with("author")) %>%
   summary()
 #Check distribution of traditionalism
-qplot(ces88$authoritarianism, geom="histogram")
+#qplot(ces88$authoritarianism, geom="histogram")
 # table(ces88$authoritarianism, useNA="ifany")
 
 # #Calculate Cronbach's alpha
@@ -504,72 +500,72 @@ qplot(ces88$authoritarianism, geom="histogram")
 
 #recode Quebec Accommodation (qa9) (Left=more accom)
 # look_for(ces88, "quebec")
-ces88$quebec_accom<-Recode(ces88$qa9, "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
+ces88$quebec_accom<-Recode(as.numeric(ces88$qa9), "1=1; 2=0; 3=0.5; 8=0.5; else=NA")
 #checks
 # table(ces88$quebec_accom)
 
 
 #recode Liberal leader (xe2b)
 # look_for(ces88, "Turner")
-ces88$liberal_leader<-Recode(ces88$xe2b, "0=1; 997:999=NA")
+ces88$liberal_leader<-Recode(as.numeric(ces88$xe2b), "0=1; 997:999=NA")
 #checks
 # table(ces88$liberal_leader)
 
 #recode conservative leader (xe2a)
 # look_for(ces88, "Mulroney")
-ces88$conservative_leader<-Recode(ces88$xe2a, "0=1; 997:999=NA")
+ces88$conservative_leader<-Recode(as.numeric(ces88$xe2a), "0=1; 997:999=NA")
 #checks
 # table(ces88$conservative_leader)
 
 #recode NDP leader (xe2c)
 # look_for(ces88, "Broadbent")
-ces88$ndp_leader<-Recode(ces88$xe2c, "0=1; 997:999=NA")
+ces88$ndp_leader<-Recode(as.numeric(ces88$xe2c), "0=1; 997:999=NA")
 #checks
 # table(ces88$ndp_leader)
 
 #recode liberal rating (xe2e)
 # look_for(ces88, "liberal")
-ces88$liberal_rating<-Recode(ces88$xe2e, "0=1; 997:999=NA")
+ces88$liberal_rating<-Recode(as.numeric(ces88$xe2e), "0=1; 997:999=NA")
 #checks
 # table(ces88$liberal_rating)
 
 #recode conservative rating (xe2d)
 # look_for(ces88, "conservative")
-ces88$conservative_rating<-Recode(ces88$xe2d, "0=1; 997:999=NA")
+ces88$conservative_rating<-Recode(as.numeric(ces88$xe2d), "0=1; 997:999=NA")
 #checks
 # table(ces88$conservative_rating)
 
 #recode NDP rating (xe2f)
 # look_for(ces88, "new democratic")
-ces88$ndp_rating<-Recode(ces88$xe2f, "0=1; 997:999=NA")
+ces88$ndp_rating<-Recode(as.numeric(ces88$xe2f), "0=1; 997:999=NA")
 #checks
 # table(ces88$ndp_rating)
 
 #recode Education (qb1)
 # look_for(ces88, "edu")
-ces88$education<-Recode(ces88$qb1, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+ces88$education<-Recode(as.numeric(ces88$qb1), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
 # table(ces88$education, ces88$qb1 , useNA = "ifany" )
 
 #recode Personal Retrospective (c1)
 # look_for(ces88, "financ")
-ces88$personal_retrospective<-Recode(ces88$c1, "1=1; 5=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces88$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces88$personal_retrospective<-Recode(as.numeric(ces88$c1), "1=1; 5=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces88$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
-val_labels(ces88$personal_retrospective)
+#val_labels(ces88$personal_retrospective)
 # table(ces88$personal_retrospective, ces88$c1 , useNA = "ifany" )
 
 #recode National Retrospective (g1)
 # look_for(ces88, "economy")
-ces88$national_retrospective<-Recode(ces88$g1, "1=1; 5=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
-val_labels(ces88$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces88$national_retrospective<-Recode(as.numeric(ces88$g1), "1=1; 5=0; 3=0.5; 8=0.5; else=NA", as.numeric=T)
+#val_labels(ces88$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
-val_labels(ces88$national_retrospective)
+#val_labels(ces88$national_retrospective)
 # table(ces88$national_retrospective, ces88$g1 , useNA = "ifany" )
 
 #recode Ideology (h5a)
 # look_for(ces88, "self")
-ces88$ideology<-Recode(ces88$h5a , "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+ces88$ideology<-Recode(as.numeric(ces88$h5a) , "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
 val_labels(ces88$ideology)<-c(Left=0, Right=1)
 #checks
 val_labels(ces88$ideology)
@@ -595,24 +591,24 @@ val_labels(ces88$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
 
 #recode welfare (qb6)
 # look_for(ces88, "welfare")
-ces88$welfare<-Recode(ces88$qb6, "1=1; 2=0.75; 8=0.5; 3=0.25; 4=0; else=NA")
+ces88$welfare<-Recode(as.numeric(ces88$qb6), "1=1; 2=0.75; 8=0.5; 3=0.25; 4=0; else=NA")
 #checks
 # table(ces88$welfare)
 # table(ces88$welfare, ces88$qb6)
 
 #recode Postgrad (n3)
 # look_for(ces88, "education")
-ces88$postgrad<-Recode(ces88$n3, "10:11=1; 1:9=0; else=NA")
+ces88$postgrad<-Recode(as.numeric(ces88$n3), "10:11=1; 1:9=0; else=NA")
 #checks
 # table(ces88$postgrad)
 ces88$authoritarianism
 
 #recode foreign born (n13)
 # look_for(ces88, "birth")
-ces88$foreign<-Recode(ces88$n13, "1=0; 2:21=1; 0=1; else=NA")
+ces88$foreign<-Recode(as.numeric(ces88$n13), "1=0; 2:21=1; 0=1; else=NA")
 val_labels(ces88$foreign)<-c(No=0, Yes=1)
 #checks
-val_labels(ces88$foreign)
+#val_labels(ces88$foreign)
 # table(ces88$foreign, ces88$n13, useNA="ifany")
 
 

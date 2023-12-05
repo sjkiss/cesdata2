@@ -5,12 +5,8 @@ library(labelled)
 library(here)
 library(haven)
 #load data
-if (!file.exists(here("data/ces84.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces84<-read_sav(file=here("data-raw/1984.sav"))
-} else {
-  load("data/ces84.rda")
-}
+ces84<-read_sav(file=here("data-raw/1984.sav"))
+
 
 #recode Gender (VAR456)
 # look_for(ces84, "sex")
@@ -72,6 +68,8 @@ val_labels(ces84$quebec)
 #recode Age (VAR437)
 # look_for(ces84, "age")
 ces84$age<-Recode(ces84$VAR437, "0=NA")
+val_labels(ces84$age)<-NULL
+ces84$age
 #check
 # table(ces84$age)
 
@@ -253,26 +251,26 @@ val_labels(ces84$religiosity)
 
 #recode Liberal leader (VAR301)
 # look_for(ces84, "Turner")
-ces84$liberal_leader<-Recode(ces84$VAR301, "0=1; 997:999=NA")
+ces84$liberal_leader<-Recode(as.numeric(ces84$VAR301), "0=1; 997:999=NA")
 #checks
 # table(ces84$liberal_leader)
 
 #recode conservative leader (VAR302)
 # look_for(ces84, "Mulroney")
-ces84$conservative_leader<-Recode(ces84$VAR302, "0=1; 997:999=NA")
+ces84$conservative_leader<-Recode(as.numeric(ces84$VAR302), "0=1; 997:999=NA")
 #checks
 # table(ces84$conservative_leader)
 
 #recode NDP leader (VAR303)
 # look_for(ces84, "Broadbent")
-ces84$ndp_leader<-Recode(ces84$VAR303, "0=1; 997:999=NA")
+ces84$ndp_leader<-Recode(as.numeric(ces84$VAR303), "0=1; 997:999=NA")
 #checks
 # table(ces84$ndp_leader)
 
 #recode Ideology (VAR507)
 # look_for(ces84, "scale")
-ces84$ideology<-Recode(ces84$VAR507 , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
-val_labels(ces84$ideology)<-c(Left=0, Right=1)
+ces84$ideology<-Recode(as.numeric(ces84$VAR507) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces84$ideology)<-c(Left=0, Right=1)
 #checks
 val_labels(ces84$ideology)
 # table(ces84$ideology, ces84$VAR507  , useNA = "ifany")
@@ -289,28 +287,28 @@ val_labels(ces84$turnout)
 #### recode political efficacy ####
 #recode No Say (VAR032)
 # look_for(ces84, "have any say")
-ces84$efficacy_internal<-Recode(ces84$VAR032, "1=0; 2=0.25; 3=0.75; 4=1; 7=0.5; else=NA", as.numeric=T)
-val_labels(ces84$efficacy_internal)<-c(low=0, high=1)
+ces84$efficacy_internal<-Recode(as.numeric(ces84$VAR032), "1=0; 2=0.25; 3=0.75; 4=1; 7=0.5; else=NA", as.numeric=T)
+#val_labels(ces84$efficacy_internal)<-c(low=0, high=1)
 #checks
-val_labels(ces84$efficacy_internal)
+#val_labels(ces84$efficacy_internal)
 # table(ces84$efficacy_internal)
 # table(ces84$efficacy_internal, ces84$VAR032 , useNA = "ifany" )
 
 #recode MPs lose touch (VAR029)
 # look_for(ces84, "touch")
-ces84$efficacy_external<-Recode(ces84$VAR029, "1=0; 2=0.25; 3=0.75; 4=1; 7=0.5; else=NA", as.numeric=T)
-val_labels(ces84$efficacy_external)<-c(low=0, high=1)
+ces84$efficacy_external<-Recode(as.numeric(ces84$VAR029), "1=0; 2=0.25; 3=0.75; 4=1; 7=0.5; else=NA", as.numeric=T)
+#val_labels(ces84$efficacy_external)<-c(low=0, high=1)
 #checks
-val_labels(ces84$efficacy_external)
+#val_labels(ces84$efficacy_external)
 # table(ces84$efficacy_external)
 # table(ces84$efficacy_external, ces84$VAR029 , useNA = "ifany" )
 
 #recode Official Don't Care (VAR030)
 # look_for(ces84, "doesn't care")
-ces84$efficacy_external2<-Recode(ces84$VAR030, "1=0; 2=0.25; 3=0.75; 4=1; 7=0.5; else=NA", as.numeric=T)
-val_labels(ces84$efficacy_external2)<-c(low=0, high=1)
+ces84$efficacy_external2<-Recode(as.numeric(ces84$VAR030), "1=0; 2=0.25; 3=0.75; 4=1; 7=0.5; else=NA", as.numeric=T)
+#val_labels(ces84$efficacy_external2)<-c(low=0, high=1)
 #checks
-val_labels(ces84$efficacy_external2)
+#val_labels(ces84$efficacy_external2)
 # table(ces84$efficacy_external2)
 # table(ces84$efficacy_external2, ces84$VAR030 , useNA = "ifany" )
 
@@ -325,14 +323,14 @@ ces84 %>%
 # table(ces84$political_efficacy, useNA="ifany")
 
 #Calculate Cronbach's alpha
-library(psych)
-ces84 %>%
-  select(efficacy_external, efficacy_external2, efficacy_internal) %>%
-  psych::alpha(.)
-#Check correlation
-ces84 %>%
-  select(efficacy_external, efficacy_external2, efficacy_internal) %>%
-  cor(., use="complete.obs")
+# library(psych)
+# ces84 %>%
+#   select(efficacy_external, efficacy_external2, efficacy_internal) %>%
+#   psych::alpha(.)
+# #Check correlation
+# ces84 %>%
+#   select(efficacy_external, efficacy_external2, efficacy_internal) %>%
+#   cor(., use="complete.obs")
 
 #recode foreign born (VAR400)
 # look_for(ces84, "birth")

@@ -5,12 +5,9 @@ library(labelled)
 library(here)
 library(haven)
 #load data
-if (!file.exists(here("data/ces74.rda"))) {
-  #If it does not exist read in the original raw data file
-  ces74<-read_sav(file=here("data-raw/1974_1979_1980.sav"))
-} else {
-  load("data/ces74.rda")
-}
+
+ces74<-read_sav(file=here("data-raw/1974_1979_1980.sav"))
+
 #recode Gender (V480)
 # look_for(ces74, "sex")
 ces74$male<-Recode(ces74$V480, "1=1; 2=0; 9=NA")
@@ -77,8 +74,8 @@ val_labels(ces74$religion)
 table(ces74$religion)
 
 #recode Language (V481)
-# look_for(ces74, "language")
-ces74$language<-Recode(ces74$V481, "2=0; 1=1; else=NA")
+#look_for(ces74, "language")
+ces74$language<-Recode(ces74$V471, "2=0; 1=1; else=NA")
 val_labels(ces74$language)<-c(French=0, English=1)
 #checks
 val_labels(ces74$language)
@@ -151,7 +148,7 @@ val_labels(ces74$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, 
 #Simon's Version
 ces74$V479
 ces74$income2<-Recode(ces74$V479, "1:2=1; 3=2; 4=3; 5=4; 7:8=5; else=NA")
-val_labels(ces74$income2)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces74$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 
 
 #recode Income (V479)
@@ -182,37 +179,37 @@ table(ces74$religiosity)
 
 #recode Liberal leader (V188)
 # look_for(ces74, "Trudeau")
-ces74$liberal_leader<-Recode(ces74$V188, "0=NA")
+ces74$liberal_leader<-Recode(as.numeric(ces74$V188), "0=NA")
 #checks
 table(ces74$liberal_leader)
 
 #recode conservative leader (V191)
 # look_for(ces74, "Stanfield")
-ces74$conservative_leader<-Recode(ces74$V191, "0=NA")
+ces74$conservative_leader<-Recode(as.numeric(ces74$V191), "0=NA")
 #checks
 table(ces74$conservative_leader)
 
 #recode NDP leader (V194)
 # look_for(ces74, "Lewis")
-ces74$ndp_leader<-Recode(ces74$V194, "0=NA")
+ces74$ndp_leader<-Recode(as.numeric(ces74$V194), "0=NA")
 #checks
 table(ces74$ndp_leader)
 
 #recode liberal rating (V190)
 # look_for(ces74, "therm")
-ces74$liberal_rating<-Recode(ces74$V190, "0=NA")
+ces74$liberal_rating<-Recode(as.numeric(ces74$V190), "0=NA")
 #checks
 table(ces74$liberal_rating)
 
 #recode conservative rating (V193)
 # look_for(ces74, "therm")
-ces74$conservative_rating<-Recode(ces74$V193, "0=NA")
+ces74$conservative_rating<-Recode(as.numeric(ces74$V193), "0=NA")
 #checks
 table(ces74$conservative_rating)
 
 #recode NDP rating (V196)
 # look_for(ces74, "therm")
-ces74$ndp_rating<-Recode(ces74$V196, "0=NA")
+ces74$ndp_rating<-Recode(as.numeric(ces74$V196), "0=NA")
 #checks
 table(ces74$ndp_rating)
 
@@ -228,17 +225,17 @@ table(ces74$turnout, ces74$vote)
 #### recode political efficacy ####
 #recode No Say (V24)
 # look_for(ces74, "have say")
-ces74$efficacy_internal<-Recode(ces74$V24, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
-val_labels(ces74$efficacy_internal)<-c(low=0, high=1)
+ces74$efficacy_internal<-Recode(as.numeric(ces74$V24), "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+#val_labels(ces74$efficacy_internal)<-c(low=0, high=1)
 #checks
-val_labels(ces74$efficacy_internal)
+#val_labels(ces74$efficacy_internal)
 table(ces74$efficacy_internal)
 table(ces74$efficacy_internal, ces74$V24 , useNA = "ifany" )
 
 #recode MPs lose touch (V21)
 # look_for(ces74, "lose touch")
-ces74$efficacy_external<-Recode(ces74$V21, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
-val_labels(ces74$efficacy_external)<-c(low=0, high=1)
+ces74$efficacy_external<-Recode(as.numeric(ces74$V21), "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+#val_labels(ces74$efficacy_external)<-c(low=0, high=1)
 #checks
 val_labels(ces74$efficacy_external)
 table(ces74$efficacy_external)
@@ -246,8 +243,8 @@ table(ces74$efficacy_external, ces74$V21 , useNA = "ifany" )
 
 #recode Official Don't Care (V22)
 # look_for(ces74, "doesnt care")
-ces74$efficacy_external2<-Recode(ces74$V22, "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
-val_labels(ces74$efficacy_external2)<-c(low=0, high=1)
+ces74$efficacy_external2<-Recode(as.numeric(ces74$V22), "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+#val_labels(ces74$efficacy_external2)<-c(low=0, high=1)
 #checks
 val_labels(ces74$efficacy_external2)
 table(ces74$efficacy_external2)
