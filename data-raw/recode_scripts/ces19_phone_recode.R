@@ -194,7 +194,7 @@ val_labels(ces19phone$q70r)
 #recode Religiosity (q63)
 # look_for(ces19phone, "relig")
 ces19phone$religiosity<-Recode(ces19phone$q63, "4=1; 3=2; -9=3; 2=4; 1=5; else=NA")
-val_labels(ces19phone$religiosity)<-c(Lowest=1, Lower_Middle=2, MIddle=3, Upper_Middle=4, Highest=5)
+val_labels(ces19phone$religiosity)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces19phone$religiosity)
 # table(ces19phone$religiosity)
@@ -244,25 +244,25 @@ val_labels(ces19phone$native)
 # look_for(ces19phone, "immigr")
 ces19phone$p22_a
 ces19phone$immigration_economy<-Recode(as.numeric(ces19phone$p22_a), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
-val_labels(ces19phone$immigration_economy)<-NULL
+#val_labels(ces19phone$immigration_economy)<-NULL
 
 # table(ces19phone$immigration_economy ,ces19phone$p22_a , useNA = "ifany" )
 
 ces19phone$immigration_culture<-Recode(as.numeric(ces19phone$p22_b), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
-val_labels(ces19phone$immigration_culture)<-NULL
+#val_labels(ces19phone$immigration_culture)<-NULL
 
 #checks
 #val_labels(ces19phone$immigration_culture)
 # table(ces19phone$immigration_culture ,ces19phone$p22_b , useNA = "ifany" )
 
 ces19phone$immigration_crime<-Recode(as.numeric(ces19phone$p22_c), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
-val_labels(ces19phone$immigration_crime)<-NULL
+#val_labels(ces19phone$immigration_crime)<-NULL
 #checks
 #val_labels(ces19phone$immigration_crime)
 # table(ces19phone$immigration_crime, ces19phone$p22_c , useNA = "ifany" )
 
 ces19phone$immigration_rate<-Recode(as.numeric(ces19phone$q39), "1=1; 2=0; 3=0.5; -9=0.5; else=NA", as.numeric=T)
-val_labels(ces19phone$immigration_rate)<-NULL
+#val_labels(ces19phone$immigration_rate)<-NULL
 #checks
 #val_labels(ces19phone$immigration_rate)
 # table(ces19phone$immigration_rate, ces19phone$q39 , useNA = "ifany" )
@@ -271,7 +271,7 @@ val_labels(ces19phone$immigration_rate)<-NULL
 #1 = pro-racial minority sentiment 0 = anti-racial minority sentiment
 # look_for(ces19phone, "minor")
 ces19phone$minorities_culture<-Recode(as.numeric(ces19phone$p21_a), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
-val_labels(ces19phone$minorities_culture)<-NULL
+#val_labels(ces19phone$minorities_culture)<-NULL
 
 # table(ces19phone$minorities_culture, ces19phone$p21_a , useNA = "ifany" )
 
@@ -352,55 +352,55 @@ val_labels(ces19phone$past_vote)
 # table(ces19phone$Francois_Blanchet)
 
 #recode Liberal leader (q20)
-ces19phone$liberal_leader<-Recode(ces19phone$q20, "0=1; -9:-6=NA")
-val_labels(ces19phone$liberal_leader)<-NULL
+ces19phone$liberal_leader<-Recode(as.numeric(ces19phone$q20), "0=1; -9:-6=NA")
+#val_labels(ces19phone$liberal_leader)<-NULL
 #checks
 #table(ces19phone$Trudeau19)
 #ces19phone$liberal_leader<-(ces19phone$Trudeau19 /100)
 # table(ces19phone$liberal_leader)
 
 #recode Conservative leader (q21)
-ces19phone$conservative_leader<-Recode(ces19phone$q21, "0=1; -9:-6=NA")
-val_labels(ces19phone$conservative_leader)<-NULL
+ces19phone$conservative_leader<-Recode(as.numeric(ces19phone$q21), "0=1; -9:-6=NA")
+#val_labels(ces19phone$conservative_leader)<-NULL
 #checks
 #table(ces19phone$Scheer19)
 #ces19phone$conservative_leader<-(ces19phone$Scheer19 /100)
 # table(ces19phone$conservative_leader)
 
 #recode NDP leader (q22)
-ces19phone$ndp_leader<-Recode(ces19phone$q22, "0=1; -9:-6=NA")
-val_labels(ces19phone$ndp_leader)<-NULL
+ces19phone$ndp_leader<-Recode(as.numeric(ces19phone$q22), "0=1; -9:-6=NA")
+#val_labels(ces19phone$ndp_leader)<-NULL
 #checks
 #table(ces19phone$Singh19)
 #ces19phone$ndp_leader<-(ces19phone$Singh19 /100)
 # table(ces19phone$ndp_leader)
 
 #recode Bloc leader (q23)
-ces19phone$bloc_leader<-Recode(ces19phone$q23, "0=1; -9:-6=NA")
-val_labels(ces19phone$bloc_leader)<-NULL
+ces19phone$bloc_leader<-Recode(as.numeric(ces19phone$q23), "0=1; -9:-6=NA")
+#val_labels(ces19phone$bloc_leader)<-NULL
 #checks
 #table(ces19phone$Blanchet19)
 #ces19phone$bloc_leader<-(ces19phone$Blanchet19 /100)
 # table(ces19phone$bloc_leader)
 
 #recode Green leader (q24)
-ces19phone$green_leader<-Recode(ces19phone$q24, "0=1; -9:-6=NA")
-val_labels(ces19phone$green_leader)<-NULL
+ces19phone$green_leader<-Recode(as.numeric(ces19phone$q24), "0=1; -9:-6=NA")
+#val_labels(ces19phone$green_leader)<-NULL
 #checks
 # table(ces19phone$green_leader)
 
 #recode Environment (q27_b)
 # look_for(ces19phone, "enviro")
-ces19phone$environment<-Recode(ces19phone$q27_b, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
-val_labels(ces19phone$environment)<-NULL
+ces19phone$environment<-Recode(as.numeric(ces19phone$q27_b), "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
+#val_labels(ces19phone$environment)<-NULL
 #checks
 val_labels(ces19phone$environment)
 # table(ces19phone$environment, ces19phone$q27_b , useNA = "ifany" )
 
 #recode Redistribution (p44)
 # look_for(ces19phone, "rich")
-ces19phone$redistribution<-Recode(ces19phone$p44, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
-val_labels(ces19phone$redistribution)<-NULL
+ces19phone$redistribution<-Recode(as.numeric(ces19phone$p44), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+#val_labels(ces19phone$redistribution)<-NULL
 #checks
 val_labels(ces19phone$redistribution)
 # table(ces19phone$redistribution)
@@ -414,46 +414,46 @@ val_labels(ces19phone$pro_redistribution)
 
 #recode Liberal rating (q14)
 # look_for(ces19phone, "Liberal")
-ces19phone$Liberal_therm<-Recode(ces19phone$q14, "996=NA; 998=NA; 999=NA")
+ces19phone$Liberal_therm<-Recode(as.numeric(ces19phone$q14), "996=NA; 998=NA; 999=NA")
 
 #checks
 # table(ces19phone$Liberal_therm)
 ces19phone$Liberal_rating<-(ces19phone$Liberal_therm /100)
 # table(ces19phone$Liberal_rating)
 
-ces19phone$liberal_rating<-Recode(ces19phone$q14, "0=1; -9:-6=NA")
+ces19phone$liberal_rating<-Recode(as.numeric(ces19phone$q14), "0=1; -9:-6=NA")
 # table(ces19phone$liberal_rating)
 
 #recode Conservative rating (q15)
 # look_for(ces19phone, "Conservative")
-ces19phone$Conservative_therm<-Recode(ces19phone$q15, "996=NA; 998=NA; 999=NA")
+ces19phone$Conservative_therm<-Recode(as.numeric(ces19phone$q15), "996=NA; 998=NA; 999=NA")
 #checks
 # table(ces19phone$Conservative_therm)
 ces19phone$Conservative_rating<-(ces19phone$Conservative_therm /100)
 # table(ces19phone$Conservative_rating)
 
-ces19phone$conservative_rating<-Recode(ces19phone$q15, "0=1; -9:-6=NA")
+ces19phone$conservative_rating<-Recode(as.numeric(ces19phone$q15), "0=1; -9:-6=NA")
 # table(ces19phone$conservative_rating)
 
 #recode NDP rating (q16)
 # look_for(ces19phone, "NDP")
-ces19phone$NDP_therm<-Recode(ces19phone$q16, "-6=NA; -8=NA; -9=NA")
+ces19phone$NDP_therm<-Recode(as.numeric(ces19phone$q16), "-6=NA; -8=NA; -9=NA")
 #checks
 # table(ces19phone$NDP_therm)
 ces19phone$NDP_rating<-(ces19phone$NDP_therm /100)
 # table(ces19phone$NDP_rating)
 
-ces19phone$ndp_rating<-Recode(ces19phone$q16, "0=1; -9:-6=NA")
+ces19phone$ndp_rating<-Recode(as.numeric(ces19phone$q16), "0=1; -9:-6=NA")
 # table(ces19phone$ndp_rating)
 
 #recode Bloc rating (q17)
 # look_for(ces19phone, "bloc")
-ces19phone$bloc_rating<-Recode(ces19phone$q17, "0=1; -9:-6=NA")
+ces19phone$bloc_rating<-Recode(as.numeric(ces19phone$q17), "0=1; -9:-6=NA")
 # table(ces19phone$bloc_rating)
 
 #recode Green rating (q18)
 # look_for(ces19phone, "green")
-ces19phone$green_rating<-Recode(ces19phone$q18, "0=1; -9:-6=NA")
+ces19phone$green_rating<-Recode(as.numeric(ces19phone$q18), "0=1; -9:-6=NA")
 # table(ces19phone$green_rating)
 
 #recode Manage economy (q33)
@@ -487,8 +487,8 @@ val_labels(ces19phone$address_issue)
 # look_for(ces19phone, "leave")
 # look_for(ces19phone, "blame")
 
-ces19phone$market1<-Recode(ces19phone$p20_a, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
-ces19phone$market2<-Recode(ces19phone$p20_f, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$market1<-Recode(as.numeric(ces19phone$p20_a), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$market2<-Recode(as.numeric(ces19phone$p20_f), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$market1)<-c(Strongly_disagree=0, Somewhat_disagree=0.25, Neither=0.5, Somewhat_agree=0.75, Strongly_agree=1)
 #checks
 # table(ces19phone$market1, ces19phone$p20_a , useNA = "ifany" )
@@ -519,8 +519,8 @@ ces19phone %>%
 #recode Moral Traditionalism (p35_b, p20_e,  p35_c)
 # look_for(ces19phone, "women")
 # look_for(ces19phone, "gays")
-ces19phone$moral_1<-Recode(ces19phone$p20_e, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
-ces19phone$moral_2<-Recode(ces19phone$p35_b, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
+ces19phone$moral_1<-Recode(as.numeric(ces19phone$p20_e), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$moral_2<-Recode(as.numeric(ces19phone$p35_b), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
 ces19phone$moral_3<-Recode(as.numeric(ces19phone$p35_c), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$moral_1)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
@@ -544,8 +544,8 @@ ces19phone %>%
 
 #recode Political Disaffection (p20_i and p20_n)
 # look_for(ces19phone, "politicians")
-ces19phone$disaffection1<-Recode(ces19phone$p20_i, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
-ces19phone$disaffection2<-Recode(ces19phone$p20_n, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$disaffection1<-Recode(as.numeric(ces19phone$p20_i), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$disaffection2<-Recode(as.numeric(ces19phone$p20_n), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$disaffection1)<-c(Strongly_disagree=0, Somewhat_disagree=0.25, Neither=0.5, Somewhat_agree=0.75, Strongly_agree=1)
 #checks
 # table(ces19phone$disaffection1 , ces19phone$p20_i , useNA = "ifany" )
@@ -565,15 +565,15 @@ ces19phone %>%
 
 #recode Continentalism (p43)
 # look_for(ces19phone, "united states")
-ces19phone$continentalism<-Recode(ces19phone$p43, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; 6=0.5; else=NA", as.numeric=T)
+ces19phone$continentalism<-Recode(as.numeric(ces19phone$p43), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; 6=0.5; else=NA", as.numeric=T)
 #val_labels(ces19phone$continentalism)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
-val_labels(ces19phone$continentalism)
+#val_labels(ces19phone$continentalism)
 # table(ces19phone$continentalism, ces19phone$p43 , useNA = "ifany" )
 
 #recode Quebec Sovereignty (q43)
 # look_for(ces19phone, "quebec")
-ces19phone$quebec_sovereignty<-Recode(ces19phone$q43, "1=1; 2=0.75; -9=0.5; 3=0.25; 4=0; else=NA", as.numeric=T)
+ces19phone$quebec_sovereignty<-Recode(as.numeric(ces19phone$q43), "1=1; 2=0.75; -9=0.5; 3=0.25; 4=0; else=NA", as.numeric=T)
 #val_labels(ces19phone$quebec_sovereignty)<-c(Much_less=0, Somewhat_less=0.25, Dont_know=0.5, Somewhat_more=0.75, Much_more=1)
 #checks
 val_labels(ces19phone$quebec_sovereignty)
@@ -581,39 +581,39 @@ val_labels(ces19phone$quebec_sovereignty)
 
 #recode Personal Retrospective (q47)
 # look_for(ces19phone, "situation")
-ces19phone$personal_retrospective<-Recode(ces19phone$q47, "1=1; 2=0; 3=0.5; -9=0.5; else=NA", as.numeric=T)
-val_labels(ces19phone$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces19phone$personal_retrospective<-Recode(as.numeric(ces19phone$q47), "1=1; 2=0; 3=0.5; -9=0.5; else=NA", as.numeric=T)
+#val_labels(ces19phone$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
 val_labels(ces19phone$personal_retrospective)
 # table(ces19phone$personal_retrospective , ces19phone$q47, useNA = "ifany" )
 
 #recode National Retrospective (q31)
 # look_for(ces19phone, "economy")
-ces19phone$national_retrospective<-Recode(ces19phone$q31, "1=1; 2=0; 3=0.5; -9=0.5; else=NA", as.numeric=T)
-val_labels(ces19phone$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+ces19phone$national_retrospective<-Recode(as.numeric(ces19phone$q31), "1=1; 2=0; 3=0.5; -9=0.5; else=NA", as.numeric=T)
+#val_labels(ces19phone$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
 val_labels(ces19phone$national_retrospective)
 # table(ces19phone$national_retrospective, ces19phone$q31, useNA = "ifany" )
 
 #recode Defence (q27_d)
 # look_for(ces19phone, "defence")
-ces19phone$defence<-Recode(ces19phone$q27_d, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
-val_labels(ces19phone$defence)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+ces19phone$defence<-Recode(as.numeric(ces19phone$q27_d), "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
+#val_labels(ces19phone$defence)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 val_labels(ces19phone$defence)
 # table(ces19phone$defence, ces19phone$q27_d , useNA = "ifany" )
 
 #recode Crime and Justice (q27_c)
 # look_for(ces19phone, "justice")
-ces19phone$justice<-Recode(ces19phone$q27_c, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
-val_labels(ces19phone$justice)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+ces19phone$justice<-Recode(as.numeric(ces19phone$q27_c), "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
+#val_labels(ces19phone$justice)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 val_labels(ces19phone$justice)
 # table(ces19phone$justice , ces19phone$q27_c , useNA = "ifany" )
 
 #recode Education (q27_a)
 # look_for(ces19phone, "education")
-ces19phone$education<-Recode(ces19phone$q27_a, "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
+ces19phone$education<-Recode(as.numeric(ces19phone$q27_a), "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
 #val_labels(ces19phone$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 #val_labels(ces19phone$education)
@@ -623,6 +623,7 @@ ces19phone$education<-Recode(ces19phone$q27_a, "3=0.5; 1=1; 2=0; -9=0.5; else=NA
 #### mip ####
 #In another script I coded the MIP responses according to the categories
 # Provided in the 2015 CES to maximize comparability
+
 source(here("data-raw/recode_scripts/ces19_phone_mip_recode.R"))
 #The original response is ces19phone$q7
 ces19phone$q7
@@ -640,64 +641,18 @@ ces19phone$mip<-Recode(ces19phone$q7_out, "75=1; 71=2; 77=2; 18=2; 5=3; 2=3; 90:
 val_labels(ces19phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9,
                               Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
 
-# table(ces19phone$mip, useNA="ifany")
-
-#convert q7 to q7_out
-# ces19phone$q7_out<-tolower(ces19phone$q7)
-# #### Most important Problem for Environment ####
-# #convert mip to mip_cat
-# ces19phone$q7_out
-#
-# ces19phone %>%
-#   mutate(mip=case_when(
-#     str_detect(q7_out, "climat") ~ 1,
-#         str_detect(q7_out, "environ") ~ 1,
-#     str_detect(mip, "ecologie") ~1,
-#     str_detect(q7_out, "health") ~ 8,
-#        str_detect(q7_out, "tax") ~ 9,
-#            str_detect(q7_out, "impots") ~ 9,
-#                str_detect(q7_out, "santé") ~ 8,
-#                    str_detect(q7_out, "crim[ei]") ~ 2,
-#                        str_detect(q7_out, "job") ~ 6,
-#                            str_detect(q7_out, "deficit") ~ 10,
-#                                str_detect(q7_out, "debt") ~ 10,
-#                                    str_detect(q7_out, "trudeau") ~ 0,
-#                                    str_detect(q7_out, "ethic") ~ 3,
-#                                        str_detect(q7_out, "immigr") ~ 13,
-#                                            str_detect(q7_out, "pipeline") ~ 6,
-#                                                str_detect(q7_out, "ecologie") ~ 1,
-#                                                      str_detect(q7_out, "economy") ~ 6,
-#                                                    str_detect(q7_out, "économie") ~ 6,
-#                                                        str_detect(q7_out, "emploi") ~ 6,
-#                                                               str_detect(q7_out, "oil") ~ 5,
-#                                                               str_detect(q7_out, "gas") ~ 5,
-#                                                                   str_detect(q7_out, "nuclear") ~ 5,
-#     TRUE ~ NA_real_
-#   )) ->ces19phone
-# ces19phone$mip
-#
-# val_labels(ces19phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs_Economy=6, Economy=7, Health=8, Taxes=9,
-#                               Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Pipeline=20)
-#
-# ces19phone %>%
-#   mutate(mip_enviro=case_when(
-#     mip==1~1,
-#     TRUE~0
-#   ))->ces19phone
-# table(as_factor(ces19phone$mip))
-# Recode visible minority
 
 source(here('data-raw/recode_scripts/ces19_phone_vismin_recode.R'))
 
 #recode Immigration (q39)
 # look_for(ces19phone, "admit")
-ces19phone$immigration_rates<-Recode(ces19phone$q39, "1=0; 2=1; 3=0.5; -9=0.5; else=NA", as.numeric=T)
+ces19phone$immigration_rates<-Recode(as.numeric(ces19phone$q39), "1=0; 2=1; 3=0.5; -9=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces19phone$immigration_rates, ces19phone$q39 , useNA = "ifany" )
 
 #recode Environment (q27_b) (spending question)
 # look_for(ces19phone, "env")
-ces19phone$enviro<-Recode(ces19phone$q27_b, "1=0; 2=1; 3=0.5; -9=0.5; else=NA")
+ces19phone$enviro<-Recode(as.numeric(ces19phone$q27_b), "1=0; 2=1; 3=0.5; -9=0.5; else=NA")
 #checks
 # table(ces19phone$enviro , ces19phone$q27_b , useNA = "ifany" )
 
@@ -705,13 +660,13 @@ ces19phone$enviro<-Recode(ces19phone$q27_b, "1=0; 2=1; 3=0.5; -9=0.5; else=NA")
 
 #recode Crime (q27_c) (spending question)
 # look_for(ces19phone, "crime")
-ces19phone$crime<-Recode(ces19phone$q27_c, "1=1; 2=0; 3=0.5; -9=0.5; else=NA")
+ces19phone$crime<-Recode(as.numeric(ces19phone$q27_c), "1=1; 2=0; 3=0.5; -9=0.5; else=NA")
 #checks
 # table(ces19phone$crime, ces19phone$q27_c , useNA = "ifany" )
 
 #recode Gay Rights (p35_c) (should do more question)
 # look_for(ces19phone, "gays")
-ces19phone$gay_rights<-Recode(ces19phone$p35_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA")
+ces19phone$gay_rights<-Recode(as.numeric(ces19phone$p35_c), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; -9=0.5; else=NA")
 #checks
 # table(ces19phone$gay_rights, ces19phone$p35_c , useNA = "ifany" )
 
@@ -719,7 +674,7 @@ ces19phone$gay_rights<-Recode(ces19phone$p35_c, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1
 
 #recode Stay Home (p20_e)
 # look_for(ces19phone, "women")
-ces19phone$stay_home<-Recode(ces19phone$p20_e, "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA")
+ces19phone$stay_home<-Recode(as.numeric(ces19phone$p20_e), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; -9=0.5; else=NA")
 #checks
 # table(ces19phone$stay_home, ces19phone$p20_e , useNA = "ifany" )
 
@@ -784,8 +739,8 @@ ces19phone %>%
 
 #recode Ideology (p42)
 # look_for(ces19phone, "scale")
-ces19phone$ideology<-Recode(ces19phone$p42, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
-val_labels(ces19phone$ideology)<-c(Left=0, Right=1)
+ces19phone$ideology<-Recode(as.numeric(ces19phone$p42), "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
+#val_labels(ces19phone$ideology)<-c(Left=0, Right=1)
 #checks
 val_labels(ces19phone$ideology)
 # table(ces19phone$ideology, ces19phone$p42 , useNA = "ifany" )
@@ -793,7 +748,7 @@ val_labels(ces19phone$ideology)
 #### recode Immigration sentiment (p22_a) ####
 # look_for(ces19phone, "immigr")
 #ces19phone$immigration_job<-Recode(ces19phone$p22_a, "1=0; 2=0.25; 3=0.75; 4=1; -9=0.5; else=NA", as.numeric=T)
-ces19phone$immigration_job<-Recode(ces19phone$p22_a, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+ces19phone$immigration_job<-Recode(as.numeric(ces19phone$p22_a), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
 #checks
 # table(ces19phone$immigration_job, ces19phone$p22_a, useNA = "ifany" )
 
@@ -808,36 +763,36 @@ val_labels(ces19phone$turnout)
 
 # recode satisfaction with democracy (q6, p4)
 # look_for(ces19phone, "dem")
-ces19phone$satdem<-Recode(ces19phone$p4, "1=1; 2=0.75; 3=0.25; 4=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$satdem<-Recode(as.numeric(ces19phone$p4), "1=1; 2=0.75; 3=0.25; 4=0; -9=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces19phone$satdem, ces19phone$p4, useNA = "ifany" )
 
-ces19phone$satdem2<-Recode(ces19phone$q6, "1=1; 2=0.75; 3=0.25; 4=0; -9=0.5; else=NA", as.numeric=T)
+ces19phone$satdem2<-Recode(as.numeric(ces19phone$q6), "1=1; 2=0.75; 3=0.25; 4=0; -9=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces19phone$satdem2, ces19phone$q6, useNA = "ifany" )
 
 # recode immigration society (p22_b)
 # look_for(ces19phone, "culture")
-ces19phone$immigration_soc<-Recode(ces19phone$p22_b, "5=0; 4=0.25; 2=0.75; 1=1; 3=0.5; -9=0.5; else=NA", as.numeric=T)
+ces19phone$immigration_soc<-Recode(as.numeric(ces19phone$p22_b), "5=0; 4=0.25; 2=0.75; 1=1; 3=0.5; -9=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces19phone$immigration_soc, ces19phone$p22_b, useNA = "ifany" )
 
 #recode Postgrad (q61)
 # look_for(ces19phone, "education")
-ces19phone$postgrad<-Recode(ces19phone$q61, "10:11=1; 1:9=0; else=NA")
+ces19phone$postgrad<-Recode(as.numeric(ces19phone$q61), "10:11=1; 1:9=0; else=NA")
 #checks
 # table(ces19phone$postgrad)
 
 #recode efficacy rich (p20_n)
 # look_for(ces19phone, "rich")
-ces19phone$efficacy_rich<-Recode(ces19phone$p20_n, "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+ces19phone$efficacy_rich<-Recode(as.numeric(ces19phone$p20_n), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
 #checks
 # table(ces19phone$efficacy_rich)
 # table(ces19phone$efficacy_rich, ces19phone$p20_n)
 
 # recode political interest (p27)
 # look_for(ces19phone, "interest")
-ces19phone$pol_interest<-Recode(ces19phone$p27, "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+ces19phone$pol_interest<-Recode(as.numeric(ces19phone$p27), "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
 #checks
 # table(ces19phone$pol_interest, ces19phone$p27, useNA = "ifany" )
 
@@ -851,10 +806,13 @@ val_labels(ces19phone$foreign)
 
 #recode Environment Spend (q27_b)
 # look_for(ces19phone, "env")
-ces19phone$enviro_spend<-Recode(ces19phone$q27_b, "1=1; 2=0; 3=0.5; -9=0.5; else=NA")
+ces19phone$enviro_spend<-Recode(as.numeric(ces19phone$q27_b), "1=1; 2=0; 3=0.5; -9=0.5; else=NA")
 #checks
 # table(ces19phone$enviro_spend , ces19phone$q27_b , useNA = "ifany" )
 
-
+#glimpse(ces19phone)
+# add mode
+ces19phone$mode<-rep("Phone", nrow(ces19phone))
+ces19phone$election<-rep(2019, nrow(ces19phone))
 # Save the file
 save(ces19phone, file=here("data/ces19phone.rda"))

@@ -352,9 +352,15 @@ val_labels(ces84$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
 # table(ces84$mip)
 
 #Empty variables that are not available pre-88
-ces84$redistribution<-rep(NA, nrow(ces84))
-ces84$market_liberalism<-rep(NA, nrow(ces84))
-ces84$traditionalism2<-rep(NA, nrow(ces84))
-ces84$immigration_rates<-rep(NA, nrow(ces84))
+# ces84$redistribution<-rep(NA, nrow(ces84))
+# ces84$market_liberalism<-rep(NA, nrow(ces84))
+# ces84$traditionalism2<-rep(NA, nrow(ces84))
+# ces84$immigration_rates<-rep(NA, nrow(ces84))
+glimpse(ces84)
+
+#Add mode
+ces84$mode<-rep("Phone", nrow(ces84))
+#Add Election
+ces84$election<-rep(1984, nrow(ces84))
 # Save the file
 save(ces84, file=here("data/ces84.rda"))

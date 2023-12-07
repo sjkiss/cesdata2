@@ -6,10 +6,10 @@ library(here)
 library(haven)
 #load data
 
-ces74<-read_sav(file=here("data-raw/1974_1979_1980.sav"))
+ces74<-read_sav(file=here("data-raw/CES-E-1974_F1.sav"))
 
 #recode Gender (V480)
-# look_for(ces74, "sex")
+look_for(ces74, "sex")
 ces74$male<-Recode(ces74$V480, "1=1; 2=0; 9=NA")
 val_labels(ces74$male)<-c(Female=0, Male=1)
 #checks
@@ -292,8 +292,14 @@ val_labels(ces74$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
 
 
 #Empty variables that are not available pre-88
-ces74$redistribution<-rep(NA, nrow(ces74))
-ces74$market_liberalism<-rep(NA, nrow(ces74))
-ces74$traditionalism2<-rep(NA, nrow(ces74))
-ces74$immigration_rates<-rep(NA, nrow(ces74))
+# ces74$redistribution<-rep(NA, nrow(ces74))
+# ces74$market_liberalism<-rep(NA, nrow(ces74))
+# ces74$traditionalism2<-rep(NA, nrow(ces74))
+# ces74$immigration_rates<-rep(NA, nrow(ces74))
+# Add mode
+ces74$mode<-rep("Phone", nrow(ces74))
+
+#Add Election
+ces74$election<-c(rep(1974, nrow(ces74)))
+glimpse(ces74)
 save(ces74, file=here("data/ces74.rda"))

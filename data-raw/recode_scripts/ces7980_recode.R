@@ -472,9 +472,20 @@ val_labels(ces7980$mip80)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Educatio
 # table(ces7980$mip80)
 #
 # #Empty variables that are not available pre-88
-ces7980$redistribution<-rep(NA, nrow(ces7980))
-ces7980$market_liberalism<-rep(NA, nrow(ces7980))
-ces7980$traditionalism2<-rep(NA, nrow(ces7980))
-ces7980$immigration_rates<-rep(NA, nrow(ces7980))
+# ces7980$redistribution<-rep(NA, nrow(ces7980))
+# ces7980$market_liberalism<-rep(NA, nrow(ces7980))
+# ces7980$traditionalism2<-rep(NA, nrow(ces7980))
+# ces7980$immigration_rates<-rep(NA, nrow(ces7980))
+# Add mode
+ces7980$mode<-rep("Phone", nrow(ces7980))
+
+#Add Election
+table(ces7980$V4002, ces7980$V4008)
+ces7980 %>%
+  mutate(election=case_when(
+    V4002==1 ~ 1979
+  ))->ces7980
+#Now we run recodes *specific* to CES80 respondents
+source("data-raw/recode_scripts/ces80_recode.R")
 
 save(ces7980, file=here("data/ces7980.rda"))

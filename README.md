@@ -29,13 +29,20 @@ devtools::install_github("sjkiss/cesdata2")
 
 ## How to use it.
 
-Once installed, individual datasets are available by calling:
+Once installed and loaded, individual datasets are *immediately*
+available by calling:
 
 ``` r
+library(devtools)
+devtools::install_github("sjkiss/cesdata2")
 library(cesdata2)
 ## basic example code
-data("ces65")
-data("ces68")
+tail(names(ces21))
+#> [1] "postgrad"      "inequality"    "efficacy_rich" "pol_interest" 
+#> [5] "foreign"       "enviro_spend"
+tail(names(ces65))
+#> [1] "foreign"           "mip"               "redistribution"   
+#> [4] "market_liberalism" "traditionalism2"   "immigration_rates"
 ```
 
 These are the datasets currently available with the names required to
@@ -57,27 +64,12 @@ load them.
 | CES 2019 Phone          | `ces19phone` |                                                                                         Phone survey from 2019                                                                                         |
 | CES 2019 Web            |   `ces19web` |                                                                                         Phone survey from 2019                                                                                         |
 
-# Recoded variables
+# Package Structure
 
-Polacko and Kiss (particularly the former) have gone to great lengths to
-recode and rename variables of interest to allow for combination into a
-single tabular dataset that allows for time series analysis.
-
-Wherever possible, the following conventions have been used.
-
-1.  Likert items have been rescaled from 0 to 1
-2.  Liberal views are scored 0 and conservative views are scaled high.
-
-This is an incomplete list of recoded and renamed variables.
-
-| Concept | Variable Name |  notes  |
-|:--------|--------------:|:-------:|
-| This    |          This |  This   |
-| column  |        column | column  |
-| will    |            be | aligned |
-| left    |         right | center  |
-
-## How are variables recoded
+Before explaining how variables are recoded, it is worth describing the
+package structure. We have followed advice on creating so-called `data`
+packages [here](https://r-pkgs.org/data.html) and
+[here](https://www.davekleinschmidt.com/r-packages/).
 
 Currently the `cesdata2` package comes with two files for each Canada
 Election Study.
@@ -126,13 +118,43 @@ list.files(path="data")
 ```
 
 The recode scripts themselves are stored in the package subfolder
-`data-raw/recode_scripts/`.
+`data-raw/recode_scripts/`. When these scripts are executed via R’s
+`source()` command, they:
 
-Users invited to the project are invited to begin constructing a tabular
-data frame, right away making use of our recoded variables. However,
-users are also welcome to contribute to the package’s development by
-adding new recodes in the recode scripts. The next section shows how to
-do that:
+1.  Import the Stata or SPSS file from `data-raw`
+2.  Execute all documented recode functions
+3.  Save an `.rda` object, properly named in the folder `data`
+
+Doing so, makes the `.rda` file, with all recodes executed, available to
+users on install and loading.
+
+## Recoding conventions
+
+Polacko and Kiss (particularly the former) have gone to great lengths to
+recode and rename variables of interest to allow for combination into a
+single tabular dataset that allows for time series analysis.
+
+Wherever possible, the following conventions have been used.
+
+1.  Likert items have been rescaled from 0 to 1
+2.  Liberal views are scored 0 and conservative views are scaled high.
+
+This is an incomplete list of recoded and renamed variables.
+
+| Concept | Variable Name |  notes  |
+|:--------|--------------:|:-------:|
+| This    |          This |  This   |
+| column  |        column | column  |
+| will    |            be | aligned |
+| left    |         right | center  |
+
+# Establishing A Usable Time Series
+
+## Future recodes
+
+However, users are also welcome to contribute to the package’s
+development by adding new recodes in the recode scripts. The next
+section shows how to do that:
 
 ### Adding recoded variables
 
@@ -147,32 +169,23 @@ do that:
 
 3.  Open the recode script for the data-set you want to work on. Here,
     you will need to navigate to the folder `data-raw/recode_scripts/`
-    and select which one you want.
+    and select which one you want. In this way you will be able to
+    execute, see and diagnose recode commands in the local environment.
 
-4.  You probably want to load the data-set, here by running this
-    command.
-
-``` r
-data("ces04011")
-```
-
-In this way you will be able to execute, see and diagnose recode
-commands in the local environment.
-
-5.  Once complete, you will need to `source()` the recode script from
+4.  Once complete, you will need to `source()` the recode script from
     beginning to end. This is important for a few reasons. First,
     running `source()` is *noticeably* faster than executing code by
-    selecting it in RStudio and running cmd-Enter. We have been doing
+    selecting it in RStudio and running `cmd-Enter`. We have been doing
     this and it can take forever.
 
 Second, and more importantly, you will see that the recode script always
 starts by loading the original raw data file and then saving an `.rdata`
 file out into the folder `data`. *This* is the file that is available to
-users when they
+users when they install and load `cesdata2`
 
-6.  After sourcing all recode scripts, it is necessary to re-build and
-    re-install the package. Once you have done this, you can: 1) exit
-    the package, 2) Open a new RScript for analysis (which should be an
+6.  After sourcing all `recode` scripts, it is necessary to re-install
+    the package. Once you have done this, you can: 1) exit the
+    package, 2) Open a new RScript for analysis (which should be an
     RStudio project) 3) call `library(cesdata2)` and your recoded
     variables should be available to you.
 
@@ -191,17 +204,6 @@ the main branch and communicate when that has happened.
 In the simple case of combinining three single-election datasets, we can
 combine them in this way.
 
-``` r
-#First load the datasets
-data("ces93")
-data("ces97")
-data("ces00")
-```
-
-Next, it is necessary to take the variables of interest and select them
-from each dataset. There are many ways to do this, but this is a quick
-way.
-
 1.  Make a list of your datasets.
 2.  Provide names for each list item, corresponding to the election year
 3.  Make a separate vector of all the variable names you want to select
@@ -214,24 +216,16 @@ ces.list<-list(ces00, ces93, ces97)
 #Make a vector of desired common variables
 myvars<-c("male", "degree")
 library(tidyverse)
-library(haven) #necessary to zap labels
+library(haven) 
 ces.list %>% 
   map(., select, any_of(myvars)) %>% 
-  list_rbind(., names_to=c("election"))
-#> # A tibble: 12,471 × 3
-#>    election       male       degree
-#>       <int>  <dbl+lbl>    <dbl+lbl>
-#>  1        1 1 [Male]   0 [nodegree]
-#>  2        1 1 [Male]   0 [nodegree]
-#>  3        1 1 [Male]   0 [nodegree]
-#>  4        1 1 [Male]   0 [nodegree]
-#>  5        1 1 [Male]   1 [degree]  
-#>  6        1 1 [Male]   0 [nodegree]
-#>  7        1 0 [Female] 1 [degree]  
-#>  8        1 0 [Female] 1 [degree]  
-#>  9        1 1 [Male]   0 [nodegree]
-#> 10        1 1 [Male]   0 [nodegree]
-#> # ℹ 12,461 more rows
+  list_rbind(., names_to=c("election"))->ces
+glimpse(ces)
+#> Rows: 12,471
+#> Columns: 3
+#> $ election <int> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+#> $ male     <dbl+lbl> 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, …
+#> $ degree   <dbl+lbl> 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
 ```
 
 ### Issues and Special Cases
@@ -250,12 +244,6 @@ are only one part of the project and one wishes to use data from CES
 1988 for other parts.
 
 ``` r
-#Load data sets
-data("ces84")
-data("ces88")
-data("ces93")
-data("ces97")
-data("ces00")
 # Construct the list
 ces.list<-list(ces84,ces88, ces93, ces97, ces00)
 #names
@@ -270,8 +258,6 @@ length(ces88$gay_rights) #3609 cases of gay_rights values
 myvars<-c("gender", "vote", "gay_rights")
 #Make data frame
 ces.list %>% 
-  #Zap the labels
-  map(., zap_labels) %>% 
   #Select the variables
   map(., select, any_of(myvars)) %>% 
   #bind together providing a new variable Election containing the election year
@@ -288,7 +274,7 @@ ces %>%
   select(gay_rights)
 #> # A tibble: 3,377 × 1
 #>    gay_rights
-#>         <dbl>
+#>     <dbl+lbl>
 #>  1         NA
 #>  2         NA
 #>  3         NA
@@ -309,7 +295,7 @@ ces %>%
   select(gay_rights)
 #> # A tibble: 3,609 × 1
 #>    gay_rights
-#>         <dbl>
+#>     <dbl+lbl>
 #>  1       NA  
 #>  2       NA  
 #>  3       NA  
@@ -332,14 +318,11 @@ chose of consistently renaming variables.
 The underlying data files look like this the following table, for *each*
 respondent, there are variables for the 2004, 2006, and 2008 surveys
 *whether or not* the respondent actually completed the surveys.
-
-| Respondent ID |    Survey     | `ces04_PES_K5A` |     `ces06_PES_B4A`     | `ces08_PES_B4B` |
-|:-------------:|:-------------:|:---------------:|:-----------------------:|:---------------:|
-|       1       |     2004      |    `Refused`    |           NA            |       NA        |
-|       2       |     2006      |       NA        | Liberal Party of Canada |       NA        |
-|       3       |     2008      |       NA        |           NA            |       NDP       |
-|       4       | 2004 and 2006 |      Other      | Liberal Party of Canada |       NA        |
-|       5       | 2006 and 2008 |       NA        |                         |                 |
+Respondent ID \|Survey \|`ces04_PES_K5A` \| `ces06_PES_B4A`
+\|`ces08_PES_B4B` \| \|:—–:\|:—–:\|:—————————:\| :———————-:\| :——-:\| \|
+1\|2004 \| `Refused` \| NA\| NA\| \| 2\|2006 \| NA \| Liberal Party of
+Canada \|NA\| \|3 \|2008\| NA \| NA \| NDP \|4 \|2004 and 2006\| Other
+\| Liberal Party of Canada \| NA\| \|5 \| 2006 and 2008 \| NA \|
 
 Ultimately, each of these columns measure the same variable, the
 person’s vote cast, but at different time periods. As currently
@@ -453,14 +436,6 @@ strategy, you can first `select()` only the `survey` variable and count
 what your filter strategy produces, and then actually filter into a new
 data frame.
 
-``` r
-ces0411 %>% 
-  select(survey) %>% 
-  filter(survey=="CPS04") %>% 
-  count(survey) %>% 
-  kable()
-```
-
 | survey |    n |
 |:-------|-----:|
 | CPS04  | 1182 |
@@ -512,25 +487,25 @@ ces04 %>%
 | vote04 | vote06 | vote08 | vote11 |
 |-------:|-------:|-------:|-------:|
 |     NA |     NA |     NA |     NA |
-|      2 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
-|      5 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      4 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
+|      1 |     NA |     NA |     NA |
+|      2 |     NA |     NA |     NA |
+|      2 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|      3 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      2 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
 
 Please note that alternative, more expansive selection strategies are
 available. For example, we can collect *any* respondent who responded to
@@ -717,5 +692,7 @@ package which creates this very awkwared `labelled` class variable
 instead of standard R factors. In hindsight this was a mistake. It would
 be better to go back and convert those variables as value labels
 straight to factors.
+
+
 
 ## References

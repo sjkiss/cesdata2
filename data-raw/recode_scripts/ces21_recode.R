@@ -304,7 +304,7 @@ table(ces21$personal_retrospective , ces21$cps21_own_fin_retro, useNA = "ifany" 
 #recode National Retrospective (cps21_econ_retro)
 look_for(ces21, "economy")
 ces21$national_retrospective<-Recode(as.numeric(ces21$cps21_econ_retro), "1=1; 2=0.5; 3=0; 4=0.5; else=NA", as.numeric=T)
-val_labels(ces21$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#val_labels(ces21$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
 #checks
 val_labels(ces21$national_retrospective)
 table(ces21$national_retrospective, ces21$cps21_econ_retro, useNA = "ifany" )
@@ -320,7 +320,7 @@ table(ces21$education, ces21$cps21_spend_educ , useNA = "ifany" )
 #recode Break Promise (pes21_keepromises)
 look_for(ces21, "promise")
 ces21$promise<-Recode(as.numeric(ces21$pes21_keepromises), "1=0; 2=0.5; 3=1; 4=1; 5=0.5; else=NA", as.numeric=T)
-val_labels(ces21$promise)<-c(low=0, high=1)
+#val_labels(ces21$promise)<-c(low=0, high=1)
 #checks
 val_labels(ces21$promise)
 table(ces21$promise)
@@ -578,7 +578,9 @@ look_for(ces21, "env")
 ces21$enviro_spend<-Recode(as.numeric(ces21$cps21_spend_env), "1=0; 2=0.5; 3=1; else=NA")
 #checks
 table(ces21$enviro_spend , ces21$cps21_spend_env , useNA = "ifany" )
-
+#
+ces21$mode<-rep("Web", nrow(ces21))
+ces21$election<-rep(2021, nrow(ces21))
+#glimpse(ces21)
 # #### Resave the file in the .rda file
-#devtools::use_data(ces21)
 save(ces21, file=here("data/ces21.rda"))

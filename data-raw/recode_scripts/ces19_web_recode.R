@@ -35,6 +35,7 @@ ces19web$occupation<-Recode(as.numeric(ces19web$NOC), "0:1099=2;
  6400:6799=3; 7200:7399=4;
                               7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 val_labels(ces19web$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+var_label(ces19web$occupation)<-c("5 category class no self-employed from actual NOC codes")
 #This code checks if we missed anything
 ces19web %>%
   filter(is.na(NOC)==F&is.na(occupation)==T) %>%
@@ -66,9 +67,12 @@ ces19web %>%
   ))->ces19web
 table(is.na(ces19web$occupation))
 table(is.na(ces19web$occupation2))
+table(ces19web$occupation)
+table(ces19web$occupation2)
 table(is.na(ces19web$NOC))
 
-
+table(is.na(ces19web$NOC21_4))
+var_label(ces19web$occupation2)<-c("5 category class no self-employed from pre-existing categories provided to R")
 
 look_for(ces19web, "ethnic")
 ces19web$cps19_ethnicity_41_TEXT
@@ -160,6 +164,8 @@ val_labels(ces19web$trust)<-c(no=0, yes=1)
 #val_labels(ces19web$trust)
 # table(ces19web$trust)
 # table(ces19web$trust, ces19web$pes19_trust , useNA = "ifany" )
-
+ces19web$mode<-rep("Web", nrow(ces19web))
+ces19web$election<-rep(2019, nrow(ces19web))
+#glimpse(ces19web)
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))

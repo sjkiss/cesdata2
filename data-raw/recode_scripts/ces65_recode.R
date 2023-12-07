@@ -228,8 +228,15 @@ val_labels(ces65$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
 # table(ces65$mip)
 
 #Empty variables that are not available pre-88
-ces65$redistribution<-rep(NA, nrow(ces65))
-ces65$market_liberalism<-rep(NA, nrow(ces65))
-ces65$traditionalism2<-rep(NA, nrow(ces65))
-ces65$immigration_rates<-rep(NA, nrow(ces65))
+# ces65$redistribution<-rep(NA, nrow(ces65))
+# ces65$market_liberalism<-rep(NA, nrow(ces65))
+# ces65$traditionalism2<-rep(NA, nrow(ces65))
+# ces65$immigration_rates<-rep(NA, nrow(ces65))
+# Add mode
+ces65$mode<-rep("Phone", nrow(ces65))
+
+#Add Election
+ces65$election<-c(rep(1965, nrow(ces65)))
+
+glimpse(ces65)
 save(ces65, file=here("data/ces65.rda"))

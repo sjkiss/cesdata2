@@ -154,11 +154,17 @@ table(ces72_nov$foreign, ces72_nov$qx, useNA="ifany")
 table(ces72_nov$foreign)
 
 #Empty variables that are not available pre-88
-ces72_nov$redistribution<-rep(NA, nrow(ces72_nov))
-ces72_nov$market_liberalism<-rep(NA, nrow(ces72_nov))
-ces72_nov$traditionalism2<-rep(NA, nrow(ces72_nov))
-ces72_nov$immigration_rates<-rep(NA, nrow(ces72_nov))
-ces72_nov$turnout<-rep(NA, nrow(ces72_nov))
-ces72_nov$mip<-rep(NA, nrow(ces72_nov))
+# ces72_nov$redistribution<-rep(NA, nrow(ces72_nov))
+# ces72_nov$market_liberalism<-rep(NA, nrow(ces72_nov))
+# ces72_nov$traditionalism2<-rep(NA, nrow(ces72_nov))
+# ces72_nov$immigration_rates<-rep(NA, nrow(ces72_nov))
+# ces72_nov$turnout<-rep(NA, nrow(ces72_nov))
+# ces72_nov$mip<-rep(NA, nrow(ces72_nov))
 
+# Add mode
+ces72_nov$mode<-rep("Phone", nrow(ces72_nov))
+
+#Add Election
+ces72_nov$election<-c(rep(1972, nrow(ces72_nov)))
+glimpse(ces72_nov)
 save(ces72_nov, file=here("data/ces72_nov.rda"))

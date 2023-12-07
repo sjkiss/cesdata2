@@ -373,28 +373,28 @@ val_labels(ces93$immigration_rates)<-NULL
 #recode Environment (MBSA12)
 look_for(ces93, "env")
 table(ces93$MBSA12, useNA = "ifany")
-ces93$enviro<-Recode(ces93$MBSA12, "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
+ces93$enviro<-Recode(as.numeric(ces93$MBSA12), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
 table(ces93$enviro, useNA = "ifany")
 
 #recode Capital Punishment (CPSG7C)
 look_for(ces93, "punish")
 table(ces93$CPSG7C, useNA = "ifany")
-ces93$death_penalty<-Recode(ces93$CPSG7C, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
+ces93$death_penalty<-Recode(as.numeric(ces93$CPSG7C), "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
 #checks
 table(ces93$death_penalty, useNA = "ifany")
 
 #recode Crime (PESE15B)
 look_for(ces93, "crime")
 table(ces93$PESE15B)
-ces93$crime<-Recode(ces93$PESE15B, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+ces93$crime<-Recode(as.numeric(ces93$PESE15B), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
 #checks
 table(ces93$crime, useNA = "ifany")
 
 #recode Gay Rights (CPSG7B)
 look_for(ces93, "homo")
 table(ces93$CPSG7B)
-ces93$gay_rights<-Recode(ces93$CPSG7B, "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
+ces93$gay_rights<-Recode(as.numeric(ces93$CPSG7B), "1=0; 3=0.25; 5=0.75; 7=1; 8=0.5; else=NA")
 #checks
 table(ces93$gay_rights,  useNA = "ifany")
 
@@ -421,14 +421,14 @@ table(ces93$abortion, useNA = "ifany")
 
 #recode Censorship (MBSA15)
 look_for(ces93, "porn")
-ces93$censorship<-Recode(ces93$MBSA15, "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+ces93$censorship<-Recode(as.numeric(ces93$MBSA15), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
 #checks
 table(ces93$censorship, useNA = "ifany")
 
 #recode Stay Home (CPSG7A)
 look_for(ces93, "home")
 table(ces93$CPSG7A)
-ces93$stay_home<-Recode(ces93$CPSG7A, "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+ces93$stay_home<-Recode(as.numeric(ces93$CPSG7A), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
 #checks
 table(ces93$stay_home,useNA = "ifany")
 
@@ -803,6 +803,30 @@ val_labels(ces93$foreign)<-c(No=0, Yes=1)
 #checks
 val_labels(ces93$foreign)
 table(ces93$foreign, ces93$CPSO11, useNA="ifany")
+glimpse(ces93)
+lookfor(ces93, "election")
+lookfor(ces93, "referendum")
+ces93$RTYPE3
+table(as_factor(ces93$CESTYPE), as_factor(ces93$RTYPE4), useNA = "ifany")
+var_label(ces93$RTYPE4)
+table(as_factor(ces93$RTYPE4), useNA = "ifany")
+table(as_factor(ces93$CESTYPE), as_factor(ces93$RTYPE3), useNA = "ifany")
+table(as_factor(ces93$RTYPE1), as_factor(ces93$RTYPE3), useNA = "ifany")
+table(as_factor(ces93$RTYPE2), as_factor(ces93$RTYPE3), useNA = "ifany")
+### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
+ces93 %>%
+  filter(is.na(ces93$RTYPE4)) %>%
+  select(contains("RTYPE"), CESTYPE) %>%
+  as_factor()
+nrow(ces93)
 
+lookfor(ces93)
+#Add mode
+ces93$mode<-rep("Phone", nrow(ces93))
+#Add Election
+# Note: Care should be taken in the master file to consider whether or not the user
+# Wants to include Rs from the 1992 referendum or not.
+#
+ces93$election<-rep(1993, nrow(ces93))
 # Save the file
 save(ces93, file=here("data/ces93.rda"))

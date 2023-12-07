@@ -734,5 +734,13 @@ val_labels(ces97$foreign)<-c(No=0, Yes=1)
 #val_labels(ces97$foreign)
 # (ces97$foreign, ces97$cpsm11, useNA="ifany")
 
+#Add mode
+ces97$mode<-rep("Phone", nrow(ces97))
+#Add Election
+# Note: Care should be taken in the master file to consider whether or not the user
+# Wants to include Rs from the 1992 referendum or not.
+#
+ces97$election<-rep(1997, nrow(ces97))
+glimpse(ces97)
 # Save the file
 save(ces97, file=here("data/ces97.rda"))

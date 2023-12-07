@@ -566,9 +566,9 @@ ces88$national_retrospective<-Recode(as.numeric(ces88$g1), "1=1; 5=0; 3=0.5; 8=0
 #recode Ideology (h5a)
 # look_for(ces88, "self")
 ces88$ideology<-Recode(as.numeric(ces88$h5a) , "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
-val_labels(ces88$ideology)<-c(Left=0, Right=1)
+#val_labels(ces88$ideology)<-c(Left=0, Right=1)
 #checks
-val_labels(ces88$ideology)
+
 # table(ces88$ideology, ces88$h5a  , useNA = "ifany")
 
 #recode turnout (xb1)
@@ -610,7 +610,10 @@ val_labels(ces88$foreign)<-c(No=0, Yes=1)
 #checks
 #val_labels(ces88$foreign)
 # table(ces88$foreign, ces88$n13, useNA="ifany")
-
-
+glimpse(ces88)
+#Add mode
+ces88$mode<-rep("Phone", nrow(ces88))
+#Add Election
+ces88$election<-rep(1988, nrow(ces88))
 # Save the file
 save(ces88, file=here("data/ces88.rda"))

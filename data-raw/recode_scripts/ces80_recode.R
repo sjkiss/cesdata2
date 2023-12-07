@@ -6,7 +6,7 @@ library(here)
 library(haven)
 #load data
 
-ces7980<-read_sav(file=here("data-raw/1974_1979_1980.sav"))
+#ces7980<-read_sav(file=here("data-raw/1974_1979_1980.sav"))
 
 #recode Gender (V2156)
 # look_for(ces7980, "sex")
@@ -80,6 +80,14 @@ table(ces7980$vote80)
 # No Occupation variable
 
 # No Income variable
-
+ces7980 %>%
+  mutate(election80=case_when(
+    V4008==1 ~ 1980
+  ))->ces7980
 # Save the file
-save(ces7980, file=here("data/ces7980.rda"))
+# Note: Do not save the ces7980.rda file out here
+# because it will overwrite the recodes done in the
+# ces7980_recode.R script
+# Instead, if you look at the end, this scxript is source
+# so it is executed after the general ces7980 recodes
+# and then everything is saved out.

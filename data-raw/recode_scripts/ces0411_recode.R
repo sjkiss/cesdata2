@@ -599,7 +599,7 @@ ces0411 %>%
 #   filter(na>0, na<6)
 #Scale Averaging
 ces0411 %>%
-  mutate(authoritarianism04=rowMeans(select(., author041:author044)), na.rm=T)->ces0411
+  mutate(authoritarianism04=rowMeans(select(., author041:author044), na.rm=T))->ces0411
 
 #Check distribution of authoritarianism04
 # qplot(ces0411$authoritarianism04, geom="histogram")
@@ -863,6 +863,12 @@ ces0411$enviro_spend04<-Recode(as.numeric(ces0411$ces04_PES_D1F), "1=1; 3=0; 5=0
 # table(ces0411$enviro_spend04, useNA = "ifany" )
 #val_labels(ces0411$enviro_spend04)<-NULL
 
+# Add election04 variable
+ces0411 %>%
+  mutate(election04=case_when(
+    str_detect(survey, "04")~ 2004
+  ))->ces0411
+table(ces0411$election04, useNA = "ifany")
 ###Recode 2006 2nd ####
 
 # Gender done at top
@@ -1731,7 +1737,11 @@ val_labels(ces0411$foreign06)
 ces0411$enviro_spend06<-Recode(as.numeric(ces0411$ces06_PES_D1F), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
 #checks
 # table(ces0411$enviro_spend06, useNA = "ifany" )
-
+ces0411 %>%
+  mutate(election06=case_when(
+    str_detect(survey, "06")~ 2006
+  ))->ces0411
+table(ces0411$election06, useNA = "ifany")
 #----------------------------------------------------------------------------
 ####Recode 2008 3rd ####
 
@@ -2816,7 +2826,14 @@ val_labels(ces0411$foreign08)<-c(No=0, Yes=1)
 #checks
 val_labels(ces0411$foreign08)
 # table(ces0411$foreign08, ces0411$ces08_CPS_S12, useNA="ifany")
-
+ces0411 %>%
+  mutate(election08=case_when(
+    str_detect(survey, "08")~ 2008
+  ))->ces0411
+ces0411 %>%
+  filter(str_detect(survey, "CPS08")) %>%
+  select(survey, election08)
+table(ces0411$election08, useNA = "ifany")
 #### recode Environment Spend (ces04_PES_D1F)
 # look_for(ces0411, "env")
 ces0411$enviro_spend08<-Recode(as.numeric(ces0411$ces08_PES_D1F), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
@@ -3138,7 +3155,7 @@ ces0411 %>%
 
 #### #recode Immigration (PES11_28)####
 # look_for(ces0411, "imm")
-ces0411$immigration_rates11<-Recode(ces0411$PES11_28, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
+ces0411$immigration_rates11<-Recode(as.numeric(ces0411$PES11_28), "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces0411$immigration_rates11, useNA = "ifany" )
 
@@ -3508,7 +3525,7 @@ ces0411$postgrad11<-Recode(as.numeric(ces0411$CPS11_79), "10:11=1; 1:9=0; else=N
 #### recode Break Promise (PES11_54) ####
 # look_for(ces0411, "promise")
 ces0411$promise11<-Recode(as.numeric(ces0411$PES11_54), "1=0; 3=0.5; 5=1; 7=0.5; else=NA", as.numeric=T)
-val_labels(ces0411$promise11)<-c(low=0, high=1)
+#val_labels(ces0411$promise11)<-c(low=0, high=1)
 #checks
 val_labels(ces0411$promise11)
 # table(ces0411$promise11)
@@ -3542,6 +3559,18 @@ val_labels(ces0411$foreign11)
 ces0411$enviro_spend11<-Recode(as.numeric(ces0411$CPS11_35), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
 #checks
 # table(ces0411$enviro_spend11, useNA = "ifany" )
-
+# Add 20011 Election Variable
+table(ces0411$survey)
+ces0411 %>%
+  mutate(election11=case_when(
+    str_detect(survey, "11")~ 2011
+  ))->ces0411
+table(ces0411$election11, useNA = "ifany")
+# ces0411 %>%
+#   filter(election11==2011) %>%
+#   select(survey) %>%
+#   View()
+#Add mode
+ces0411$mode<-rep("Phone", nrow(ces0411))
 
 save(ces0411, file=here("data/ces0411.rda"))
