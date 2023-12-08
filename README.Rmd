@@ -107,9 +107,7 @@ The recode scripts themselves are stored in the package subfolder `data-raw/reco
 
 1. Import the Stata or SPSS file from `data-raw`
 2. Execute all documented recode functions
-3. Save an `.rda` object, properly named, in the folder `data`
-
-Doing so, makes the `.rda` file, with all recodes executed, available to users on install and loading. 
+3. Save an `.rda` object, properly named, in the folder `data`. Doing so, makes the `.rda` file, with all recodes executed, available to users on install and loading. 
 
 ## Recoding conventions
 

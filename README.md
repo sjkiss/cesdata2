@@ -25,22 +25,49 @@ You can install the development version of `cesdata2` from
 ``` r
 # install.packages("devtools")
 devtools::install_github("sjkiss/cesdata2")
+#>      checking for file ‘/private/var/folders/zn/sxvg8sy539b2yfxt5c0xtwfm0000gq/T/Rtmpa3gxoG/remotes60036c742a1e/sjkiss-cesdata2-d37117f/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/zn/sxvg8sy539b2yfxt5c0xtwfm0000gq/T/Rtmpa3gxoG/remotes60036c742a1e/sjkiss-cesdata2-d37117f/DESCRIPTION’ (486ms)
+#>   ─  preparing ‘cesdata2’:
+#>      checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
+#>   ─  checking for LF line-endings in source and make files and shell scripts
+#>   ─  checking for empty or unneeded directories
+#>   ─  building ‘cesdata2_0.0.1.tar.gz’
+#>      
+#> 
 ```
 
 ## How to use it.
 
 Once installed and loaded, individual datasets are *immediately*
-available by calling:
+available.
 
 ``` r
 library(cesdata2)
 ## view sample datasets
-tail(names(ces21))
-#> [1] "efficacy_rich" "pol_interest"  "foreign"       "enviro_spend" 
-#> [5] "mode"          "election"
-tail(names(ces65))
-#> [1] "efficacy_external2" "political_efficacy" "foreign"           
-#> [4] "mip"                "mode"               "election"
+library(tidyverse)
+#CES21 is immediately available
+ces21 %>% 
+  select(1:5) %>% 
+  glimpse()
+#> Rows: 22,328
+#> Columns: 5
+#> $ cps21_StartDate       <dttm> 2021-09-19 06:14:46, 2021-09-15 15:23:33, 2021-…
+#> $ cps21_EndDate         <dttm> 2021-09-19 06:28:25, 2021-09-15 15:46:57, 2021-…
+#> $ Status                <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+#> $ Progress              <dbl> 100, 100, 100, 100, 100, 100, 100, 100, 100, 100…
+#> $ Duration__in_seconds_ <dbl> 818, 1403, 775, 825, 1660, 1332, 1240, 1594, 945…
+
+#As is CES1965
+
+ces21 %>% 
+  select(1:5) %>% 
+  glimpse()
+#> Rows: 22,328
+#> Columns: 5
+#> $ cps21_StartDate       <dttm> 2021-09-19 06:14:46, 2021-09-15 15:23:33, 2021-…
+#> $ cps21_EndDate         <dttm> 2021-09-19 06:28:25, 2021-09-15 15:46:57, 2021-…
+#> $ Status                <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+#> $ Progress              <dbl> 100, 100, 100, 100, 100, 100, 100, 100, 100, 100…
+#> $ Duration__in_seconds_ <dbl> 818, 1403, 775, 825, 1660, 1332, 1240, 1594, 945…
 ```
 
 These are the datasets currently available with the names required to
@@ -61,13 +88,13 @@ load them.
 | CES 2015 Web            |   `ces15web` |                                                                                          Web survey from 2015                                                                                          |
 | CES 2019 Phone          | `ces19phone` |                                                                                         Phone survey from 2019                                                                                         |
 | CES 2019 Web            |   `ces19web` |                                                                                         Phone survey from 2019                                                                                         |
+| CES 2021 Web            |      `ces21` |                                                                                         Werb survey from 2021                                                                                          |
 
 # Package Structure
 
-Before explaining how variables are recoded, it is worth describing the
-package structure. We have followed advice on creating so-called `data`
-packages [here](https://r-pkgs.org/data.html) and
-[here](https://www.davekleinschmidt.com/r-packages/).
+It is worth describing the package structure. We have followed advice on
+creating so-called `data` packages [here](https://r-pkgs.org/data.html)
+and [here](https://www.davekleinschmidt.com/r-packages/).
 
 Currently the `cesdata2` package comes with two files for each Canada
 Election Study.
@@ -121,10 +148,9 @@ The recode scripts themselves are stored in the package subfolder
 
 1.  Import the Stata or SPSS file from `data-raw`
 2.  Execute all documented recode functions
-3.  Save an `.rda` object, properly named in the folder `data`
-
-Doing so, makes the `.rda` file, with all recodes executed, available to
-users on install and loading.
+3.  Save an `.rda` object, properly named, in the folder `data`. Doing
+    so, makes the `.rda` file, with all recodes executed, available to
+    users on install and loading.
 
 ## Recoding conventions
 
@@ -521,26 +547,26 @@ ces04 %>%
 
 | vote04 | vote06 | vote08 | vote11 |
 |-------:|-------:|-------:|-------:|
+|      4 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      2 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|      1 |     NA |     NA |     NA |
 |      3 |     NA |     NA |     NA |
-|      2 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
 
 Please note that alternative, more expansive selection strategies are
 available. For example, we can collect *any* respondent who responded to
