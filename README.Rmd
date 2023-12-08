@@ -10,6 +10,10 @@ authors:
 
 ```{r, include = FALSE}
 library(knitr)
+library(tidyverse)
+library(devtools)
+library(haven)
+library(labelled)
 knitr::opts_chunk$set(
   results='markup',
   collapse = TRUE,
@@ -34,23 +38,31 @@ First, it stores all extant CES data files in one spot, quickly loadable in R. S
 ## Installation
 
 You can install the development version of `cesdata2` from [GitHub](https://github.com/) with:
-
-``` r
+```{r install-cesdata2}
 # install.packages("devtools")
 devtools::install_github("sjkiss/cesdata2")
 ```
 
+
 ## How to use it.
 
-Once installed and loaded, individual datasets are *immediately* available by calling:
+Once installed and loaded, individual datasets are *immediately* available.
 
 ```{r example}
-library(devtools)
-devtools::install_github("sjkiss/cesdata2")
 library(cesdata2)
-## basic example code
-tail(names(ces21))
-tail(names(ces65))
+## view sample datasets
+library(tidyverse)
+#CES21 is immediately available
+ces21 %>% 
+  select(1:5) %>% 
+  glimpse()
+
+#As is CES1965
+
+ces21 %>% 
+  select(1:5) %>% 
+  glimpse()
+
 
 ```
 
@@ -71,10 +83,11 @@ These are the datasets currently available with the names required to load them.
 | CES 2015 Web | `ces15web` | Web survey from 2015 |
 | CES 2019 Phone | `ces19phone` | Phone survey from 2019 |
 | CES 2019 Web | `ces19web` | Phone survey from 2019 |
+|CES 2021 Web| `ces21` | Werb survey from 2021|
 
 # Package Structure
 
-Before explaining how variables are recoded, it is worth describing the package structure. We have followed advice on creating so-called `data` packages [here](https://r-pkgs.org/data.html) and [here](https://www.davekleinschmidt.com/r-packages/).
+It is worth describing the package structure. We have followed advice on creating so-called `data` packages [here](https://r-pkgs.org/data.html) and [here](https://www.davekleinschmidt.com/r-packages/).
 
 Currently the `cesdata2` package comes with two files for each Canada Election Study. 
 
@@ -94,7 +107,7 @@ The recode scripts themselves are stored in the package subfolder `data-raw/reco
 
 1. Import the Stata or SPSS file from `data-raw`
 2. Execute all documented recode functions
-3. Save an `.rda` object, properly named in the folder `data`
+3. Save an `.rda` object, properly named, in the folder `data`
 
 Doing so, makes the `.rda` file, with all recodes executed, available to users on install and loading. 
 
@@ -105,8 +118,12 @@ Polacko and Kiss (particularly the former) have gone to great lengths to recode 
 Wherever possible, the following conventions have been used.
 
 1. Likert items have been rescaled from 0 to 1
-2. Liberal views are scored 0 and conservative views are scaled high.
-
+2. Liberal views are scored 0 and conservative views are scaled high.MATT IS THIS CORRECT
+3. Directional items are scored low (0) to high (1)
+  - Party and leader thermometer ratings are scored (1, strongly dislike, 100 strongly like)
+  - Spending preferences are scored such that 0 is less spending 1 is more spending (even though this might conflict with the liberal and conservative ratings in 2. )
+  - evaluations of the economy and personal financial situation are scored such that 0 is worse or bad and 1 is better or good. 
+  
 This is an incomplete list of recoded and renamed variables. 
 
 | Concept | Variable Name | notes|
@@ -119,31 +136,7 @@ This is an incomplete list of recoded and renamed variables.
 # Establishing A Usable Time Series
 
 
-## Future recodes
-
- However, users are also welcome to contribute to the package's development by adding new recodes in the recode scripts. The next section shows how to do that:
-
-### Adding recoded variables
-
-1. Users must clone the package's GitHub repository to their desktop. Instructions on how to do this can be found [here](https://happygitwithr.com/existing-github-first), particularly Section 16.2.2.  
-
-2. That done, open the RStudio project in the local directory you have just created on your computer which is a clone of the existing package repository. 
-
-3. Open the recode script for the data-set you want to work on. Here, you will need to navigate to the folder `data-raw/recode_scripts/` and select which one you want. In this way you will be able to execute, see and diagnose recode commands in the local environment. 
-
-5. Once complete, you will need to `source()` the recode script from beginning to end. This is important for a few reasons. First, running `source()` is *noticeably* faster than executing code by selecting it in RStudio and running `cmd-Enter`. We have been doing this and it can take forever. 
-
-Second, and more importantly, you will see that the recode script always starts by loading the original raw data file and then saving an `.rdata` file out into the folder `data`. *This* is the file that is available to users when they install and load `cesdata2`
-
-6. After sourcing all `recode` scripts, it is necessary to re-install the package. Once you have done this, you can: 1) exit the package, 2) Open a new RScript for analysis (which should be an RStudio project) 3) call `library(cesdata2)` and your recoded variables should be available to you.
-
-7. To share with other users, which is highly desirable, *re-open the `cesdata2`* project on your computer, make a new Github branch, using an informative title, commit these changes to the GitHub repository and push them to that new branch, *not* the main branch.
-
-The package is currently set up to permit only Simon Kiss and Matt Polacko to contribute to the main branch. All others must commit to other branches. Simon Kiss, package maintainer, will merge branches to the main branch and communicate when that has happened.
-
-## Constructing a dataset for analysis.
-
-In the simple case of combinining three single-election datasets, we can combine them in this way.
+In the simple case of combining three single-election datasets, we can combine them in this way.
 
 1. Make a list of your datasets.
 2. Provide names for each list item, corresponding to the election year
@@ -156,12 +149,12 @@ ces.list<-list(ces00, ces93, ces97)
 # Names
 names(ces.list)<-c(2000, 1993, 1997)
 #Make a vector of desired common variables
-myvars<-c("male", "degree")
+myvars<-c("male", "degree", "election")
 library(tidyverse)
 library(haven) 
 ces.list %>% 
   map(., select, any_of(myvars)) %>% 
-  list_rbind(., names_to=c("election"))->ces
+  list_rbind(.)->ces
 glimpse(ces)
 
   
@@ -186,13 +179,13 @@ length(ces84$gay_rights) # Zero indicates it does not exist
 #Check to see if ces88 gay_rights exists
 length(ces88$gay_rights) #3609 cases of gay_rights values
 # Construct common variables
-myvars<-c("gender", "vote", "gay_rights")
+myvars<-c("gender", "vote", "gay_rights", "election")
 #Make data frame
 ces.list %>% 
   #Select the variables
   map(., select, any_of(myvars)) %>% 
   #bind together providing a new variable Election containing the election year
-  list_rbind(., names_to=c("Election"))->ces
+  list_rbind(.)->ces
 
 ```
 Now we can confirm what was happen with the variable `gay_rights` in each year.
@@ -200,7 +193,7 @@ Now we can confirm what was happen with the variable `gay_rights` in each year.
 ```{r show-gay-rights-84}
 #Check the gay_rights variable in 1984
 ces %>% 
-  filter(Election==1984) %>% 
+  filter(election==1984) %>% 
   select(gay_rights)
 
 ```
@@ -208,7 +201,7 @@ ces %>%
 ```{r show-gay-rights-88}
 #Check the gay_rights variable in 1988
 ces %>% 
-  filter(Election==1988) %>% 
+  filter(election==1988) %>% 
   select(gay_rights)
 ```
 
@@ -216,7 +209,34 @@ ces %>%
 
 2. Panel datasets
 
-There are two panel sets in the complete series, 1979-1980 and 2004-2006-2008-2011. These present some challenges for the strategy we chose of consistently renaming variables. 
+1. 1974-1979-1980
+There is a complete 1974-1979-1980 Canada Election Study file and it is loaded into `cesdata2` as `ces7980`. However, we have also loaded the original 1974 file into `cesdata2` as `ces74`. Effectively we did not make use of the panel feature for 1974-1979. There are respondents in `ces7980` that did participate in the 1974 study. Users can track them down using the variables contained in `ces7980`, but we haven't down that.
+
+The user can search through `ces7980` in this way to filter respondents as they wish in the master file that is necessary to make their CES data-set.
+```{r lookfor-74-79-panel}
+lookfor(ces7980, "1979 Filter|1980 Filter|1974 Filter|P74|P79")
+
+```
+
+It is possible though that the recode script may need to be modified in order to make potential use of this feature. Good luck.
+
+In addition, MATT CAN YOU EXPLAIN WHAT HAPPENED WITH 1980
+
+
+2. 1992 Referendum and 1993 Election Survey
+
+The object `ces93` contains respondents that participated in both the 1992 Referendum *and* the 1993 general election. All the original distinguishing variables are included in `ces93` for the user to filter and select as necessary.
+
+```{r show-ces93}
+ces93 %>% 
+  select(contains("RTYPE"), contains("CESTYPE")) %>% 
+  as_factor() %>% 
+  head()
+```
+
+
+3. 2004-2011
+The CES 2004-2011 is a very large file and presents some significant challenges given our renaming and recoding strategy. However, we have come up with a method that is expansive in that recodes are run on every respondent and can then be efficiently filtered to select respondent values for specific sets of surveys.
 
 The underlying data files look like this the following table, for *each* respondent, there are variables for the 2004, 2006, and 2008 surveys *whether or not* the respondent actually completed the surveys. 
 Respondent ID |Survey |`ces04_PES_K5A` | `ces06_PES_B4A` |`ces08_PES_B4B`  | 
@@ -248,7 +268,7 @@ table(ces0411$survey) %>%
 
 ```
 
-There are multiple ways to split the file.  You can split it very precisely and narrowly.  For example, one can pick only the respondents who completed the CPS04, the CPS04 PES04 or the CPS04 PES04 MBS04 sequence by using `filter()` and a regular epression in `str_detect()`. Note, to diagnose the accuracy of your regular expressin and filter strategy, you can first `select()` only the `survey` variable and count what your filter strategy produces, and then actually filter into a new data frame.  
+There are multiple ways to split the file.  You can split it very precisely and narrowly.  For example, one can pick only the respondents who completed the CPS04, the CPS04 PES04 or the CPS04 PES04 MBS04 sequence by using `filter()` and a regular expression in `str_detect()`. Note, to diagnose the accuracy of your regular expression and filter strategy, you can first `select()` only the `survey` variable and count what your filter strategy produces, and then actually filter into a new data frame.  
 
 ```{r include-only-cps04, echo=F}
 ces0411 %>% 
@@ -293,7 +313,7 @@ Please note that alternative, more expansive selection strategies are available.
 For example, we can collect *any* respondent who responded to any survey by using `str_detect()`. 
 You can see the effects of such a strategy here:
 
-```{r}
+```{r show-pes08}
 ces0411 %>% 
   select(survey) %>% 
   filter(str_detect(survey, "PES08")) %>% 
@@ -301,7 +321,7 @@ ces0411 %>%
   kable()
 ```
 
-This might be desirable to increase sample size, but it might be undesirable to include panel respondents, who, after having been interviewed multiple times, may be demonstrate different responses than other purely cross-sectional respondents. We leave this to the user.
+This might be desirable to increase sample size, but it might be undesirable to include panel respondents, who, after having been interviewed multiple times, may be demonstrate different responses than other purely cross-sectional respondents. *We leave this to the user.*
 
 For now, we will keep the filtering strategy and save the resulting object as `ces08`.
 ```{r make-ces08}
@@ -312,68 +332,125 @@ ces0411 %>%
 3. Renaming re-coded variables in `ces04`, `ces06`, `ces08` and `ces11` data frames.
 
 Because respondents in`ces04` and `ces08` all come from the giant combined file, all have recoded variables from each election. For variables they were not eligible to report because they weren't in that survey, their values are `NA`
-```{r}
+```{r show-ces04-vote}
 ces04 %>% 
-select(contains('vote'))
+select(contains('vote')) %>% 
+  as_factor()
 
 ```
 Note, because we used an expansive filtering strategy for `ces08` there are respondents who actully have responses for variables from 2004. However, because we are defining this as a dataset for 2008, we will effectively drop those earlier responses and only take respondents' values from 2008. 
-```{r}
+```{r show-ces08-vote}
 ces08 %>% 
-  select(contains('vote')) 
+  select(contains('vote')) %>% 
+  as_factor()
 
 ```
 
+Previously, we had a fairly laborious method of individually renaming variables such as `vote04` to be `vote`. There is a cleaner and quicker way to accomplish this. Specifically, for each datafram that comes from the `ces0411` combined file, we just strip out any instance of `04` in the `ces04` data frame, `06` in the `ces06` dataframe. 
 
-The most straightforward way to do this is to strip out year identifying numbers from the variables you *want* to keep. 
-
-So, for the `ces04` dataset, we want to keep the variables recoded with `04` appended. You can do this really quickly with the `clean_names()` function in the `janitor` package. 
+You can see the effects of this below:
 
 ```{r ces04-select-04-variables}
-library(janitor)
-ces04 %>% 
-  clean_names(., replace=c("vote04"="vote", 
-              "gender04"="gender", 
-              "degree04"="degree")) %>% 
-  select(survey, vote, gender, degree)->ces04
-#Check the names
-names(ces04)
-```
-And for `ces08`
 
-```{r}
-ces08 %>% 
-  clean_names(., replace=c("gender08"="gender",
-                           "degree08"="degree",
-                           "vote08"="vote")) %>% 
-  select(gender, degree, vote)->ces08
-#names(ces08)
+#Take only the ces04 data frame
+ces04 %>% 
+  #Select variables containing vote and trad
+  select(contains('vote'), contains('trad')) %>% 
+  #Show the names of the variables
+  names()
+
 ```
+
+Here it is apparent that there are consistent variables for `04`, `06` and `08` even in the data set that contains only respondents that participated in the `04` survey. 
+
+If we strip out `04` from the variable names we are left with.
+
+```{r strip-out-04}
+#Take only the ces04 data frame
+ces04 %>% 
+  #Select variables containing vote and trad
+  select(contains('vote'), contains('trad')) %>% 
+  #Show the names of the variables
+  names() %>% 
+  str_remove_all(., "04")
+```
+
+Now, for example, in the `ces04` data frame, `vote04` has become `vote`, `trad041` has become `trad1`, etc. But `vote06`and `trad06`  remains untouched.
+
+We make the permanent changes to the data-sets in the following way:
+
+```{r remove-names-04-11}
+
+#Rename variables in 2008
+#Strip out any instance of `08` in the names of 08
+names(ces08)<-str_remove_all(names(ces08), "08")
+
+```
+
+
 
 And now, we could proceed, as noted above, creating a unified tabular ces dataset from with other, more simple, one-election datafiles.
 
 ```{r ces08-select-08-variables}
 #List the data frames to be used.
-ces.list<-c(ces93, ces97, ces00, ces04, ces08)
+ces.list<-list(ces97, ces00, ces04, ces08)
+
 #Provide names
-names(ces.list)<-c(1993, 1997, 2000, 2004, 2008)
+names(ces.list)<-c(1997, 2000, 2004, 2008)
+myvars<-c("gender", "vote", "gay_rights", "trad1", "election", "mode")
+
+#Make data frame
+ces.list %>% 
+  #Select the variables
+  map(., select, any_of(myvars)) %>% 
+  #bind together providing a new variable Election containing the election year
+  bind_rows(.)->ces
+#Show results
+head(as_factor(ces))
+#Summarize
+summary(as_factor(ces))
 ```
 
+# Future recodes
 
-3. The 1980 Canada Election Study
+Users are also welcome to contribute to the package's development by adding new recodes in the recode scripts. The next section shows how to do that:
 
-Something happened in the 1980 election because it was called so quickly, the CES team was not able to field a full survey or something. As a result, some demographic variables were not asked. 
+## Adding recoded variables
+
+1. Users must clone the package's GitHub repository to their desktop. Instructions on how to do this can be found [here](https://happygitwithr.com/existing-github-first), particularly Section 16.2.2.  
+
+2. That done, open the RStudio project in the local directory you have just created on your computer which is a clone of the existing package repository. 
+
+3. Open the recode script for the data-set you want to work on. Here, you will need to navigate to the folder `data-raw/recode_scripts/` and select which one you want. In this way you will be able to execute, see and diagnose recode commands in the local environment. 
+
+5. Once complete, you will need to `source()` the recode script from beginning to end. This is important for a few reasons. First, running `source()` is *noticeably* faster than executing code by selecting it in RStudio and running `cmd-Enter`. We have been doing this and it can take forever. 
+
+Second, and more importantly, you will see that the recode script always starts by loading the original raw data file and then saving an `.rda` file out into the folder `data`. *This* is the file that is available to users when they install and load `cesdata2`, *not* the raw data file.
+
+6. After sourcing all `recode` scripts, it is necessary to re-install the package. Once you have done this, you can: 1) exit the package, 2) Open a new RScript for analysis (which should be an RStudio project) 3) call `library(cesdata2)` and your recoded variables should be available to you.
+
+7. To share with other users, which is highly desirable, *re-open the `cesdata2`* project on your computer, make a new Github branch, using an informative title, commit these changes to the GitHub repository and push them to that new branch, *not* the main branch.
+
+The package is currently set up to permit only Simon Kiss and Matt Polacko to contribute to the main branch. All others must commit to other branches. Simon Kiss, package maintainer, will merge branches to the main branch and communicate when that has happened.
 
 
 # Outstanding Issues
 
-1. It would be desirable to add a `mode` variable in the recode scripts so that potentially phone and web surveys from 2015 and 2019 could be used in the same analysis and the analyst could distinguish which mode provided the case. The consistent naming scheme could remain for common variables (e.g. `male` for male gendered people, `vote` for vote cast), but then there could be 
+1. The 2015 Web survey is currently included in the package, but there have been almost no variables recoded.
 
 2. Value labels
 
-Right now, all the original CES files are imported via the `haven` package which creates this very awkwared `labelled` class variable instead of standard R factors. In hindsight this was a mistake. It would be better to go back and convert those variables as value labels straight to factors. 
+Right now, all the original CES files are imported via the `haven` package which creates this very awkward `labelled` class variable instead of standard R factors. In hindsight this was a mistake. It would be better to go back and convert those variables as value labels straight to factors.
+
+Care has been taken to ensure value labels are consistent throughout, however, the user is strongly advised to very quickly after making `ces` to use `as_factor()` to convert `labelled` variables to factors. 
+
+Care has also been taken to *not* assign value labels to truly numeric or continuous variables. They should show up as class `double`. This does mean that it may be difficult to know exactly what `1` and `0` means in those cases. The user is encouraged to look at the naming conventions in the section above, to quickly crosstab recoded with original variables in the underlying dataframe or to examine the recode scripts in the `cesdata2` package themselves.
 
 ## Template For Constructing A CES 
+
+We provide here a template R code that will get the user up and running quickly. This can be copied and pasted into an R Script and should work as long as `cesdata2` is installed from the GitHub repository.
+
+Note: this script belongs in an *analysis* project, *not* in the `cesdata2` project. 
 
 ```{r template}
 library(purrr)
@@ -396,7 +473,8 @@ names(ces80)<-str_remove_all(names(ces80), "80")
 
 tail(names(ces80))
 
-### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
+### Decide On CES 1993 sample
+# this command includes only those respondents that completed the 1993 Campaign and Post-Election Survey
 # ces93[!is.na(ces93$RTYPE4), ] -> ces93
 
   #Use Panel Respondents for 2004
@@ -470,8 +548,12 @@ summary(ces)
 ```
 
 
+## Credit
 
-
-
+As this R package remains a private, by invitation only repository, there is no way to cite it. Instead, collaborators invited to participate are requested to cite one of the papers in the reference list below as recognition of the work that has gone into this. This package was instrumental in both publications.
 
 ## References
+
+Polacko, Matthew, Simon Kiss, and Peter Graefe. “The Changing Nature of Class Voting in Canada, 1965-2019.” Canadian Journal of Political Science/Revue Canadienne de Science Politique 55, no. 3 (September 1, 2022): 1–24.
+
+Kiss, Simon, Peter Graefe, and Matt Polacko. “The Evolving Education-Income Cleavage In Canada.” Electoral Studies, 2023.
