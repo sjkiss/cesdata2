@@ -212,7 +212,7 @@ ces %>%
 
 2. Panel datasets
 
-    1. 1974-1979-1980
+    * 1974-1979-1980
 There is a complete 1974-1979-1980 Canada Election Study file and it is loaded into `cesdata2` as `ces7980`. However, we have also loaded the original 1974 file into `cesdata2` as `ces74`. Effectively we did not make use of the panel feature for 1974-1979. There are respondents in `ces7980` that did participate in the 1974 study. Users can track them down using the variables contained in `ces7980`, but we haven't down that.
 
 The user can search through `ces7980` in this way to filter respondents as they wish in the master file that is necessary to make their CES data-set.
@@ -226,7 +226,7 @@ It is possible though that the recode script may need to be modified in order to
 In addition, MATT CAN YOU EXPLAIN WHAT HAPPENED WITH 1980
 
 
-    2. 1992 Referendum and 1993 Election Survey
+    * 1992 Referendum and 1993 Election Survey
 
 The object `ces93` contains respondents that participated in both the 1992 Referendum *and* the 1993 general election. All the original distinguishing variables are included in `ces93` for the user to filter and select as necessary.
 
@@ -238,7 +238,7 @@ ces93 %>%
 ```
 
 
-    3. 2004-2011
+    * 2004-2011
 The CES 2004-2011 is a very large file and presents some significant challenges given our renaming and recoding strategy. However, we have come up with a method that is expansive in that recodes are run on every respondent and can then be efficiently filtered to select respondent values for specific sets of surveys.
 
 The underlying data files look like this the following table, for *each* respondent, there are variables for the 2004, 2006, and 2008 surveys *whether or not* the respondent actually completed the surveys. 

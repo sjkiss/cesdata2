@@ -293,14 +293,13 @@ ces %>%
 
 2.  Panel datasets
 
-    1.  1974-1979-1980 There is a complete 1974-1979-1980 Canada
-        Election Study file and it is loaded into `cesdata2` as
-        `ces7980`. However, we have also loaded the original 1974 file
-        into `cesdata2` as `ces74`. Effectively we did not make use of
-        the panel feature for 1974-1979. There are respondents in
-        `ces7980` that did participate in the 1974 study. Users can
-        track them down using the variables contained in `ces7980`, but
-        we haven’t down that.
+    - 1974-1979-1980 There is a complete 1974-1979-1980 Canada Election
+      Study file and it is loaded into `cesdata2` as `ces7980`. However,
+      we have also loaded the original 1974 file into `cesdata2` as
+      `ces74`. Effectively we did not make use of the panel feature for
+      1974-1979. There are respondents in `ces7980` that did participate
+      in the 1974 study. Users can track them down using the variables
+      contained in `ces7980`, but we haven’t down that.
 
 The user can search through `ces7980` in this way to filter respondents
 as they wish in the master file that is necessary to make their CES
@@ -344,7 +343,7 @@ order to make potential use of this feature. Good luck.
 
 In addition, MATT CAN YOU EXPLAIN WHAT HAPPENED WITH 1980
 
-    2. 1992 Referendum and 1993 Election Survey
+    * 1992 Referendum and 1993 Election Survey
 
 The object `ces93` contains respondents that participated in both the
 1992 Referendum *and* the 1993 general election. All the original
@@ -368,7 +367,7 @@ ces93 %>%
 #> # ℹ 1 more variable: CESTYPE <fct>
 ```
 
-    3. 2004-2011
+    * 2004-2011
 
 The CES 2004-2011 is a very large file and presents some significant
 challenges given our renaming and recoding strategy. However, we have
@@ -548,25 +547,25 @@ ces04 %>%
 | vote04 | vote06 | vote08 | vote11 |
 |-------:|-------:|-------:|-------:|
 |      1 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
 |      4 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|      5 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      2 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
+|      3 |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
+|      4 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|      2 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
 
 Please note that alternative, more expansive selection strategies are
 available. For example, we can collect *any* respondent who responded to
