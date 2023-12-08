@@ -25,14 +25,6 @@ You can install the development version of `cesdata2` from
 ``` r
 # install.packages("devtools")
 devtools::install_github("sjkiss/cesdata2")
-#>      checking for file ‘/private/var/folders/zn/sxvg8sy539b2yfxt5c0xtwfm0000gq/T/Rtmpa3gxoG/remotes60036c742a1e/sjkiss-cesdata2-d37117f/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/zn/sxvg8sy539b2yfxt5c0xtwfm0000gq/T/Rtmpa3gxoG/remotes60036c742a1e/sjkiss-cesdata2-d37117f/DESCRIPTION’ (486ms)
-#>   ─  preparing ‘cesdata2’:
-#>      checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
-#>   ─  checking for LF line-endings in source and make files and shell scripts
-#>   ─  checking for empty or unneeded directories
-#>   ─  building ‘cesdata2_0.0.1.tar.gz’
-#>      
-#> 
 ```
 
 ## How to use it.
@@ -194,17 +186,22 @@ combine them in this way.
     those variables and join them together in a tabular data frame.
 
 ``` r
+library(tidyverse)
+library(haven) 
 #make a list of datasets
 ces.list<-list(ces00, ces93, ces97)
 # Names
 names(ces.list)<-c(2000, 1993, 1997)
 #Make a vector of desired common variables
 myvars<-c("male", "degree", "election")
-library(tidyverse)
-library(haven) 
+#Start with ces.list
 ces.list %>% 
+  #Map onto each data frame in ces.list the function select()
+  # select any of the variables in the object myvars
   map(., select, any_of(myvars)) %>% 
+  #bind everything into one data frame and save it as ces
   list_rbind(.)->ces
+#Glimpse 
 glimpse(ces)
 #> Rows: 12,471
 #> Columns: 3
@@ -296,13 +293,14 @@ ces %>%
 
 2.  Panel datasets
 
-3.  1974-1979-1980 There is a complete 1974-1979-1980 Canada Election
-    Study file and it is loaded into `cesdata2` as `ces7980`. However,
-    we have also loaded the original 1974 file into `cesdata2` as
-    `ces74`. Effectively we did not make use of the panel feature for
-    1974-1979. There are respondents in `ces7980` that did participate
-    in the 1974 study. Users can track them down using the variables
-    contained in `ces7980`, but we haven’t down that.
+    1.  1974-1979-1980 There is a complete 1974-1979-1980 Canada
+        Election Study file and it is loaded into `cesdata2` as
+        `ces7980`. However, we have also loaded the original 1974 file
+        into `cesdata2` as `ces74`. Effectively we did not make use of
+        the panel feature for 1974-1979. There are respondents in
+        `ces7980` that did participate in the 1974 study. Users can
+        track them down using the variables contained in `ces7980`, but
+        we haven’t down that.
 
 The user can search through `ces7980` in this way to filter respondents
 as they wish in the master file that is necessary to make their CES
@@ -346,7 +344,7 @@ order to make potential use of this feature. Good luck.
 
 In addition, MATT CAN YOU EXPLAIN WHAT HAPPENED WITH 1980
 
-2.  1992 Referendum and 1993 Election Survey
+    2. 1992 Referendum and 1993 Election Survey
 
 The object `ces93` contains respondents that participated in both the
 1992 Referendum *and* the 1993 general election. All the original
@@ -370,11 +368,13 @@ ces93 %>%
 #> # ℹ 1 more variable: CESTYPE <fct>
 ```
 
-3.  2004-2011 The CES 2004-2011 is a very large file and presents some
-    significant challenges given our renaming and recoding strategy.
-    However, we have come up with a method that is expansive in that
-    recodes are run on every respondent and can then be efficiently
-    filtered to select respondent values for specific sets of surveys.
+    3. 2004-2011
+
+The CES 2004-2011 is a very large file and presents some significant
+challenges given our renaming and recoding strategy. However, we have
+come up with a method that is expansive in that recodes are run on every
+respondent and can then be efficiently filtered to select respondent
+values for specific sets of surveys.
 
 The underlying data files look like this the following table, for *each*
 respondent, there are variables for the 2004, 2006, and 2008 surveys
@@ -547,9 +547,10 @@ ces04 %>%
 
 | vote04 | vote06 | vote08 | vote11 |
 |-------:|-------:|-------:|-------:|
+|      1 |     NA |     NA |     NA |
 |      4 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
+|      5 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
@@ -557,15 +558,14 @@ ces04 %>%
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      2 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
-|      3 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|      2 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
 
 Please note that alternative, more expansive selection strategies are
