@@ -293,13 +293,15 @@ ces %>%
 
 2.  Panel datasets
 
-    - 1974-1979-1980 There is a complete 1974-1979-1980 Canada Election
-      Study file and it is loaded into `cesdata2` as `ces7980`. However,
-      we have also loaded the original 1974 file into `cesdata2` as
-      `ces74`. Effectively we did not make use of the panel feature for
-      1974-1979. There are respondents in `ces7980` that did participate
-      in the 1974 study. Users can track them down using the variables
-      contained in `ces7980`, but we haven’t down that.
+    - 1974-1979-1980
+
+There is a complete 1974-1979-1980 Canada Election Study file and it is
+loaded into `cesdata2` as `ces7980`. However, we have also loaded the
+original 1974 file into `cesdata2` as `ces74`. Effectively we did not
+make use of the panel feature for 1974-1979. There are respondents in
+`ces7980` that did participate in the 1974 study. Users can track them
+down using the variables contained in `ces7980`, but we haven’t down
+that.
 
 The user can search through `ces7980` in this way to filter respondents
 as they wish in the master file that is necessary to make their CES
@@ -343,7 +345,7 @@ order to make potential use of this feature. Good luck.
 
 In addition, MATT CAN YOU EXPLAIN WHAT HAPPENED WITH 1980
 
-    * 1992 Referendum and 1993 Election Survey
+    - 1992 Referendum and 1993 Election Survey
 
 The object `ces93` contains respondents that participated in both the
 1992 Referendum *and* the 1993 general election. All the original
@@ -367,7 +369,7 @@ ces93 %>%
 #> # ℹ 1 more variable: CESTYPE <fct>
 ```
 
-    * 2004-2011
+    - 2004-2011
 
 The CES 2004-2011 is a very large file and presents some significant
 challenges given our renaming and recoding strategy. However, we have
@@ -546,26 +548,26 @@ ces04 %>%
 
 | vote04 | vote06 | vote08 | vote11 |
 |-------:|-------:|-------:|-------:|
+|     NA |     NA |     NA |     NA |
+|      1 |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|      4 |     NA |     NA |     NA |
+|      2 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
+|      1 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      2 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|      3 |     NA |     NA |     NA |
+|      2 |     NA |     NA |     NA |
+|      2 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
-|      4 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
 
 Please note that alternative, more expansive selection strategies are
 available. For example, we can collect *any* respondent who responded to
@@ -756,7 +758,9 @@ untouched.
 We make the permanent changes to the data-sets in the following way:
 
 ``` r
-
+#Rename variables in 2004
+#Strip out any instance of `08` in the names of 08
+names(ces04)<-str_remove_all(names(ces04), "04")
 #Rename variables in 2008
 #Strip out any instance of `08` in the names of 08
 names(ces08)<-str_remove_all(names(ces08), "08")
@@ -792,14 +796,14 @@ head(as_factor(ces))
 #> 6 <NA>               1     1        1997 Phone
 #Summarize
 summary(as_factor(ces))
-#>            vote        gay_rights        trad1          election   
-#>  Other       : 113   Min.   :0.000   Min.   :0.000   Min.   :1997  
-#>  Liberal     :2335   1st Qu.:0.000   1st Qu.:0.000   1st Qu.:1997  
-#>  Conservative:2759   Median :0.250   Median :0.250   Median :2000  
-#>  NDP         : 992   Mean   :0.468   Mean   :0.444   Mean   :2002  
-#>  Bloc        : 777   3rd Qu.:1.000   3rd Qu.:0.750   3rd Qu.:2008  
-#>  Green       : 187   Max.   :1.000   Max.   :1.000   Max.   :2008  
-#>  NA's        :6450   NA's   :5025    NA's   :2694    NA's   :2324  
+#>            vote        gay_rights        trad1           election   
+#>  Other       : 120   Min.   :0.000   Min.   :0.0000   Min.   :1997  
+#>  Liberal     :2596   1st Qu.:0.000   1st Qu.:0.0000   1st Qu.:1997  
+#>  Conservative:3015   Median :0.250   Median :0.2500   Median :2000  
+#>  NDP         :1145   Mean   :0.467   Mean   :0.4444   Mean   :2002  
+#>  Bloc        : 862   3rd Qu.:1.000   3rd Qu.:0.7500   3rd Qu.:2008  
+#>  Green       : 217   Max.   :1.000   Max.   :1.0000   Max.   :2008  
+#>  NA's        :5658   NA's   :3908    NA's   :382                    
 #>      mode          
 #>  Length:13613      
 #>  Class :character  
@@ -861,10 +865,12 @@ the main branch and communicate when that has happened.
 
 # Outstanding Issues
 
-1.  The 2015 Web survey is currently included in the package, but there
-    have been almost no variables recoded.
+1.  **2015 Web Survey**
 
-2.  Value labels
+The 2015 Web survey is currently included in the package, but there have
+been almost no variables recoded.
+
+2.  **Value labels**
 
 Right now, all the original CES files are imported via the `haven`
 package which creates this very awkward `labelled` class variable
@@ -894,26 +900,31 @@ Note: this script belongs in an *analysis* project, *not* in the
 `cesdata2` project.
 
 ``` r
-library(purrr)
+
 library(tidyverse)
 #Install cesdata2
 #devtools::install_github("sjkiss/github")
 library(cesdata2)
+
 #Seprate ces79 and ces80 to two separate files
 ces7980 %>% 
+  #This variable indicates Rs who completed the 1979 survey, no panel respondents
   filter(V4002==1)->ces79
 
 ces7980 %>% 
+  #This variable indicates Rs who completed the 1980 survey, may also havecompleted the 1979 survey; a user should check.
   filter(V4008==1)->ces80
 # Drop the `election` variable from ces80
+# This is a quirk of the election80 variable; 
+# I'll explain another time. Trust me; it is necessary and in this order.
 ces80 %>% 
   select(-election)->ces80
 #Remove the '80' from the duplicate ces80 variables
 # in the ces780
 names(ces80)<-str_remove_all(names(ces80), "80")
-
+#Check
 tail(names(ces80))
-#> [1] "ndp_rating" "turnout"    "foreign"    "mip"        "mode"      
+#> [1] "ndp_rating" "mode"       "mip"        "foreign"    "turnout"   
 #> [6] "election"
 
 ### Decide On CES 1993 sample
@@ -923,148 +934,7 @@ tail(names(ces80))
   #Use Panel Respondents for 2004
 ces0411 %>%
  filter(str_detect(ces0411$survey, "PES04"))->ces04
-table(ces0411$survey)
-#> 
-#>                                                                     CPS04 
-#>                                                                      1182 
-#>                                                               CPS04 PES04 
-#>                                                                       671 
-#>                                                      CPS04 PES04 CPS06  * 
-#>                                                                       107 
-#>                                                   CPS04 PES04 CPS06 PES06 
-#>                                                                       207 
-#>                                                         CPS04 PES04 MBS04 
-#>                                                                       471 
-#>                                                   CPS04 PES04 MBS04 CPS06 
-#>                                                                        71 
-#>                                             CPS04 PES04 MBS04 CPS06 PES06 
-#>                                                                       229 
-#>                                                                     CPS06 
-#>                                                                       493 
-#>                                                               CPS06 PES06 
-#>                                                                      1566 
-#>                                                                     CPS08 
-#>                                                                       806 
-#>                                                               CPS08 PES08 
-#>                                                                      1233 
-#>                                                         CPS08 PES08 MBS08 
-#>                                                                      1218 
-#>                                 Panel - CPS04 PES04 CPS06 PES06 PES08  ** 
-#>                                                                       109 
-#>                               Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 
-#>                                                                        58 
-#>                                           Panel - CPS04 PES04 CPS06 PES08 
-#>                                                                        29 
-#>                                     Panel - CPS04 PES04 CPS06 PES08 MBS08 
-#>                                                                         7 
-#>                               Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 
-#>                                                                        99 
-#>                         Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 
-#>                                                                       204 
-#>                                     Panel - CPS04 PES04 MBS04 CPS06 PES08 
-#>                                                                        10 
-#>                               Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 
-#>                                                                        19 
-#>                                                        New RDD_2011 CPS11 
-#>                                                                       863 
-#>                                                   CPS04 PES04 CPS06 CPS11 
-#>                                                                         6 
-#>                                             CPS04 PES04 CPS06 PES06 CPS11 
-#>                                                                        13 
-#>                                             CPS04 PES04 MBS04 CPS06 CPS11 
-#>                                                                         6 
-#>                                       CPS04 PES04 MBS04 CPS06 PES06 CPS11 
-#>                                                                        12 
-#>                               Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 
-#>                                                                        15 
-#>                         Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 
-#>                                                                         4 
-#>                                     Panel - CPS04 PES04 CPS06 PES08 CPS11 
-#>                                                                         2 
-#>                               Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 
-#>                                                                         0 
-#>                         Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 
-#>                                                                         7 
-#>                   Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 
-#>                                                                        16 
-#>                               Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 
-#>                                                                         1 
-#>                         Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 
-#>                                                                         1 
-#>                                                  New RDD_2011 CPS11 PES11 
-#>                                                                      1492 
-#>                                             CPS04 PES04 CPS06 CPS11 PES11 
-#>                                                                         6 
-#>                                       CPS04 PES04 CPS06 PES06 CPS11 PES11 
-#>                                                                        42 
-#>                                       CPS04 PES04 MBS04 CPS06 CPS11 PES11 
-#>                                                                         2 
-#>                                 CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 
-#>                                                                        20 
-#>                         Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 
-#>                                                                        88 
-#>                   Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 
-#>                                                                        22 
-#>                               Panel - CPS04 PES04 CPS06 PES08 CPS11 PES11 
-#>                                                                         7 
-#>                         Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 
-#>                                                                         2 
-#>                   Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 
-#>                                                                        52 
-#>             Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 
-#>                                                                        83 
-#>                         Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 
-#>                                                                         7 
-#>                   Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 
-#>                                                                         5 
-#>                                            New RDD_2011 CPS11 PES11 MBS11 
-#>                                                                       584 
-#>                                       CPS04 PES04 CPS06 CPS11 PES11 MBS11 
-#>                                                                         1 
-#>                                 CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 
-#>                                                                         5 
-#>                                 CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11 
-#>                                                                         2 
-#>                           CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 
-#>                                                                        12 
-#>                   Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 MBS11 
-#>                                                                        13 
-#>             Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 
-#>                                                                        15 
-#>                   Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 
-#>                                                                         2 
-#>             Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 MBS11 
-#>                                                                        48 
-#>       Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 
-#>                                                                       105 
-#>                   Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 MBS11 
-#>                                                                         1 
-#>             Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 
-#>                                                                         3 
-#>                                      New RDD_2011 CPS11 PES11 MBS11 WBS11 
-#>                                                                       519 
-#>                                 CPS04 PES04 CPS06 CPS11 PES11 MBS11 WBS11 
-#>                                                                         2 
-#>                           CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 WBS11 
-#>                                                                         3 
-#>                           CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11 WBS11 
-#>                                                                         1 
-#>                     CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 WBS11 
-#>                                                                        14 
-#>             Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 MBS11 WBS11 
-#>                                                                         7 
-#>       Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 
-#>                                                                        20 
-#>             Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 
-#>                                                                         4 
-#>       Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 MBS11 WBS11 
-#>                                                                        20 
-#> Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 
-#>                                                                       141 
-#>             Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 MBS11 WBS11 
-#>                                                                         2 
-#>       Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 
-#>                                                                        10
+
 # Use Panel Respondets for 2006
 ces0411 %>%
  filter(str_detect(ces0411$survey, "PES06"))->ces06
@@ -1136,7 +1006,7 @@ glimpse(ces)
 #> $ union                  <dbl+lbl> NA,  0,  0, NA, NA, NA,  0, NA,  0, NA, NA,…
 #> $ degree                 <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
 #> $ quebec                 <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
-#> $ age                    <dbl+lbl> 45, 36, 48, 32, 53, 33, 47, 75, 45, 62, 71,…
+#> $ age                    <dbl> 45, 36, 48, 32, 53, 33, 47, 75, 45, 62, 71, 24,…
 #> $ religion               <dbl+lbl> 2, 2, 1, 1, 1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2…
 #> $ vote                   <dbl+lbl>  1,  1,  2,  1,  1,  1,  2,  2,  2,  1,  2,…
 #> $ income                 <dbl+lbl>  1,  2,  2,  2,  3,  2,  3,  2,  3,  2,  1,…
@@ -1182,120 +1052,6 @@ glimpse(ces)
 #> $ enviro_spend           <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ inequality             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ efficacy_rich          <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
-# 
-summary(ces)
-#>       male         occupation      employment      union_both   
-#>  Min.   :0.00    Min.   :1.00    Min.   :0.00    Min.   :0.0    
-#>  1st Qu.:0.00    1st Qu.:1.00    1st Qu.:0.00    1st Qu.:0.0    
-#>  Median :0.00    Median :3.00    Median :1.00    Median :0.0    
-#>  Mean   :0.52    Mean   :2.76    Mean   :0.58    Mean   :0.3    
-#>  3rd Qu.:1.00    3rd Qu.:4.00    3rd Qu.:1.00    3rd Qu.:1.0    
-#>  Max.   :2.00    Max.   :5.00    Max.   :1.00    Max.   :1.0    
-#>  NA's   :46645   NA's   :89056   NA's   :48858   NA's   :55026  
-#>      region          union           degree          quebec     
-#>  Min.   :1.00    Min.   :0.00    Min.   :0.0     Min.   :0.0    
-#>  1st Qu.:2.00    1st Qu.:0.00    1st Qu.:0.0     1st Qu.:0.0    
-#>  Median :2.00    Median :0.00    Median :0.0     Median :0.0    
-#>  Mean   :2.26    Mean   :0.27    Mean   :0.3     Mean   :0.3    
-#>  3rd Qu.:3.00    3rd Qu.:1.00    3rd Qu.:1.0     3rd Qu.:1.0    
-#>  Max.   :3.00    Max.   :1.00    Max.   :1.0     Max.   :1.0    
-#>  NA's   :66818   NA's   :59548   NA's   :48787   NA's   :54580  
-#>       age            religion          vote           income     
-#>  Min.   :  13.0   Min.   :0.00    Min.   :0.00    Min.   :1.00   
-#>  1st Qu.:  36.0   1st Qu.:1.00    1st Qu.:1.00    1st Qu.:2.00   
-#>  Median :  51.0   Median :1.00    Median :2.00    Median :3.00   
-#>  Mean   : 215.9   Mean   :1.24    Mean   :2.01    Mean   :2.98   
-#>  3rd Qu.:  67.0   3rd Qu.:2.00    3rd Qu.:3.00    3rd Qu.:4.00   
-#>  Max.   :1997.0   Max.   :3.00    Max.   :6.00    Max.   :5.00   
-#>  NA's   :40599    NA's   :49957   NA's   :70501   NA's   :51887  
-#>     turnout           mip        personal_retrospective efficacy_external
-#>  Min.   :0.00    Min.   : 0.00   Min.   :0.00           Min.   :0.00     
-#>  1st Qu.:1.00    1st Qu.: 6.00   1st Qu.:0.00           1st Qu.:0.00     
-#>  Median :1.00    Median : 7.00   Median :0.50           Median :0.25     
-#>  Mean   :0.88    Mean   : 7.75   Mean   :0.48           Mean   :0.39     
-#>  3rd Qu.:1.00    3rd Qu.:10.00   3rd Qu.:0.50           3rd Qu.:0.75     
-#>  Max.   :1.00    Max.   :17.00   Max.   :1.00           Max.   :1.00     
-#>  NA's   :59660   NA's   :80514   NA's   :58454          NA's   :78898    
-#>  efficacy_external2 efficacy_internal political_efficacy    foreign     
-#>  Min.   :0.00       Min.   :0.00      Min.   :0.000      Min.   :0.00   
-#>  1st Qu.:0.00       1st Qu.:0.25      1st Qu.:0.250      1st Qu.:0.00   
-#>  Median :0.25       Median :0.25      Median :0.375      Median :0.00   
-#>  Mean   :0.42       Mean   :0.44      Mean   :0.422      Mean   :0.14   
-#>  3rd Qu.:0.75       3rd Qu.:0.75      3rd Qu.:0.750      3rd Qu.:0.00   
-#>  Max.   :1.00       Max.   :1.00      Max.   :1.000      Max.   :1.00   
-#>  NA's   :58477      NA's   :36579     NA's   :24184      NA's   :53574  
-#>  non_charter_language    language        party_id     income_tertile 
-#>  Min.   :0.00         Min.   :0.00    Min.   :0.00    Min.   :1.00   
-#>  1st Qu.:0.00         1st Qu.:1.00    1st Qu.:1.00    1st Qu.:1.00   
-#>  Median :0.00         Median :1.00    Median :1.00    Median :2.00   
-#>  Mean   :0.29         Mean   :0.75    Mean   :1.59    Mean   :2.01   
-#>  3rd Qu.:1.00         3rd Qu.:1.00    3rd Qu.:2.00    3rd Qu.:3.00   
-#>  Max.   :1.00         Max.   :1.00    Max.   :5.00    Max.   :3.00   
-#>  NA's   :54883        NA's   :48879   NA's   :67043   NA's   :73700  
-#>     income2          mode              election        sector     
-#>  Min.   :1.00    Length:122079      Min.   :1965   Min.   :0.0    
-#>  1st Qu.:2.00    Class :character   1st Qu.:2000   1st Qu.:0.0    
-#>  Median :3.00    Mode  :character   Median :2019   Median :0.0    
-#>  Mean   :2.97                       Mean   :2008   Mean   :0.2    
-#>  3rd Qu.:4.00                       3rd Qu.:2019   3rd Qu.:0.0    
-#>  Max.   :5.00                       Max.   :2021   Max.   :1.0    
-#>  NA's   :73932                                     NA's   :77052  
-#>   occupation3        ideology     redistribution  market_liberalism
-#>  Min.   :1.0      Min.   :0.00    Min.   :0.00    Min.   :0.00     
-#>  1st Qu.:2.0      1st Qu.:0.38    1st Qu.:0.75    1st Qu.:0.25     
-#>  Median :3.0      Median :0.50    Median :0.75    Median :0.50     
-#>  Mean   :3.5      Mean   :0.52    Mean   :0.78    Mean   :0.48     
-#>  3rd Qu.:5.0      3rd Qu.:0.70    3rd Qu.:1.00    3rd Qu.:0.75     
-#>  Max.   :6.0      Max.   :1.00    Max.   :1.00    Max.   :1.00     
-#>  NA's   :104163   NA's   :82728   NA's   :77479   NA's   :74342    
-#>  immigration_rates traditionalism  traditionalism2     trad1      
-#>  Min.   :0.00      Min.   :0.00    Min.   :0.00    Min.   :0.00   
-#>  1st Qu.:0.50      1st Qu.:0.17    1st Qu.:0.12    1st Qu.:0.00   
-#>  Median :0.50      Median :0.33    Median :0.38    Median :0.25   
-#>  Mean   :0.56      Mean   :0.36    Mean   :0.39    Mean   :0.35   
-#>  3rd Qu.:1.00      3rd Qu.:0.50    3rd Qu.:0.50    3rd Qu.:0.50   
-#>  Max.   :1.00      Max.   :1.00    Max.   :1.00    Max.   :1.00   
-#>  NA's   :65036     NA's   :72104   NA's   :72549   NA's   :73119  
-#>      trad2          market1         market2        education    
-#>  Min.   :0.00    Min.   :0.00    Min.   :0.00    Min.   :0.00   
-#>  1st Qu.:0.00    1st Qu.:0.25    1st Qu.:0.25    1st Qu.:0.50   
-#>  Median :0.50    Median :0.25    Median :0.75    Median :0.50   
-#>  Mean   :0.44    Mean   :0.41    Mean   :0.57    Mean   :0.64   
-#>  3rd Qu.:0.75    3rd Qu.:0.75    3rd Qu.:0.75    3rd Qu.:1.00   
-#>  Max.   :1.00    Max.   :1.00    Max.   :1.00    Max.   :1.00   
-#>  NA's   :77442   NA's   :75387   NA's   :77539   NA's   :66993  
-#>  national_retrospective     vote3           postgrad         enviro     
-#>  Min.   :0.00           Min.   :0.00     Min.   :0.00    Min.   :0.00   
-#>  1st Qu.:0.00           1st Qu.:1.00     1st Qu.:0.00    1st Qu.:0.25   
-#>  Median :0.50           Median :2.00     Median :0.00    Median :0.50   
-#>  Mean   :0.39           Mean   :2.61     Mean   :0.11    Mean   :0.59   
-#>  3rd Qu.:0.50           3rd Qu.:4.00     3rd Qu.:0.00    3rd Qu.:1.00   
-#>  Max.   :1.00           Max.   :6.00     Max.   :1.00    Max.   :1.00   
-#>  NA's   :63724          NA's   :112878   NA's   :65140   NA's   :80772  
-#>   pol_interest       satdem         satdem2        household    
-#>  Min.   :0.00    Min.   :0.00    Min.   :0.00    Min.   :0.00   
-#>  1st Qu.:0.50    1st Qu.:0.25    1st Qu.:0.25    1st Qu.:0.50   
-#>  Median :0.70    Median :0.75    Median :0.75    Median :1.00   
-#>  Mean   :0.62    Mean   :0.60    Mean   :0.60    Mean   :0.98   
-#>  3rd Qu.:0.80    3rd Qu.:0.75    3rd Qu.:0.75    3rd Qu.:1.00   
-#>  Max.   :1.00    Max.   :1.00    Max.   :1.00    Max.   :7.50   
-#>  NA's   :70829   NA's   :77937   NA's   :68791   NA's   :89198  
-#>   income_house      promise          trust        enviro_spend  
-#>  Min.   :1.00    Min.   :0.00    Min.   :0.00    Min.   :0.00   
-#>  1st Qu.:1.00    1st Qu.:0.50    1st Qu.:0.00    1st Qu.:0.50   
-#>  Median :2.00    Median :0.50    Median :0.00    Median :1.00   
-#>  Mean   :2.09    Mean   :0.67    Mean   :0.47    Mean   :0.77   
-#>  3rd Qu.:3.00    3rd Qu.:1.00    3rd Qu.:1.00    3rd Qu.:1.00   
-#>  Max.   :3.00    Max.   :1.00    Max.   :1.00    Max.   :1.00   
-#>  NA's   :92814   NA's   :72421   NA's   :81254   NA's   :79448  
-#>    inequality     efficacy_rich  
-#>  Min.   :0.00     Min.   :0.00   
-#>  1st Qu.:0.50     1st Qu.:0.25   
-#>  Median :0.75     Median :0.25   
-#>  Mean   :0.74     Mean   :0.39   
-#>  3rd Qu.:1.00     3rd Qu.:0.50   
-#>  Max.   :1.00     Max.   :1.00   
-#>  NA's   :103127   NA's   :92908
 ```
 
 ## Credit

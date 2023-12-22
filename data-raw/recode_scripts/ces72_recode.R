@@ -57,7 +57,8 @@ table(ces72_nov$quebec)
 
 #recode Age (qv)
 # look_for(ces72_nov, "age")
-ces72_nov$age<-Recode(ces72_nov$qv, "0=NA; 1=19; 2=22; 3=27; 4=32; 5=37; 6=42; 7=47; 8=52; 9=57; 10=62; 11=70")
+ces72_nov$age<-Recode(as.numeric(ces72_nov$qv), "0=NA; 1=19; 2=22; 3=27; 4=32; 5=37; 6=42; 7=47; 8=52; 9=57; 10=62; 11=70")
+
 #check
 table(ces72_nov$age)
 
@@ -166,5 +167,5 @@ ces72_nov$mode<-rep("Phone", nrow(ces72_nov))
 
 #Add Election
 ces72_nov$election<-c(rep(1972, nrow(ces72_nov)))
-glimpse(ces72_nov)
+#glimpse(ces72_nov)
 save(ces72_nov, file=here("data/ces72_nov.rda"))

@@ -60,8 +60,9 @@ table(ces74$quebec)
 
 #recode Age (V478)
 # look_for(ces74, "age")
-ces74$age<-ces74$V478
-ces74$age<-Recode(ces74$V478, "0=NA")
+#ces74$age<-ces74$V478
+ces74$age<-Recode(as.numeric(ces74$V478), "0=NA")
+val_labels(ces74$age)
 #check
 table(ces74$age)
 
@@ -301,5 +302,5 @@ ces74$mode<-rep("Phone", nrow(ces74))
 
 #Add Election
 ces74$election<-c(rep(1974, nrow(ces74)))
-glimpse(ces74)
+#glimpse(ces74)
 save(ces74, file=here("data/ces74.rda"))

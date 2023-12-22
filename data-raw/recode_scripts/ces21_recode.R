@@ -1,6 +1,7 @@
 
 #File to Recode 2021 CES Data
 #Load original file
+library(tidyverse)
 library(haven)
 library(here)
 library(car)
@@ -17,7 +18,126 @@ val_labels(ces21$male)<-c(Female=0, Male=1)
 #checks
 val_labels(ces21$male)
 table(ces21$male)
+#Source the script in data-raw that reads in the 2021 occupation codes
+# and merges it with ces21
+source("data-raw/recode_scripts/ces21_NOC_recode.R")
+# Occupation
+tail(names(ces21))
+ces21$NOC21_4
 
+#This code is left here for legacy if anyone wants to make
+# Class categories using the more specific 5-digit NOC codes
+# There is greater specificity in terms of occupations
+# but more missing cases
+# ces21$occupation_NOC21_5<-Recode(ces21$NOC21_5, as.numeric=T,"95000:95999=5;
+#        85000:85999=5;
+#        75000:75999=5;
+#        65000:65999=5;
+#        55000:65999=5;
+#        45000:45999=5;
+#        94000:94999=4;
+#        84000:84999=4;
+#        74000:74999=4;
+#        64000:64999=3;
+#        54000:54999=3;
+#        44000:44999=3;
+#        14000:14999=3;
+#        93000:93999=4;
+#        83000:83999=4;
+#        73000:73999=4;
+#        63000:63999=3;
+#        53000:53999=3;
+#        43000:43999=3;
+#        33000:33999=3;
+#        13000:13999=3;
+#        92000:92999=4;
+#        82000:82999=4;
+#        72000:72999=4;
+#        62000:62999=3;
+#        52000:52999=3;
+#        42000:42999=3;
+#        32000:32999=3;
+#        22000:29999=3;
+#        12000:12999=3;
+#        90000:90999=2;
+#        80000:80999=2;
+#        70000:70999=2;
+#        60000:60999=2;
+#        50000:50999=2;
+#        40000:40999=2;
+#        30000:30999=2;
+#        20000:20999=2;
+#        10000:10999=2;
+#        00000:00019=2;
+#        11000:11999=1;
+#        21000:21999=1;
+#        31000:31999=1;
+#        41000:41999=1;
+#        51000:51999=1;
+#        else=NA")
+
+ces21$occupation<-Recode(ces21$NOC21_4, as.numeric=T,"9500:9599=5;
+       8500:8599=5;
+       7500:7599=5;
+       6500:6599=5;
+       5500:6599=5;
+       4500:4599=5;
+       9400:9499=4;
+       8400:8499=4;
+       7400:7499=4;
+       6400:6499=3;
+       5400:5499=3;
+       4400:4499=3;
+       1400:1499=3;
+       9300:9399=4;
+       8300:8399=4;
+       7300:7399=4;
+       6300:6399=3;
+       5300:5399=3;
+       4300:4399=3;
+       3300:3399=3;
+       1300:1399=3;
+       9200:9299=4;
+       8200:8299=4;
+       7200:7299=4;
+       6200:6299=3;
+       5200:5299=3;
+       4200:4299=3;
+       3200:3299=3;
+       2200:2999=3;
+       1200:1299=3;
+       9000:9099=2;
+       8000:8099=2;
+       7000:7099=2;
+       6000:6099=2;
+       5000:5099=2;
+       4000:4099=2;
+       3000:3099=2;
+       2000:2099=2;
+       1000:1099=2;
+       0000:0001=2;
+       1100:1199=1;
+       2100:2199=1;
+       3100:3199=1;
+       4100:4199=1;
+       5100:5199=1;
+       else=NA")
+ces21$occupation
+# ADd value labels
+val_labels(ces21$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+
+# Make occupation3 as self-employed and unskilled and skilleed groupi together
+library(labelled)
+lookfor(ces21, "employed")
+ces21 %>%
+  mutate(occupation3=case_when(
+    cps21_employment==3~6,
+    TRUE~occupation))->ces21
+
+# ADd value labels for occupation3
+val_labels(ces21$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+
+table(ces21$cps21_employment)
 # recode Union Household (cps21_union)
 look_for(ces21, "union")
 ces21$union<-Recode(ces21$cps21_union, "1=1; 2=0; else=NA")
@@ -579,6 +699,13 @@ ces21$enviro_spend<-Recode(as.numeric(ces21$cps21_spend_env), "1=0; 2=0.5; 3=1; 
 #checks
 table(ces21$enviro_spend , ces21$cps21_spend_env , useNA = "ifany" )
 #
+#recode duty (cps21_duty_choice )
+look_for(ces21, "duty")
+ces21$duty<-Recode(ces21$cps21_duty_choice , "1=1; 2=0; else=NA")
+val_labels(ces21$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces21$duty)
+table(ces21$duty, ces21$cps21_duty_choice, useNA="ifany")
 ces21$mode<-rep("Web", nrow(ces21))
 ces21$election<-rep(2021, nrow(ces21))
 #glimpse(ces21)

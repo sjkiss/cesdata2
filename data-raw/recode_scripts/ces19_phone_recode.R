@@ -10,7 +10,7 @@ ces19phone<-read_dta(file=here("data-raw/2019 Canadian Election Study - Phone Su
 #recode Gender (q3)
 # look_for(ces19phone, "gender")
 ces19phone$q3
-ces19phone$male<-Recode(ces19phone$q3, "3=NA; -7:-9=NA")
+ces19phone$male<-Recode(ces19phone$q3, "1=1; 2=0; else=NA")
 val_labels(ces19phone$male)<-c(Female=0, Male=1)
 #checks
 val_labels(ces19phone$male)
@@ -809,7 +809,14 @@ val_labels(ces19phone$foreign)
 ces19phone$enviro_spend<-Recode(as.numeric(ces19phone$q27_b), "1=1; 2=0; 3=0.5; -9=0.5; else=NA")
 #checks
 # table(ces19phone$enviro_spend , ces19phone$q27_b , useNA = "ifany" )
-
+#
+#recode duty (q76 )
+look_for(ces19phone, "duty")
+ces19phone$duty<-Recode(ces19phone$q76 , "1=1; 2:3=0; else=NA")
+val_labels(ces19phone$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces19phone$duty)
+table(ces19phone$duty, ces19phone$q76, useNA="ifany")
 #glimpse(ces19phone)
 # add mode
 ces19phone$mode<-rep("Phone", nrow(ces19phone))

@@ -56,6 +56,7 @@ val_labels(ces65$quebec)
 
 #recode Age (v335)
 # look_for(ces65, "age")
+
 ces65$age<-ces65$v335
 #check
 # table(ces65$age)

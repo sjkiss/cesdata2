@@ -1083,6 +1083,13 @@ ces15phone$enviro_spend<-Recode(as.numeric(ces15phone$CPS15_35), "5=0.5; 1=1; 3=
 # table(ces15phone$enviro_spend , ces15phone$CPS15_35 , useNA = "ifany" )
 #val_labels(ces15phone$enviro_spend)<-NULL
 #glimpse(ces15phone)
+#recode duty (CPS15_62 )
+look_for(ces15phone, "duty")
+ces15phone$duty<-Recode(ces15phone$CPS15_62 , "1=1; 5=0; else=NA")
+val_labels(ces15phone$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces15phone$duty)
+table(ces15phone$duty, ces15phone$CPS15_62, useNA="ifany")
 
 # add Election
 ces15phone$election<-rep(2015, nrow(ces15phone))

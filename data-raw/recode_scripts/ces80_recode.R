@@ -15,10 +15,13 @@ val_labels(ces7980$male80)<-c(Female=0, Male=1)
 #checks
 val_labels(ces7980$male80)
 table(ces7980$male80)
+# No union respondent variable
+#Convert from 1979
+
 
 #No Union Household variable
+#Convert from 1979
 
-#No Union Combined variable
 
 #No Education variable
 
@@ -80,6 +83,72 @@ table(ces7980$vote80)
 # No Occupation variable
 
 # No Income variable
+
+
+#recode Most Important Question (V2021)
+look_for(ces7980, "MOST IMPORTANT ISSUE")
+ces7980$mip80<-Recode(ces7980$V2021, "1=7; 2=6; 3:8=7; 9=9; 10:12=7; 15:17=15; 18=8; 19=6; 20:25=16; 29:31=12;
+					                            37:39=0; 40=11; 41:43=3; 50:51=5; 52=9; 53:61=5; 62=0; 63=13; 70:75=0;
+					                            76=11; 77=2; 78=14; 79=0; 80=2; 81=14; 87=0; else=NA")
+val_labels(ces7980$mip80)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
+                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
+table(ces7980$mip80)
+
+# Foreign born
+#recode foreign born (V1517)
+look_for(ces7980, "birth")
+ces7980$foreign80<-Recode(ces7980$V1517, "1=0; 2:12=1; else=NA")
+val_labels(ces7980$foreign80)<-c(No=0, Yes=1)
+#checks
+val_labels(ces7980$foreign80)
+table(ces7980$foreign80, ces7980$V1517, useNA="ifany")
+
+#recode Liberal leader (V2080)
+look_for(ces7980, "Trudeau")
+ces7980$liberal_leader80<-Recode(ces7980$V2080, "0=NA")
+#checks
+table(ces7980$liberal_leader80)
+
+#recode conservative leader (V2083)
+look_for(ces7980, "Clark")
+ces7980$conservative_leader80<-Recode(ces7980$V2083, "0=NA")
+#checks
+table(ces7980$conservative_leader80)
+
+#recode NDP leader (V2086)
+look_for(ces7980, "Broadbent")
+ces7980$ndp_leader80<-Recode(ces7980$V2086, "0=NA")
+#checks
+table(ces7980$ndp_leader80)
+
+#recode liberal rating (V2082)
+look_for(ces7980, "therm")
+ces7980$liberal_rating80<-Recode(ces7980$V2082, "0=NA")
+#checks
+table(ces7980$liberal_rating80)
+
+#recode conservative rating (V2085)
+look_for(ces7980, "therm")
+ces7980$conservative_rating80<-Recode(ces7980$V2085, "0=NA")
+#checks
+table(ces7980$conservative_rating80)
+
+#recode NDP rating (V2088)
+look_for(ces7980, "therm")
+ces7980$ndp_rating80<-Recode(ces7980$V2088, "0=NA")
+#checks
+table(ces7980$ndp_rating80)
+
+#recode turnout (V2061)
+look_for(ces7980, "vote")
+ces7980$turnout80<-Recode(ces7980$V2061, "1=1; 2=0;  8=0; else=NA")
+val_labels(ces7980$turnout80)<-c(No=0, Yes=1)
+#checks
+val_labels(ces7980$turnout80)
+table(ces7980$turnout80)
+table(ces7980$turnout80, ces7980$vote80)
+
+
 ces7980 %>%
   mutate(election80=case_when(
     V4008==1 ~ 1980

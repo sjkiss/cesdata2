@@ -438,14 +438,6 @@ ces7980$ndp_rating80<-Recode(as.numeric(ces7980$V2088), "0=NA")
 #checks
 # table(ces7980$ndp_rating80)
 
-#recode turnout (V2061)
-# look_for(ces7980, "vote")
-ces7980$turnout80<-Recode(ces7980$V2061, "1=1; 2=0;  8=0; else=NA")
-val_labels(ces7980$turnout80)<-c(No=0, Yes=1)
-#checks
-#val_labels(ces7980$turnout80)
-# table(ces7980$turnout80)
-# table(ces7980$turnout80, ces7980$vote80)
 
 ##### See the script 1_master_file.R There I turned the values for the 79 variables into 1980 variables for the 1980 respondents
 # No Occupation variable
@@ -454,21 +446,10 @@ val_labels(ces7980$turnout80)<-c(No=0, Yes=1)
 
 # No Religiosity variable
 
-#recode foreign born (V1517)
-# look_for(ces7980, "birth")
-ces7980$foreign80<-Recode(ces7980$V1517, "1=0; 2:12=1; else=NA")
-val_labels(ces7980$foreign80)<-c(No=0, Yes=1)
-#checks
-val_labels(ces7980$foreign80)
-# table(ces7980$foreign80, ces7980$V1517, useNA="ifany")
 
-#recode Most Important Question (V2021)
-# look_for(ces7980, "MOST IMPORTANT ISSUE")
-ces7980$mip80<-Recode(ces7980$V2021, "1=7; 2=6; 3:8=7; 9=9; 10:12=7; 15:17=15; 18=8; 19=6; 20:25=16; 29:31=12;
-					                            37:39=0; 40=11; 41:43=3; 50:51=5; 52=9; 53:61=5; 62=0; 63=13; 70:75=0;
-					                            76=11; 77=2; 78=14; 79=0; 80=2; 81=14; 87=0; else=NA")
-val_labels(ces7980$mip80)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
+
+
+
 # table(ces7980$mip80)
 #
 # #Empty variables that are not available pre-88
@@ -480,12 +461,21 @@ val_labels(ces7980$mip80)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Educatio
 ces7980$mode<-rep("Phone", nrow(ces7980))
 
 #Add Election
-table(ces7980$V4002, ces7980$V4008)
+ces7980$V4002
+class(ces7980)
+table(ces7980$V4002, ces7980$V4008, useNA="ifany")
 ces7980 %>%
   mutate(election=case_when(
     V4002==1 ~ 1979
   ))->ces7980
 #Now we run recodes *specific* to CES80 respondents
 source("data-raw/recode_scripts/ces80_recode.R")
+table(ces7980$election, ces7980$election80, useNA = "ifany")
+
+# WARNING! THERE ARE 17 RESPONDENTS WHO HAVE DID NOT TAKE PART
+# IN CES79 BUT WHO DID TAKE PART IN CES80
+# THEY WILL SHOW UP IN THE CONSTRUCTION OF CES IN THE MASTER FILE
+#
+
 
 save(ces7980, file=here("data/ces7980.rda"))

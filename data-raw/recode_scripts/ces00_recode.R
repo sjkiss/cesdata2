@@ -470,9 +470,7 @@ ces00 %>%
   mutate(traditionalism2=rowMeans(select(., c('trad1', 'trad2')), na.rm=T))->ces00
 
 
-ces00 %>%
-  select(starts_with("trad")) %>%
-  summary()
+
 #Check distribution of traditionalism
 qplot(ces00$traditionalism2, geom="histogram")
 # table(ces00$traditionalism2, useNA="ifany")
@@ -744,6 +742,22 @@ ces00$foreign<-Recode(as.numeric(ces00$cpsm11), "1=0; 2:97=1; 0=1; else=NA")
 #val_labels(ces00$foreign)<-c(No=0, Yes=1)
 #checks
 #val_labels(ces00$foreign)
+
+#recode duty (mbsc9 )
+look_for(ces00, "duty")
+ces00$duty<-Recode(ces00$mbsc9 , "1=1; 2:4=0; else=NA")
+val_labels(ces00$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces00$duty)
+table(ces00$duty, ces00$mbsc9, useNA="ifany")
+#recode duty (mbsc9 )
+look_for(ces00, "duty")
+ces00$duty<-Recode(ces00$mbsc9 , "1=1; 2:4=0; else=NA")
+val_labels(ces00$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces00$duty)
+table(ces00$duty, ces00$mbsc9, useNA="ifany")
+
 # table(ces00$foreign, ces00$cpsm11, useNA="ifany")
 glimpse(ces00)
 #Add mode
@@ -751,5 +765,6 @@ ces00$mode<-rep("Phone", nrow(ces00))
 
 ces00$election<-rep(2000, nrow(ces00))
 # Save the file
+
 
 save(ces00, file=here("data/ces00.rda"))
