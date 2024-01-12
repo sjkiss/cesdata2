@@ -9,14 +9,14 @@ lookfor(ces19web, "occupation")
 ces19web %>%
   mutate(pes19_occ_text_lower=str_to_lower(pes19_occ_text)) %>%
   left_join(., noc2016, by=c("pes19_occ_text_lower"="title"))->ces19web
-?left_join
+
 #Read in Rafael's unique occupations file
 #read in the data file
 read_excel(path=here("data-raw/2021_occupations_coded.xlsx")) %>%
   #Select only the columns with the unique job title and the NOC codes
   select("title", "NOC21_4", "NOC21_5") %>%
   #Set 0s to be missing in the two columns containing the NOC code
-  mutate(across(2:3, function(x) car::Recode(x, "0=NA", as.factor=T)))->
+  mutate(across(2:3, function(x) car::Recode(x, "0=NA", as.factor=F)))->
   # Store as object noc
   noc21
 #| label: merge-2019-web

@@ -3,6 +3,7 @@ library(tidyverse)
 library(car)
 library(labelled)
 library(here)
+library(haven)
 #load data
 ces19web <- read_sav(file=here("data-raw/CES-E-2019-online_F1.sav"), encoding="latin1")
 #there is a problem with French accented characters int he original data file of the 2019
