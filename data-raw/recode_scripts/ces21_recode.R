@@ -24,7 +24,8 @@ source("data-raw/recode_scripts/ces21_NOC_recode.R")
 # Occupation
 tail(names(ces21))
 ces21$NOC21_4
-
+class(ces21$NOC21_4)
+class(ces21$NOC21_5)
 #This code is left here for legacy if anyone wants to make
 # Class categories using the more specific 5-digit NOC codes
 # There is greater specificity in terms of occupations
@@ -709,5 +710,6 @@ table(ces21$duty, ces21$cps21_duty_choice, useNA="ifany")
 ces21$mode<-rep("Web", nrow(ces21))
 ces21$election<-rep(2021, nrow(ces21))
 #glimpse(ces21)
+table(ces21$occupation)
 # #### Resave the file in the .rda file
 save(ces21, file=here("data/ces21.rda"))
