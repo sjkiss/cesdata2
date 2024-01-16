@@ -50,16 +50,16 @@ ces21 %>%
 
 #As is CES1965
 
-ces21 %>% 
+ces65 %>% 
   select(1:5) %>% 
   glimpse()
-#> Rows: 22,328
+#> Rows: 2,118
 #> Columns: 5
-#> $ cps21_StartDate       <dttm> 2021-09-19 06:14:46, 2021-09-15 15:23:33, 2021-…
-#> $ cps21_EndDate         <dttm> 2021-09-19 06:28:25, 2021-09-15 15:46:57, 2021-…
-#> $ Status                <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
-#> $ Progress              <dbl> 100, 100, 100, 100, 100, 100, 100, 100, 100, 100…
-#> $ Duration__in_seconds_ <dbl> 818, 1403, 775, 825, 1660, 1332, 1240, 1594, 945…
+#> $ v1 <dbl> 7225, 7225, 7225, 7225, 7225, 7225, 7225, 7225, 7225, 7225, 7225, 7…
+#> $ v2 <dbl> 1, 2, 3, 4, 5, 6, 8, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22…
+#> $ v3 <dbl+lbl> 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, …
+#> $ v4 <dbl+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+#> $ v5 <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
 ```
 
 These are the datasets currently available with the names required to
@@ -548,26 +548,26 @@ ces04 %>%
 
 | vote04 | vote06 | vote08 | vote11 |
 |-------:|-------:|-------:|-------:|
-|     NA |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
+|      5 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|      2 |     NA |     NA |     NA |
+|      3 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
+|      3 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      2 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
-|      2 |     NA |     NA |     NA |
-|      2 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|      3 |     NA |     NA |     NA |
 |     NA |     NA |     NA |     NA |
 |      1 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
+|      1 |     NA |     NA |     NA |
+|     NA |     NA |     NA |     NA |
 
 Please note that alternative, more expansive selection strategies are
 available. For example, we can collect *any* respondent who responded to
