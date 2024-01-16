@@ -130,7 +130,8 @@ val_labels(ces21$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3,
 # Make occupation3 as self-employed and unskilled and skilleed groupi together
 library(labelled)
 lookfor(ces21, "employed")
-ces21$occupation3<-ifelse(ces21$occupation==3, 6, ces21$occupation)
+
+ces21$occupation3<-ifelse(ces21$cps21_employment==3, 6, ces21$occupation)
 
 # ADd value labels for occupation3
 val_labels(ces21$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
