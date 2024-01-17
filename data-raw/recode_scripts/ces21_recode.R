@@ -226,11 +226,18 @@ table(ces21$party_id, ces21$pid_party_en , useNA = "ifany" )
 
 #recode Vote (pes21_votechoice2021)
 look_for(ces21, "party did you vote")
-ces21$vote<-Recode(ces21$pes21_votechoice2021, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=6; else=NA")
-val_labels(ces21$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, PPC=6)
+ces21$vote<-Recode(ces21$pes21_votechoice2021, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
+val_labels(ces21$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces21$vote)
 table(ces21$vote , ces21$pes21_votechoice2021 , useNA = "ifany" )
+
+look_for(ces21, "party did you vote")
+ces21$vote3<-Recode(ces21$pes21_votechoice2021, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=6; else=NA")
+val_labels(ces21$vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, PPC=6)
+#checks
+val_labels(ces21$vote3)
+table(ces21$vote3 , ces21$pes21_votechoice2021 , useNA = "ifany" )
 
 # #recode Occupation (pes21_occ_text)
 # look_for(ces21, "occupation")
