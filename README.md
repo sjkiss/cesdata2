@@ -1,4 +1,27 @@
 
+- <a href="#introduction" id="toc-introduction">Introduction</a>
+  - <a href="#installation" id="toc-installation">Installation</a>
+- <a href="#how-to-use-it" id="toc-how-to-use-it">How to use it.</a>
+- <a href="#package-structure" id="toc-package-structure">Package
+  Structure</a>
+  - <a href="#recoding-conventions" id="toc-recoding-conventions">Recoding
+    conventions</a>
+- <a href="#establishing-a-usable-time-series"
+  id="toc-establishing-a-usable-time-series">Establishing A Usable Time
+  Series</a>
+  - <a href="#issues-and-special-cases"
+    id="toc-issues-and-special-cases">Issues and Special Cases</a>
+- <a href="#future-recodes" id="toc-future-recodes">Future recodes</a>
+  - <a href="#adding-recoded-variables"
+    id="toc-adding-recoded-variables">Adding recoded variables</a>
+- <a href="#outstanding-issues" id="toc-outstanding-issues">Outstanding
+  Issues</a>
+  - <a href="#template-for-constructing-a-ces"
+    id="toc-template-for-constructing-a-ces">Template For Constructing A
+    CES</a>
+- <a href="#credit" id="toc-credit">Credit</a>
+- <a href="#references" id="toc-references">References</a>
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # Introduction
@@ -27,7 +50,7 @@ You can install the development version of `cesdata2` from
 devtools::install_github("sjkiss/cesdata2")
 ```
 
-## How to use it.
+# How to use it.
 
 Once installed and loaded, individual datasets are *immediately*
 available.
@@ -62,8 +85,8 @@ ces65 %>%
 #> $ v5 <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
 ```
 
-These are the datasets currently available with the names required to
-load them.
+These are the datasets currently available with the names with which
+they can be called.
 
 | Dataset title           |     Filename |                                                                                                 Notes                                                                                                  |
 |:------------------------|-------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
@@ -212,7 +235,7 @@ glimpse(ces)
 
 ### Issues and Special Cases
 
-1.  A variable is not in one of the datasets.
+#### A variable is not in one of the datasets.
 
 One of the desirable aspects for using the approach of defining common
 variables and then mapping the `select()` function to each data frame in
@@ -291,9 +314,9 @@ ces %>%
 #> # ℹ 3,599 more rows
 ```
 
-2.  Panel datasets
+#### Panel datasets
 
-    - 1974-1979-1980
+1.  1974-1979-1980
 
 There is a complete 1974-1979-1980 Canada Election Study file and it is
 loaded into `cesdata2` as `ces7980`. However, we have also loaded the
@@ -308,36 +331,18 @@ as they wish in the master file that is necessary to make their CES
 data-set.
 
 ``` r
-lookfor(ces7980, "1979 Filter|1980 Filter|1974 Filter|P74|P79")
-#>  pos  variable label                   col_type values
-#>  487  V1007    1979 FILTER:1           dbl            
-#>  1023 V2005    1980 FILTER:1           dbl            
-#>  1221 V4002    1979 FILTER:1           dbl            
-#>  1227 V4008    1980 FILTER:1           dbl            
-#>  1232 V4013    P74-79-80 NATIONAL WGHT dbl            
-#>  1233 V4014    P74-79-80 FILTER:1      dbl            
-#>  1234 V4015    P74-79-80 MARITIME WGHT dbl            
-#>  1235 V4016    P74-79-80 ATLANTIC WGHT dbl            
-#>  1236 V4017    P74-79-80 PRAIRIE WGHT  dbl            
-#>  1237 V4018    P74-79-80 WESTERN WGHT  dbl            
-#>  1238 V4019    P74-79 NATIONAL WGHT    dbl            
-#>  1239 V4020    P74-79 FILTER:1         dbl            
-#>  1240 V4021    P74-79 MARITIME WGHT    dbl            
-#>  1241 V4022    P74-79 ATLANTIC WGHT    dbl            
-#>  1242 V4023    P74-79 PRAIRIE WGHT     dbl            
-#>  1243 V4024    P74-79 WESTERN WGHT     dbl            
-#>  1244 V4025    P79-80 NATIONAL WGHT    dbl            
-#>  1245 V4026    P79-80 FILTER:1         dbl            
-#>  1246 V4027    P79-80 MARITIME WGHT    dbl            
-#>  1247 V4028    P79-80 ATLANTIC WGHT    dbl            
-#>  1248 V4029    P79-80 PRAIRIE WGHT     dbl            
-#>  1249 V4030    P79-80 WESTERN WGHT     dbl            
-#>  1250 V4031    P74-80 NATIONAL WGHT    dbl            
-#>  1251 V4032    P74-80 FILTER:1         dbl            
-#>  1252 V4033    P74-80 MARITIME WGHT    dbl            
-#>  1253 V4034    P74-80 ATLANTIC WGHT    dbl            
-#>  1254 V4035    P74-80 PRAIRIE WGHT     dbl            
-#>  1255 V4036    P74-80 WESTERN WGHT     dbl
+lookfor(ces7980, "FILTER")
+#>  pos  variable label              col_type values          
+#>  487  V1007    1979 FILTER:1      dbl                      
+#>  1023 V2005    1980 FILTER:1      dbl                      
+#>  1221 V4002    1979 FILTER:1      dbl                      
+#>  1227 V4008    1980 FILTER:1      dbl                      
+#>  1233 V4014    P74-79-80 FILTER:1 dbl                      
+#>  1239 V4020    P74-79 FILTER:1    dbl                      
+#>  1245 V4026    P79-80 FILTER:1    dbl                      
+#>  1251 V4032    P74-80 FILTER:1    dbl                      
+#>  1261 filter_$ V4008=1 (FILTER)   dbl+lbl  [0] Not Selected
+#>                                            [1] Selected
 ```
 
 It is possible though that the recode script may need to be modified in
@@ -345,7 +350,7 @@ order to make potential use of this feature. Good luck.
 
 In addition, MATT CAN YOU EXPLAIN WHAT HAPPENED WITH 1980
 
-    - 1992 Referendum and 1993 Election Survey
+2.  1992 Referendum and 1993 Election Survey
 
 The object `ces93` contains respondents that participated in both the
 1992 Referendum *and* the 1993 general election. All the original
@@ -369,7 +374,7 @@ ces93 %>%
 #> # ℹ 1 more variable: CESTYPE <fct>
 ```
 
-    - 2004-2011
+3.  2004-2011
 
 The CES 2004-2011 is a very large file and presents some significant
 challenges given our renaming and recoding strategy. However, we have
@@ -380,11 +385,14 @@ values for specific sets of surveys.
 The underlying data files look like this the following table, for *each*
 respondent, there are variables for the 2004, 2006, and 2008 surveys
 *whether or not* the respondent actually completed the surveys.
-Respondent ID \|Survey \|`ces04_PES_K5A` \| `ces06_PES_B4A`
-\|`ces08_PES_B4B` \| \|:—–:\|:—–:\|:—————————:\| :———————-:\| :——-:\| \|
-1\|2004 \| `Refused` \| NA\| NA\| \| 2\|2006 \| NA \| Liberal Party of
-Canada \|NA\| \|3 \|2008\| NA \| NA \| NDP \|4 \|2004 and 2006\| Other
-\| Liberal Party of Canada \| NA\| \|5 \| 2006 and 2008 \| NA \|
+
+| Respondent ID |    Survey     | `ces04_PES_K5A` |     `ces06_PES_B4A`     | `ces08_PES_B4B` |
+|:-------------:|:-------------:|:---------------:|:-----------------------:|:---------------:|
+|       1       |     2004      |    `Refused`    |           NA            |       NA        |
+|       2       |     2006      |       NA        | Liberal Party of Canada |       NA        |
+|       3       |     2008      |       NA        |           NA            |       NDP       |
+|       4       | 2004 and 2006 |      Other      | Liberal Party of Canada |       NA        |
+|       5       | 2006 and 2008 |       NA        |                         |                 |
 
 Ultimately, each of these columns measure the same variable, the
 person’s vote cast, but at different time periods. As currently
@@ -416,105 +424,227 @@ approaches. So, as a result this step needs to be combined with a step
 where the researcher specifies which of these surveys you wish to use.
 Here is the problem….
 
-| Var1                                                                      | Freq |
-|:--------------------------------------------------------------------------|-----:|
-| CPS04                                                                     | 1182 |
-| CPS04 PES04                                                               |  671 |
-| CPS04 PES04 CPS06 \*                                                      |  107 |
-| CPS04 PES04 CPS06 PES06                                                   |  207 |
-| CPS04 PES04 MBS04                                                         |  471 |
-| CPS04 PES04 MBS04 CPS06                                                   |   71 |
-| CPS04 PES04 MBS04 CPS06 PES06                                             |  229 |
-| CPS06                                                                     |  493 |
-| CPS06 PES06                                                               | 1566 |
-| CPS08                                                                     |  806 |
-| CPS08 PES08                                                               | 1233 |
-| CPS08 PES08 MBS08                                                         | 1218 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 \*\*                                |  109 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08                               |   58 |
-| Panel - CPS04 PES04 CPS06 PES08                                           |   29 |
-| Panel - CPS04 PES04 CPS06 PES08 MBS08                                     |    7 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08                               |   99 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08                         |  204 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08                                     |   10 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08                               |   19 |
-| New RDD_2011 CPS11                                                        |  863 |
-| CPS04 PES04 CPS06 CPS11                                                   |    6 |
-| CPS04 PES04 CPS06 PES06 CPS11                                             |   13 |
-| CPS04 PES04 MBS04 CPS06 CPS11                                             |    6 |
-| CPS04 PES04 MBS04 CPS06 PES06 CPS11                                       |   12 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11                               |   15 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11                         |    4 |
-| Panel - CPS04 PES04 CPS06 PES08 CPS11                                     |    2 |
-| Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11                               |    0 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11                         |    7 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11                   |   16 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11                               |    1 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11                         |    1 |
-| New RDD_2011 CPS11 PES11                                                  | 1492 |
-| CPS04 PES04 CPS06 CPS11 PES11                                             |    6 |
-| CPS04 PES04 CPS06 PES06 CPS11 PES11                                       |   42 |
-| CPS04 PES04 MBS04 CPS06 CPS11 PES11                                       |    2 |
-| CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11                                 |   20 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11                         |   88 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11                   |   22 |
-| Panel - CPS04 PES04 CPS06 PES08 CPS11 PES11                               |    7 |
-| Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11                         |    2 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11                   |   52 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11             |   83 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11                         |    7 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11                   |    5 |
-| New RDD_2011 CPS11 PES11 MBS11                                            |  584 |
-| CPS04 PES04 CPS06 CPS11 PES11 MBS11                                       |    1 |
-| CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11                                 |    5 |
-| CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11                                 |    2 |
-| CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11                           |   12 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 MBS11                   |   13 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11             |   15 |
-| Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 MBS11                   |    2 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 MBS11             |   48 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11       |  105 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 MBS11                   |    1 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 MBS11             |    3 |
-| New RDD_2011 CPS11 PES11 MBS11 WBS11                                      |  519 |
-| CPS04 PES04 CPS06 CPS11 PES11 MBS11 WBS11                                 |    2 |
-| CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 WBS11                           |    3 |
-| CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11 WBS11                           |    1 |
-| CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 WBS11                     |   14 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 MBS11 WBS11             |    7 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 WBS11       |   20 |
-| Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 WBS11             |    4 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 MBS11 WBS11       |   20 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 |  141 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 MBS11 WBS11             |    2 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 WBS11       |   10 |
+``` r
+
+table(ces0411$survey) 
+#> 
+#>                                                                     CPS04 
+#>                                                                      1182 
+#>                                                               CPS04 PES04 
+#>                                                                       671 
+#>                                                      CPS04 PES04 CPS06  * 
+#>                                                                       107 
+#>                                                   CPS04 PES04 CPS06 PES06 
+#>                                                                       207 
+#>                                                         CPS04 PES04 MBS04 
+#>                                                                       471 
+#>                                                   CPS04 PES04 MBS04 CPS06 
+#>                                                                        71 
+#>                                             CPS04 PES04 MBS04 CPS06 PES06 
+#>                                                                       229 
+#>                                                                     CPS06 
+#>                                                                       493 
+#>                                                               CPS06 PES06 
+#>                                                                      1566 
+#>                                                                     CPS08 
+#>                                                                       806 
+#>                                                               CPS08 PES08 
+#>                                                                      1233 
+#>                                                         CPS08 PES08 MBS08 
+#>                                                                      1218 
+#>                                 Panel - CPS04 PES04 CPS06 PES06 PES08  ** 
+#>                                                                       109 
+#>                               Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 
+#>                                                                        58 
+#>                                           Panel - CPS04 PES04 CPS06 PES08 
+#>                                                                        29 
+#>                                     Panel - CPS04 PES04 CPS06 PES08 MBS08 
+#>                                                                         7 
+#>                               Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 
+#>                                                                        99 
+#>                         Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 
+#>                                                                       204 
+#>                                     Panel - CPS04 PES04 MBS04 CPS06 PES08 
+#>                                                                        10 
+#>                               Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 
+#>                                                                        19 
+#>                                                        New RDD_2011 CPS11 
+#>                                                                       863 
+#>                                                   CPS04 PES04 CPS06 CPS11 
+#>                                                                         6 
+#>                                             CPS04 PES04 CPS06 PES06 CPS11 
+#>                                                                        13 
+#>                                             CPS04 PES04 MBS04 CPS06 CPS11 
+#>                                                                         6 
+#>                                       CPS04 PES04 MBS04 CPS06 PES06 CPS11 
+#>                                                                        12 
+#>                               Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 
+#>                                                                        15 
+#>                         Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 
+#>                                                                         4 
+#>                                     Panel - CPS04 PES04 CPS06 PES08 CPS11 
+#>                                                                         2 
+#>                               Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 
+#>                                                                         0 
+#>                         Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 
+#>                                                                         7 
+#>                   Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 
+#>                                                                        16 
+#>                               Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 
+#>                                                                         1 
+#>                         Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 
+#>                                                                         1 
+#>                                                  New RDD_2011 CPS11 PES11 
+#>                                                                      1492 
+#>                                             CPS04 PES04 CPS06 CPS11 PES11 
+#>                                                                         6 
+#>                                       CPS04 PES04 CPS06 PES06 CPS11 PES11 
+#>                                                                        42 
+#>                                       CPS04 PES04 MBS04 CPS06 CPS11 PES11 
+#>                                                                         2 
+#>                                 CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 
+#>                                                                        20 
+#>                         Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 
+#>                                                                        88 
+#>                   Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 
+#>                                                                        22 
+#>                               Panel - CPS04 PES04 CPS06 PES08 CPS11 PES11 
+#>                                                                         7 
+#>                         Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 
+#>                                                                         2 
+#>                   Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 
+#>                                                                        52 
+#>             Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 
+#>                                                                        83 
+#>                         Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 
+#>                                                                         7 
+#>                   Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 
+#>                                                                         5 
+#>                                            New RDD_2011 CPS11 PES11 MBS11 
+#>                                                                       584 
+#>                                       CPS04 PES04 CPS06 CPS11 PES11 MBS11 
+#>                                                                         1 
+#>                                 CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 
+#>                                                                         5 
+#>                                 CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11 
+#>                                                                         2 
+#>                           CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 
+#>                                                                        12 
+#>                   Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 MBS11 
+#>                                                                        13 
+#>             Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 
+#>                                                                        15 
+#>                   Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 
+#>                                                                         2 
+#>             Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 MBS11 
+#>                                                                        48 
+#>       Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 
+#>                                                                       105 
+#>                   Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 MBS11 
+#>                                                                         1 
+#>             Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 
+#>                                                                         3 
+#>                                      New RDD_2011 CPS11 PES11 MBS11 WBS11 
+#>                                                                       519 
+#>                                 CPS04 PES04 CPS06 CPS11 PES11 MBS11 WBS11 
+#>                                                                         2 
+#>                           CPS04 PES04 CPS06 PES06 CPS11 PES11 MBS11 WBS11 
+#>                                                                         3 
+#>                           CPS04 PES04 MBS04 CPS06 CPS11 PES11 MBS11 WBS11 
+#>                                                                         1 
+#>                     CPS04 PES04 MBS04 CPS06 PES06 CPS11 PES11 MBS11 WBS11 
+#>                                                                        14 
+#>             Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 MBS11 WBS11 
+#>                                                                         7 
+#>       Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 
+#>                                                                        20 
+#>             Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 
+#>                                                                         4 
+#>       Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 MBS11 WBS11 
+#>                                                                        20 
+#> Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 
+#>                                                                       141 
+#>             Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 MBS11 WBS11 
+#>                                                                         2 
+#>       Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 
+#>                                                                        10
+```
 
 There are multiple ways to split the file. You can split it very
 precisely and narrowly. For example, one can pick only the respondents
-who completed the CPS04, the CPS04 PES04 or the CPS04 PES04 MBS04
-sequence by using `filter()` and a regular expression in `str_detect()`.
-Note, to diagnose the accuracy of your regular expression and filter
-strategy, you can first `select()` only the `survey` variable and count
-what your filter strategy produces, and then actually filter into a new
-data frame.
+who completed the CPS04 survey by using `filter(survey=="CPS04")`.
 
-| survey |    n |
-|:-------|-----:|
-| CPS04  | 1182 |
+Or you can select any respondent who filled out the CPS04 survey amongst
+any other surveys by combining `filter` with `str_detect` and a regular
+expression.
+
+Compare the two commands, below. Note, to diagnose the accuracy of your
+regular expression and filter strategy, you can first `select()` only
+the `survey` variable and count what your filter strategy produces, and
+then actually filter into a new data frame.
+
+This filter command will *only* include respondents who *only* completed
+the CPS from 2004.
 
 ``` r
 ces0411 %>% 
   select(survey) %>% 
-  filter(survey=="CPS04"|survey=="CPS04 PES04"|survey=="CPS04 PES04 MBS04") %>% 
-  count(survey) %>% 
-  kable()
+  filter(survey=="CPS04") %>% 
+  count(survey) 
+#> # A tibble: 1 × 2
+#>   survey     n
+#>   <fct>  <int>
+#> 1 CPS04   1182
 ```
 
-| survey            |    n |
-|:------------------|-----:|
-| CPS04             | 1182 |
-| CPS04 PES04       |  671 |
-| CPS04 PES04 MBS04 |  471 |
+This filter command will include respondents who *only* completed the
+CPS from 2004, who only completed the CPS 04 *and* the PES04 as well as
+the respondents who completed the CPS04, the PES04 and the MBS04.
+
+``` r
+ces0411 %>% 
+  select(survey) %>% 
+  #This filter command will only include respondents
+  # with the *exact* values specified
+  filter(survey=="CPS04"|survey=="CPS04 PES04"|survey=="CPS04 PES04 MBS04") %>% 
+  count(survey) 
+#> # A tibble: 3 × 2
+#>   survey                n
+#>   <fct>             <int>
+#> 1 CPS04              1182
+#> 2 CPS04 PES04         671
+#> 3 CPS04 PES04 MBS04   471
+```
+
+This command will include *any* respondent who filled out the CPS04.
+This includes respondents who count as panel respondents who who were
+reinterviewed in later surveys.
+
+``` r
+ces0411 %>% 
+  select(survey) %>% 
+  filter(str_detect(survey, "CPS04")) %>% 
+  count(survey) 
+#> # A tibble: 60 × 2
+#>    survey                                          n
+#>    <fct>                                       <int>
+#>  1 CPS04                                        1182
+#>  2 CPS04 PES04                                   671
+#>  3 CPS04 PES04 CPS06  *                          107
+#>  4 CPS04 PES04 CPS06 PES06                       207
+#>  5 CPS04 PES04 MBS04                             471
+#>  6 CPS04 PES04 MBS04 CPS06                        71
+#>  7 CPS04 PES04 MBS04 CPS06 PES06                 229
+#>  8 Panel - CPS04 PES04 CPS06 PES06 PES08  **     109
+#>  9 Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08    58
+#> 10 Panel - CPS04 PES04 CPS06 PES08                29
+#> # ℹ 50 more rows
+```
+
+Such a strategy might be desirable to increase sample size, but it might
+be undesirable to include panel respondents, who, after having been
+interviewed multiple times, may be demonstrate different responses than
+other purely cross-sectional respondents. *We leave this to the user.*
 
 When satisfied, it is essential of course to save the results in a
 single-year dataset.
@@ -532,175 +662,87 @@ nrow(ces04)
 #> [1] 2324
 ```
 
-Please note how this interacts with the above strategy of providing
-renamed and recoded variables for each variable. The respondents in
-`ces04` *never had the chance to participate in any other year surveys*.
-But they will have variables in the new `ces04` dataset for later year
-variabes; they will simply all be `NA`.
-
-``` r
-#Note I am using the ces04 dataframe
-ces04 %>% 
-  select(vote04, vote06, vote08, vote11) %>% 
-  slice_sample(n=20) %>% 
-  kable()
-```
-
-| vote04 | vote06 | vote08 | vote11 |
-|-------:|-------:|-------:|-------:|
-|      5 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|      3 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|      3 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|      2 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|      3 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-|      1 |     NA |     NA |     NA |
-|     NA |     NA |     NA |     NA |
-
-Please note that alternative, more expansive selection strategies are
-available. For example, we can collect *any* respondent who responded to
-any survey by using `str_detect()`. You can see the effects of such a
-strategy here:
-
-``` r
-ces0411 %>% 
-  select(survey) %>% 
-  filter(str_detect(survey, "PES08")) %>% 
-  count(survey) %>% 
-  kable()
-```
-
-| survey                                                                    |    n |
-|:--------------------------------------------------------------------------|-----:|
-| CPS08 PES08                                                               | 1233 |
-| CPS08 PES08 MBS08                                                         | 1218 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 \*\*                                |  109 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08                               |   58 |
-| Panel - CPS04 PES04 CPS06 PES08                                           |   29 |
-| Panel - CPS04 PES04 CPS06 PES08 MBS08                                     |    7 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08                               |   99 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08                         |  204 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08                                     |   10 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08                               |   19 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11                               |   15 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11                         |    4 |
-| Panel - CPS04 PES04 CPS06 PES08 CPS11                                     |    2 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11                         |    7 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11                   |   16 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11                               |    1 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11                         |    1 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11                         |   88 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11                   |   22 |
-| Panel - CPS04 PES04 CPS06 PES08 CPS11 PES11                               |    7 |
-| Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11                         |    2 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11                   |   52 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11             |   83 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11                         |    7 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11                   |    5 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 MBS11                   |   13 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11             |   15 |
-| Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 MBS11                   |    2 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 MBS11             |   48 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11       |  105 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 MBS11                   |    1 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 MBS11             |    3 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 CPS11 PES11 MBS11 WBS11             |    7 |
-| Panel - CPS04 PES04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 WBS11       |   20 |
-| Panel - CPS04 PES04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 WBS11             |    4 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 CPS11 PES11 MBS11 WBS11       |   20 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES06 PES08 MBS08 CPS11 PES11 MBS11 WBS11 |  141 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 CPS11 PES11 MBS11 WBS11             |    2 |
-| Panel - CPS04 PES04 MBS04 CPS06 PES08 MBS08 CPS11 PES11 MBS11 WBS11       |   10 |
-
-This might be desirable to increase sample size, but it might be
-undesirable to include panel respondents, who, after having been
-interviewed multiple times, may be demonstrate different responses than
-other purely cross-sectional respondents. *We leave this to the user.*
-
-For now, we will keep the filtering strategy and save the resulting
-object as `ces08`.
-
-``` r
-ces0411 %>% 
-  filter(str_detect(survey, "PES08"))->ces08
-```
-
 3.  Renaming re-coded variables in `ces04`, `ces06`, `ces08` and `ces11`
     data frames.
 
-Because respondents in`ces04` and `ces08` all come from the giant
-combined file, all have recoded variables from each election. For
-variables they were not eligible to report because they weren’t in that
-survey, their values are `NA`
+We executed the recode scripts on the merged `ces0411` dataset. This is
+a giant tabular dataset that includes variables for each election for
+each respondent, *even if the respondent did not participate in the
+survey for that variable*. For example, respondents who *only*
+participated in the CPS04, will still have values for the *all*
+variables, including variables in the 2006, 2008 and 2011 datasets;
+their responses will simply be `NA`.
+
+This shows the problem:
 
 ``` r
-ces04 %>% 
-select(contains('vote')) %>% 
+ces0411 %>% 
+  filter(str_detect(survey, "PES08")) %>% 
+select(survey, contains('vote')) %>% 
   as_factor()
-#> # A tibble: 2,324 × 5
-#>    ces08_PES_PROV_VOTE1 vote04       vote06 vote08 vote11
-#>    <fct>                <fct>        <fct>  <fct>  <fct> 
-#>  1 <NA>                 <NA>         <NA>   <NA>   <NA>  
-#>  2 <NA>                 <NA>         <NA>   <NA>   <NA>  
-#>  3 <NA>                 Conservative <NA>   <NA>   <NA>  
-#>  4 <NA>                 Conservative <NA>   <NA>   <NA>  
-#>  5 <NA>                 <NA>         <NA>   <NA>   <NA>  
-#>  6 <NA>                 <NA>         <NA>   <NA>   <NA>  
-#>  7 <NA>                 NDP          <NA>   <NA>   <NA>  
-#>  8 <NA>                 Conservative <NA>   <NA>   <NA>  
-#>  9 <NA>                 <NA>         <NA>   <NA>   <NA>  
-#> 10 <NA>                 <NA>         <NA>   <NA>   <NA>  
-#> # ℹ 2,314 more rows
-```
-
-Note, because we used an expansive filtering strategy for `ces08` there
-are respondents who actully have responses for variables from 2004.
-However, because we are defining this as a dataset for 2008, we will
-effectively drop those earlier responses and only take respondents’
-values from 2008.
-
-``` r
-ces08 %>% 
-  select(contains('vote')) %>% 
-  as_factor()
-#> # A tibble: 3,689 × 5
-#>    ces08_PES_PROV_VOTE1     vote04  vote06       vote08       vote11      
-#>    <fct>                    <fct>   <fct>        <fct>        <fct>       
-#>  1 NDP (New Democrats)      Green   NDP          NDP          Conservative
-#>  2 NDP (New Democrats)      Liberal Liberal      Liberal      Liberal     
-#>  3 R volunteers: It depends <NA>    Liberal      <NA>         NDP         
-#>  4 NDP (New Democrats)      Liberal Liberal      NDP          NDP         
-#>  5 Other                    Bloc    NDP          NDP          NDP         
-#>  6 L'Action Democratique    Bloc    NDP          NDP          NDP         
-#>  7 refused                  <NA>    Conservative <NA>         Conservative
-#>  8 Liberal (Grits)          Green   Green        Liberal      Green       
-#>  9 Liberal (Grits)          Bloc    NDP          Bloc         Conservative
-#> 10 Liberal (Grits)          Liberal Conservative Conservative Conservative
+#> # A tibble: 3,689 × 6
+#>    survey                       ces08_PES_PROV_VOTE1 vote04 vote06 vote08 vote11
+#>    <fct>                        <fct>                <fct>  <fct>  <fct>  <fct> 
+#>  1 Panel - CPS04 PES04 MBS04 C… NDP (New Democrats)  Green  NDP    NDP    Conse…
+#>  2 Panel - CPS04 PES04 MBS04 C… NDP (New Democrats)  Liber… Liber… Liber… Liber…
+#>  3 Panel - CPS04 PES04 MBS04 C… R volunteers: It de… <NA>   Liber… <NA>   NDP   
+#>  4 Panel - CPS04 PES04 MBS04 C… NDP (New Democrats)  Liber… Liber… NDP    NDP   
+#>  5 Panel - CPS04 PES04 MBS04 C… Other                Bloc   NDP    NDP    NDP   
+#>  6 Panel - CPS04 PES04 MBS04 C… L'Action Democratiq… Bloc   NDP    NDP    NDP   
+#>  7 Panel - CPS04 PES04 MBS04 C… refused              <NA>   Conse… <NA>   Conse…
+#>  8 Panel - CPS04 PES04 MBS04 C… Liberal (Grits)      Green  Green  Liber… Green 
+#>  9 Panel - CPS04 PES04 MBS04 C… Liberal (Grits)      Bloc   NDP    Bloc   Conse…
+#> 10 Panel - CPS04 PES04 MBS04 C… Liberal (Grits)      Liber… Conse… Conse… Conse…
 #> # ℹ 3,679 more rows
 ```
 
+The problem is that in other, non-panel datasets, there is no need to
+indicate the year that it came from.
+
+For example, in the 2000 dataset, `vote` is just that.
+
+``` r
+ces00 %>% 
+  select(election, contains('vote'))
+#> # A tibble: 3,651 × 3
+#>    election              vote             vote3
+#>       <dbl>         <dbl+lbl>         <dbl+lbl>
+#>  1     2000 NA                NA               
+#>  2     2000  2 [Conservative]  2 [Conservative]
+#>  3     2000 NA                NA               
+#>  4     2000 NA                NA               
+#>  5     2000  2 [Conservative]  2 [Conservative]
+#>  6     2000 NA                NA               
+#>  7     2000  2 [Conservative]  2 [Conservative]
+#>  8     2000  0 [Other]         0 [Other]       
+#>  9     2000  1 [Liberal]       1 [Liberal]     
+#> 10     2000  2 [Conservative]  2 [Conservative]
+#> # ℹ 3,641 more rows
+```
+
+It would be impossible to combine say, the 2000, 2004 and 2008 datasets
+because 2000 contains the variable `vote`, respondents from the 2004 and
+2008 datasets would have `vote04`, `vote06`, `vote08` and `vote11`.
+
+The answer is transforming the variable names in data frames into the
+consistent names used in all the other datasets to facilitate binding
+together.
+
 Previously, we had a fairly laborious method of individually renaming
 variables such as `vote04` to be `vote`. There is a cleaner and quicker
-way to accomplish this. Specifically, for each datafram that comes from
+way to accomplish this. Specifically, for each dataframe that comes from
 the `ces0411` combined file, we just strip out any instance of `04` in
 the `ces04` data frame, `06` in the `ces06` dataframe.
 
 You can see the effects of this below:
 
 ``` r
-
+# make a ces04 data frame
+ces0411 %>% 
+  filter(str_detect(survey, "PES04"))->ces04
+# Make a ces08 data frame
+ces0411 %>% 
+  filter(str_detect(survey, "PES08"))->ces08
 #Take only the ces04 data frame
 ces04 %>% 
   #Select variables containing vote and trad
@@ -726,7 +768,7 @@ Here it is apparent that there are consistent variables for `04`, `06`
 and `08` even in the data set that contains only respondents that
 participated in the `04` survey.
 
-If we strip out `04` from the variable names we are left with.
+But if we strip out `04` from the variable names we are left with.
 
 ``` r
 #Take only the ces04 data frame
@@ -752,7 +794,7 @@ ces04 %>%
 ```
 
 Now, for example, in the `ces04` data frame, `vote04` has become `vote`,
-`trad041` has become `trad1`, etc. But `vote06`and `trad06` remains
+`trad041` has become `trad1`, etc. But `vote06`and `trad06` remain
 untouched.
 
 We make the permanent changes to the data-sets in the following way:
@@ -771,10 +813,10 @@ ces dataset from with other, more simple, one-election datafiles.
 
 ``` r
 #List the data frames to be used.
-ces.list<-list(ces97, ces00, ces04, ces08)
+ces.list<-list(ces00, ces04, ces08)
 
 #Provide names
-names(ces.list)<-c(1997, 2000, 2004, 2008)
+names(ces.list)<-c(2000, 2004, 2008)
 myvars<-c("gender", "vote", "gay_rights", "trad1", "election", "mode")
 
 #Make data frame
@@ -788,24 +830,24 @@ head(as_factor(ces))
 #> # A tibble: 6 × 5
 #>   vote         gay_rights trad1 election mode 
 #>   <fct>             <dbl> <dbl>    <dbl> <chr>
-#> 1 Conservative       0.25  0        1997 Phone
-#> 2 NDP                0.75  0.75     1997 Phone
-#> 3 <NA>               0.25  0.25     1997 Phone
-#> 4 Liberal           NA     0.25     1997 Phone
-#> 5 <NA>              NA     0.75     1997 Phone
-#> 6 <NA>               1     1        1997 Phone
+#> 1 <NA>               0.25  0        2000 Phone
+#> 2 Conservative       0.25  0        2000 Phone
+#> 3 <NA>               0.25  0.25     2000 Phone
+#> 4 <NA>               0.75  0.25     2000 Phone
+#> 5 Conservative       0.25  0.75     2000 Phone
+#> 6 <NA>               0     0.25     2000 Phone
 #Summarize
 summary(as_factor(ces))
-#>            vote        gay_rights        trad1           election   
-#>  Other       : 120   Min.   :0.000   Min.   :0.0000   Min.   :1997  
-#>  Liberal     :2596   1st Qu.:0.000   1st Qu.:0.0000   1st Qu.:1997  
-#>  Conservative:3015   Median :0.250   Median :0.2500   Median :2000  
-#>  NDP         :1145   Mean   :0.467   Mean   :0.4444   Mean   :2002  
-#>  Bloc        : 862   3rd Qu.:1.000   3rd Qu.:0.7500   3rd Qu.:2008  
-#>  Green       : 217   Max.   :1.000   Max.   :1.0000   Max.   :2008  
-#>  NA's        :5658   NA's   :3908    NA's   :382                    
+#>            vote        gay_rights         trad1           election   
+#>  Other       :  85   Min.   :0.0000   Min.   :0.0000   Min.   :2000  
+#>  Liberal     :2353   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:2000  
+#>  Conservative:2623   Median :0.2500   Median :0.2500   Median :2004  
+#>  NDP         :1113   Mean   :0.4451   Mean   :0.4319   Mean   :2004  
+#>  Bloc        : 781   3rd Qu.:1.0000   3rd Qu.:0.7500   3rd Qu.:2008  
+#>  Green       : 290   Max.   :1.0000   Max.   :1.0000   Max.   :2008  
+#>  NA's        :3236   NA's   :472      NA's   :224                    
 #>      mode          
-#>  Length:13613      
+#>  Length:10481      
 #>  Class :character  
 #>  Mode  :character  
 #>                    
@@ -814,11 +856,18 @@ summary(as_factor(ces))
 #> 
 ```
 
+#### Actual panel analysis
+
+Note, that the ces0411 data file lends itself to amazing panel analysis.
+However, I have not even begun to think about how the variables would
+have to be renamed in orer to construct a proper dataset. It is cetainly
+possible, and probably quite easy, I just haven’t done it.
+
 # Future recodes
 
 Users are also welcome to contribute to the package’s development by
 adding new recodes in the recode scripts. The next section shows how to
-do that:
+do that.
 
 ## Adding recoded variables
 
@@ -827,36 +876,93 @@ do that:
     [here](https://happygitwithr.com/existing-github-first),
     particularly Section 16.2.2.
 
+Please note, it is essential that users be able to distinguish between
+the copy of the package that has been *cloned* to your hard drive and
+the copy of the package that has actually been *installed* for use. They
+are in two separate locations.
+
+To demonstrate, you can call `.libpaths()` to find out where your
+package has been installed.
+
+``` r
+.libPaths()
+#> [1] "/Users/skiss/Library/R/x86_64/4.1/library"                     
+#> [2] "/Library/Frameworks/R.framework/Versions/4.1/Resources/library"
+```
+
+You can open your Finder, or your PC equivalent and actually see it.
+
+<div class="figure">
+
+<img src="man/figures/path.png" alt="Figure 1: Location of installed version of cesdata2" width="100%" />
+<p class="caption">
+Figure 1: Location of installed version of cesdata2
+</p>
+
+</div>
+
+However, the cloned version from GitHub can be stored anywhere you want
+on your desktop, somewhere useful and easily accessible for the user.
+
+<img src="man/figures/finder_path.png" width="100%" />
+
+While this may be confusing, it is fairly simple.
+
+    1. Using `cesdata2` for analyses draws on the version of the package installed deep in your hard-drive (Figure 1). 
+
+    2. Opening `cesdata2` to inspect or modify code is done using the cloned copy stored where you want it to be (Figure 2). 
+
 2.  That done, open the RStudio project in the local directory you have
     just created on your computer which is a clone of the existing
     package repository.
 
 3.  Open the recode script for the data-set you want to work on. Here,
     you will need to navigate to the folder `data-raw/recode_scripts/`
-    and select which one you want. In this way you will be able to
-    execute, see and diagnose recode commands in the local environment.
+    and select which one you want. In this way you will be able to see,
+    diagnose, modify and execute recode commands in the local
+    environment.
 
-4.  Once complete, you will need to `source()` the recode script from
-    beginning to end. This is important for a few reasons. First,
+4.  Open the recode script for the file you want to work on, navigate to
+    the bottom, *before* the command `save('filename_.rda')` and add
+    your recodes. You can see the immediate effect of these recodes by
+    running the script from the top to where your cursor is (opt-CMD-B
+    on a Mac) and then check the results.
+
+5.  Once complete and satisfied you should `source()` the recode script
+    from beginning to end. This is important for a few reasons. First,
     running `source()` is *noticeably* faster than executing code by
-    selecting it in RStudio and running `cmd-Enter`. We have been doing
-    this and it can take forever.
+    selecting code in RStudio and running `cmd-Enter`. We have been
+    doing this and it can take forever.
 
-Second, and more importantly, you will see that the recode script always
-starts by loading the original raw data file and then saving an `.rda`
-file out into the folder `data`. *This* is the file that is available to
-users when they install and load `cesdata2`, *not* the raw data file.
+Users will notice that each recode script always starts by loading the
+*original raw data file* and then saving an `.rda` file out into the
+folder `data`. *This* is the file that is available to users when they
+install and load `cesdata2`, *not* the raw data file.
 
-6.  After sourcing all `recode` scripts, it is necessary to re-install
-    the package. Once you have done this, you can: 1) exit the
-    package, 2) Open a new RScript for analysis (which should be an
-    RStudio project) 3) call `library(cesdata2)` and your recoded
-    variables should be available to you.
+The reason for doing this is to protect the integrity of the original
+data files by ensuring there is no messy re-writing of original
+variables and always to be able to track exactly what has been recoded
+as what.
+
+6.  Because the installed package has pre-built `rda` files for each
+    data-set *it is unnecessary to source anything unless changes have
+    been made*.
+
+However, remember, R uses the version of the package stored in the
+library, *not* the cloned version you have been working on. After
+sourcing all scripts where new recodes have been made, installing the
+new version of the package happens by selecting `Build` and then
+`Install` in RStudio.
+
+This moves the package contents from location of the cloned directory to
+the R library deeper in your computer. From here, any analysis script
+that loads `cesdata2` should make use of your recodes.
 
 7.  To share with other users, which is highly desirable, *re-open the
-    `cesdata2`* project on your computer, make a new Github branch,
-    using an informative title, commit these changes to the GitHub
-    repository and push them to that new branch, *not* the main branch.
+    cloned `cesdata2`* project on your computer, make a new Github
+    branch, using an informative title, commit these changes to the
+    GitHub repository and push them to that new branch, *not* the main
+    branch.
 
 The package is currently set up to permit only Simon Kiss and Matt
 Polacko to contribute to the main branch. All others must commit to
@@ -1054,7 +1160,7 @@ glimpse(ces)
 #> $ efficacy_rich          <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 ```
 
-## Credit
+# Credit
 
 As this R package remains a private, by invitation only repository,
 there is no way to cite it. Instead, collaborators invited to
@@ -1062,7 +1168,7 @@ participate are requested to cite one of the papers in the reference
 list below as recognition of the work that has gone into this. This
 package was instrumental in both publications.
 
-## References
+# References
 
 Polacko, Matthew, Simon Kiss, and Peter Graefe. “The Changing Nature of
 Class Voting in Canada, 1965-2019.” Canadian Journal of Political
