@@ -122,6 +122,7 @@ ces21$occupation<-Recode(ces21$NOC21_4, as.numeric=T,"9500:9599=5;
        3100:3199=1;
        4100:4199=1;
        5100:5199=1;
+       9999=NA;
        else=NA")
 ces21$occupation
 # ADd value labels
