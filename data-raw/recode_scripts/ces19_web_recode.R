@@ -176,5 +176,11 @@ table(ces19web$duty, ces19web$cps19_duty_choice, useNA="ifany")
 ces19web$mode<-rep("Web", nrow(ces19web))
 ces19web$election<-rep(2019, nrow(ces19web))
 #glimpse(ces19web)
+
+lookfor(ces19web, "sector")
+ces19web$sector<-car::Recode(ces19web$cps19_sector, "1=0; 4=0; 2=1; 5=NA")
+ces19web$sector
+val_labels(ces19web$sector)<-c(Private=0, Public=1)
+table(ces19web$sector)
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))
