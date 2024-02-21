@@ -188,5 +188,12 @@ lookfor(ces19web, "vote")
 ces19web$vote<-Recode(ces19web$pes19_votechoice2019, "1=1; 2=2; 3=3; 4=4; 5=5; 6=2; 7=0; 8:9=NA")
 val_labels(ces19web$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 
+lookfor(ces19web, "degree")
+ces19web$degree<-Recode(ces19web$cps19_education, "1:8=0; 9:11=0; 12=NA")
+val_labels(ces19web$degree)<-c(`nodegree`=0, `degree`=1)
+
+ces19web$male<-Recode(ces19web$cps19_gender, "1=1; 2=0; 3=0")
+val_labels(ces19web$male)<-c(`Male`=1, `Female`=0)
+
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))
