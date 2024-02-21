@@ -14,4 +14,3 @@ source("data-raw/recode_scripts/ces15_web_recode.R")
 source("data-raw/recode_scripts/ces19_phone_recode.R")
 source("data-raw/recode_scripts/ces19_web_recode.R")
 source("data-raw/recode_scripts/ces21_recode.R")
-
