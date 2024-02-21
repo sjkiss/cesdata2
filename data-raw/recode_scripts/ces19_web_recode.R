@@ -183,7 +183,10 @@ val_labels(ces19web$sector)<-NULL
 table(ces19web$sector)
 ces19web$sector
 # table(ces19web$cps19_sector, ces19web$sector)
+lookfor(ces19web, "vote")
 
+ces19web$vote<-Recode(ces19web$pes19_votechoice2019, "1=1; 2=2; 3=3; 4=4; 5=5; 6=2; 7=0; 8:9=NA")
+val_labels(ces19web$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))
