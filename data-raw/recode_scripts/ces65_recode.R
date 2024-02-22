@@ -239,5 +239,6 @@ ces65$mode<-rep("Phone", nrow(ces65))
 #Add Election
 ces65$election<-c(rep(1965, nrow(ces65)))
 
+ces65$blah<-rep(1, nrow(ces65))
 glimpse(ces65)
 save(ces65, file=here("data/ces65.rda"))
