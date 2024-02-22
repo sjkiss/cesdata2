@@ -190,6 +190,13 @@ ces19web$male<-Recode(ces19web$cps19_gender, "1=1; 2=0; 3=0")
 val_labels(ces19web$male)<-c(`Male`=1, `Female`=0)
 
 #glimpse(ces19web)
-
+ces19web$degree
+ces19web$vote
+ces19web$male
+lookfor(ces19web, "sector")
+ces19web$sector<-Recode(ces19web$cps19_sector, "1=0; 4=0; 2=1; 5=NA")
+val_labels(ces19web$sector)<-c(`Private`=1, `Public`=0)
+ces19web$sector
+with(ces19web, table(cps19_sector, sector))
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))
