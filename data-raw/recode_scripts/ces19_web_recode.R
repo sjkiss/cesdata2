@@ -175,13 +175,7 @@ val_labels(ces19web$duty)
 table(ces19web$duty, ces19web$cps19_duty_choice, useNA="ifany")
 ces19web$mode<-rep("Web", nrow(ces19web))
 ces19web$election<-rep(2019, nrow(ces19web))
-#glimpse(ces19web)
-# ces19web$sector
-# ces19web$cps19_sector
-ces19web$sector<-Recode(ces19web$cps19_sector, "2=1; 1=0; 4=0; 5=NA", as.numeric=T)
-val_labels(ces19web$sector)<-NULL
-table(ces19web$sector)
-ces19web$sector
+
 # table(ces19web$cps19_sector, ces19web$sector)
 lookfor(ces19web, "vote")
 
@@ -194,6 +188,8 @@ val_labels(ces19web$degree)<-c(`nodegree`=0, `degree`=1)
 
 ces19web$male<-Recode(ces19web$cps19_gender, "1=1; 2=0; 3=0")
 val_labels(ces19web$male)<-c(`Male`=1, `Female`=0)
+
+#glimpse(ces19web)
 
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))
