@@ -122,6 +122,7 @@ ces21$occupation<-Recode(ces21$NOC21_4, as.numeric=T,"9500:9599=5;
        3100:3199=1;
        4100:4199=1;
        5100:5199=1;
+       9999=NA;
        else=NA")
 ces21$occupation
 # ADd value labels
@@ -662,7 +663,9 @@ table(ces21$satdem2, ces21$cps21_demsat, useNA = "ifany" )
 
 # Add mip as missing variable.
 ces21$mip<-rep(NA, nrow(ces21))
-ces21$sector<-rep(NA, nrow(ces21))
+
+#Add sector
+source("data-raw/recode_scripts/ces21_sector_recode.R")
 
 #recode Postgrad (cps21_education)
 look_for(ces21, "education")

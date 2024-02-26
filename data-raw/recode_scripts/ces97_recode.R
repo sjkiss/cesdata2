@@ -743,5 +743,6 @@ ces97$mode<-rep("Phone", nrow(ces97))
 #
 ces97$election<-rep(1997, nrow(ces97))
 glimpse(ces97)
+
 # Save the file
 save(ces97, file=here("data/ces97.rda"))

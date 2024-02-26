@@ -175,6 +175,28 @@ val_labels(ces19web$duty)
 table(ces19web$duty, ces19web$cps19_duty_choice, useNA="ifany")
 ces19web$mode<-rep("Web", nrow(ces19web))
 ces19web$election<-rep(2019, nrow(ces19web))
+
+# table(ces19web$cps19_sector, ces19web$sector)
+lookfor(ces19web, "vote")
+
+ces19web$vote<-Recode(ces19web$pes19_votechoice2019, "1=1; 2=2; 3=3; 4=4; 5=5; 6=2; 7=0; 8:9=NA")
+val_labels(ces19web$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+
+lookfor(ces19web, "degree")
+ces19web$degree<-Recode(ces19web$cps19_education, "1:8=0; 9:11=0; 12=NA")
+val_labels(ces19web$degree)<-c(`nodegree`=0, `degree`=1)
+
+ces19web$male<-Recode(ces19web$cps19_gender, "1=1; 2=0; 3=0")
+val_labels(ces19web$male)<-c(`Male`=1, `Female`=0)
+
 #glimpse(ces19web)
+ces19web$degree
+ces19web$vote
+ces19web$male
+lookfor(ces19web, "sector")
+ces19web$sector<-Recode(ces19web$cps19_sector, "1=0; 4=0; 2=1; 5=NA")
+val_labels(ces19web$sector)<-c(`Private`=1, `Public`=0)
+ces19web$sector
+with(ces19web, table(cps19_sector, sector))
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))
