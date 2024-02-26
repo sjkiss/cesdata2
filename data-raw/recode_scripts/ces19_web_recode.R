@@ -194,9 +194,47 @@ ces19web$degree
 ces19web$vote
 ces19web$male
 lookfor(ces19web, "sector")
+lookfor(ces19web, "employ")
 ces19web$sector<-Recode(ces19web$cps19_sector, "1=0; 4=0; 2=1; 5=NA")
+ces19web %>%
+  mutate(sector=case_when(
+    cps19_sector==1~0,
+    cps19_sector==4~0,
+    cps19_sector==2~1,
+    cps19_sector==5~NA,
+    cps19_employment>3~ 0
+  ))->ces19web
 val_labels(ces19web$sector)<-c(`Private`=1, `Public`=0)
+
 ces19web$sector
 with(ces19web, table(cps19_sector, sector))
+
+#### Income
+lookfor(ces19web, "income")
+ces19web$cps19_income_number
+
+
+#Recode Income2 # Quintles
+ces19web$income2<-Recode(ces19web$cps19_income_number, "0:57500=1;
+57501:87500=2; 87501:125000=3;
+       125001:187500=4; 187501:9999999999=5; else=NA")
+
+val_labels(ces19web$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+ces19web$income2
+
+#$55,000 to $59,999
+#$85,000 to $89,999
+#$120,000 to $129,999
+#$175,000 to $199,999
+
+# Tertiles
+# $75,000 to $79,999
+# $130,000 to $139,999
+ces19web$income_tertile<-car::Recode(ces19web$cps19_income_number, "0:77500=1;
+77501:135000=2; 135001:99999999=3;else=NA")
+
+val_labels(ces19web$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
+
+
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))
