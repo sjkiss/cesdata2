@@ -21,4 +21,5 @@ ces21 <- ces21 %>%
 # 1 - represents public sector jobs, 0 represents private sector jobs
 table(ces21$NOC21_4, ces21$sector)
 
+val_labels(ces21$sector)<-c(`Public`=1, `Private`=0)
 

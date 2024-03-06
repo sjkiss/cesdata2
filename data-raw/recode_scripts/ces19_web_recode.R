@@ -205,7 +205,7 @@ ces19web %>%
     cps19_employment>3&cps19_employment<13~ 0
   ))->ces19web
 with(ces19web, table(cps19_sector, sector, useNA = "ifany"))
-
+val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
 #### Income
 lookfor(ces19web, "income")
 ces19web$cps19_income_number
