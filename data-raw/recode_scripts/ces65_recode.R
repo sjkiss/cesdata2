@@ -222,10 +222,10 @@ val_labels(ces65$foreign)
 
 #recode Most Important Question (v8a)
 # look_for(ces65, "most")
-ces65$mip<-Recode(ces65$v8a, "11=9; 12:13=7; 14=6; 15=0; 16:17=15; 18=8; 19=0; 20=4; 21:22=14; 23:26=12;
+ces65$mip<-Recode(ces65$v8a, "11=7; 12:13=7; 14=6; 15=0; 16:17=15; 18=8; 19=0; 20=4; 21:22=14; 23:26=12;
 			                       27:29=16; 30:32=11; 33:34=3; 35:36=0; 37=13; 38=2; 39=6; 40:81=0; else=NA")
 val_labels(ces65$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
+                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Inflation=18)
 # table(ces65$mip)
 
 #Empty variables that are not available pre-88
@@ -239,6 +239,5 @@ ces65$mode<-rep("Phone", nrow(ces65))
 #Add Election
 ces65$election<-c(rep(1965, nrow(ces65)))
 
-ces65$blah<-rep(1, nrow(ces65))
 glimpse(ces65)
 save(ces65, file=here("data/ces65.rda"))

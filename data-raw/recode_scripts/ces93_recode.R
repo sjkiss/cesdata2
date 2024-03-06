@@ -727,11 +727,11 @@ ces93 %>%
 
 #recode Most Important Question (CPSA1)
 look_for(ces93, "issue")
-ces93$mip<-Recode(ces93$CPSA1, "0=0; 1:4=16; 5=0; 6:7=16; 8=11; 9=16; 10:14=6; 20:34=7; 35=0; 36=7; 40:43=10;
+ces93$mip<-Recode(ces93$CPSA1, "0=0; 1:4=16; 5=0; 6:7=16; 8=11; 9=16; 10:14=6; 20:30=7; 31=18; 32:34=7; 35=0; 36=7; 40:43=10;
 				                        44=13; 45=15; 46=12; 50:55=9; 60:64=15; 66:67=4; 68=15; 69=8; 70:71=14;
 				                        72=1; 73=14; 76:79=2; 80:86=17; 90=0; 91=3; 92:93=11; 94:95=0; 96=16; 97=0; else=NA")
 val_labels(ces93$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
+                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18, Housing=19)
 table(ces93$mip)
 
 # recode satisfaction with democracy (PESL5)
