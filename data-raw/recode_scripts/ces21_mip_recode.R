@@ -672,7 +672,8 @@ ces21 %>%
  # filter(!is.na(mip)) %>%
   #select(cps21_ResponseId, name, value,mip_single, mip) %>%
   #Repivot wider
-pivot_wider(., names_from=name, values_from = c(value)) ->ces21
+pivot_wider(., names_from=name, values_from = c(value)) %>%
+  ungroup()->ces21
 #Now set mip to be a numeric value that maps our coding scheme
 # based on mip2
 #  select(contains("mip")|ends_with("_mip"))
