@@ -1,6 +1,11 @@
 library(tidyverse)
 library(here)
-data("ces21")
+# MATT I AM DOING SOME STUFF ONTHE BACK END
+# THAT REQUIRES ME TO UNCOMMENT THIS LINE
+# IF YOU COME BACK TO THIS, JUST UNCOMMENT THE data("ces21")
+# DO WHAT YOU NEED, RECOMMENT, THEN PUSH BACK UP TO mip
+# THANKS SIMON
+#data("ces21")
 lookfor(ces21, "important issue")
 #Convert cps21_imp_iss to lower
 ces21 %>%
@@ -621,6 +626,83 @@ ces21 %>%
 ### immigr* will capture immigrants and immigration
 ### 3) French here will obviously be a particular challenge, but basically just google stuff as it comes up.
 summary(ces21$mip_total)
+# ces21 %>%
+#   select(ends_with("_mip")) %>%
+#   View()
+
+
+#### Calculation of MIP ####
+### Do not touch, but can move to the end,
+### i.e. insert code above.
+
 ces21 %>%
-  select(ends_with("_mip")) %>%
-  View()
+  select(mip_total)
+
+# How many respondents had multiple entries
+table(ces21$mip_total)
+
+# What were the biggest combinations
+ces21 %>%
+  filter(mip_total==2) %>%
+  select(ends_with("_mip"))
+# Note, the only way to really do this is to acknowledge the possibility of multiple responses
+# But code only respondents who ahd one issue coded
+ces21 %>%
+  #Define a respondent as single if their total count is 1
+  mutate(mip_single=case_when(
+    mip_total==1~ 1
+  ))->ces21
+lookfor(ces21, "id")
+ces21 %>%
+  #group respondents by respondent id to avoid messiness
+  group_by(cps21_ResponseId) %>%
+  #pivot all _mip dichtomous variables longer
+  pivot_longer(cols=ends_with("_mip")) %>%
+ # select(cps21_ResponseId, name, value,mip_single)
+  #select(cps21_ResponseId,name, value) %>%
+  #Note: store the text of the coded mip variable in mip2
+  mutate(mip2=case_when(
+    #If a respondent in the pivotted down data frame has a value of
+    # 1 for mip_single, that means they only picked one issue
+    # If one of the mip issues in the folded down data frame is not missing
+    # then set the values of mip2 to be the value of name.
+    mip_single==1&!is.na(value)~ name
+  )) %>%
+  # select(contains("mip")) %>%
+ # filter(!is.na(mip)) %>%
+  #select(cps21_ResponseId, name, value,mip_single, mip) %>%
+  #Repivot wider
+pivot_wider(., names_from=name, values_from = c(value)) ->ces21
+#Now set mip to be a numeric value that maps our coding scheme
+# based on mip2
+#  select(contains("mip")|ends_with("_mip"))
+ces21 %>%
+  mutate(mip=case_when(
+    str_detect(mip2, "enviro")~ 1,
+    str_detect(mip2, "crime")~ 2,
+    str_detect(mip2, "ethics")~ 3,
+    str_detect(mip2, "education")~ 4,
+    str_detect(mip2, "energy")~ 5,
+    str_detect(mip2, "jobs")~ 6,
+    str_detect(mip2, "economy")~ 7,
+    str_detect(mip2, "health")~ 8,
+    str_detect(mip2, "taxes")~ 9,
+    str_detect(mip2, "debt")~ 10,
+    str_detect(mip2, "democracy")~ 11,
+    str_detect(mip2, "foreign")~ 12,
+    str_detect(mip2, "immigration")~ 13,
+    str_detect(mip2, "socio_cultural")~ 14,
+    str_detect(mip2, "social_")~ 15,
+    str_detect(mip2, "brokerage")~ 16,
+    str_detect(mip2, "inflation")~ 18,
+    str_detect(mip2, "housing")~ 19,
+    str_detect(mip2, "covid")~ 20,
+  ))->ces21
+table(ces21$mip2)
+
+val_labels(ces21$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
+                         Democracy=11, Foreign_Affairs=12,
+                         Immigration=13, Socio_Cultural=14,
+                         Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18, Housing=19, COVID19=20)
+
+
