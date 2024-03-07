@@ -719,5 +719,7 @@ ces21$mode<-rep("Web", nrow(ces21))
 ces21$election<-rep(2021, nrow(ces21))
 #glimpse(ces21)
 table(ces21$occupation)
+
+
 # #### Resave the file in the .rda file
 save(ces21, file=here("data/ces21.rda"))
