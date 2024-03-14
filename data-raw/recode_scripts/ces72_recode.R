@@ -5,7 +5,9 @@ library(labelled)
 library(here)
 library(haven)
 #load data
+
 ces72_nov<-read_sav(file=here("data-raw/CES-E-1972-nov_F1.sav"))
+
 
 #recode Gender (V480)
 # look_for(ces72_nov, "sex")
@@ -161,11 +163,80 @@ table(ces72_nov$foreign)
 # ces72_nov$immigration_rates<-rep(NA, nrow(ces72_nov))
 # ces72_nov$turnout<-rep(NA, nrow(ces72_nov))
 # ces72_nov$mip<-rep(NA, nrow(ces72_nov))
-
+lookfor(ces72_nov, "problem")
 # Add mode
 ces72_nov$mode<-rep("Phone", nrow(ces72_nov))
 
 #Add Election
 ces72_nov$election<-c(rep(1972, nrow(ces72_nov)))
 #glimpse(ces72_nov)
+lookfor(ces72_nov, "problem")
+
+table(ces72_nov$q24a1a)
+#This variable was a mess
+# it is essentially stored in q24a1a to q24a8a or something like that.
+# Up until q24a5a, it seems to be coded if a respondent mentioned
+# any of about 10 core issues
+# So, in the absence of any documentation I sort of assumed the
+# first variable was a respondent's first response
+# So I just used that.
+# but then in q24a5a and afterward, it seemed to be
+# a respondent's offering a second set of secondary issues.h
+# So I basically coded this as follows:
+# I took the respondent's response to teh first variable q24a2a and
+# just mapped that onto our categorization
+# Then, if *all* of q24a1a to q24a4a was 0, I assume it meant the repsondent did not offer
+# One of the core responses, so then I took the variables with teh secondary set of responses and maped those
+# to our variable.
+# Fucking nightmare. Were they all drunk at the time?
+ces72_nov %>%
+  mutate(mip=case_when(
+    # 0 is don't know
+    #q24a1a==0~ NA,
+    # jobs
+    q24a1a==1~ 6,
+    # inflation
+    q24a1a==2~ 18,
+    # Taxes
+    q24a1a==3~ 9,
+    # welfare into social programs
+    q24a1a==4~ 15,
+    # poverty into economy
+    q24a1a==5~ 7,
+    # economy
+    q24a1a==6~ 7,
+    # old people/ SENIORS INTO SOCIAL PROGRAMS
+    q24a1a==7~ 15,
+    # Housing
+    q24a1a==8~ 0,
+    #IMMIGRATION
+    q24a1a=='-'~ 13,
+    #FARMERS
+    q24a1a=='&'~ 0,
+    #Ecology into environment
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a==0 ~ 1,
+    #Bilingualism # into brokerage
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a==1~ 16,
+    #independence of quebec into brokerage
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a==2~ 16,
+    #Canada's Unityh # into brokerage
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a==4~ 16,
+    #Strikes - into economy
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a==7~ 7,
+    #Education - into education
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a=="-"~ 4,
+    #Youths Teenagers - into socio-cultural
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a==6~ 14,
+    #Leadership - into other
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a==5~ 0,
+    #Drugs into socio-cultural
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a==5~ 14,
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a=="-"~ 0,
+    q24a1a==0&q24a2a==0&q24a3a==0&q24a4a==0&q24a5a==9~ 0
+      ))->ces72_nov
+
+val_labels(ces72_nov$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
+                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Inflation=18)
+table(as_factor(ces72_nov$mip))
+
 save(ces72_nov, file=here("data/ces72_nov.rda"))

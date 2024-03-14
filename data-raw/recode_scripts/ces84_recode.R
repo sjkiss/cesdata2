@@ -342,13 +342,13 @@ val_labels(ces84$foreign)
 
 #recode Most Important Question (VAR065)
 # look_for(ces84, "issue")
-ces84$mip<-Recode(ces84$VAR065, "1:7=7; 8:9=10; 10=3; 11:12=9; 13=7; 14=10; 15:16=6; 17=8; 18:19=15; 20:22=12; 23=0;
+ces84$mip<-Recode(ces84$VAR065, "1:2=18; 3=19; 4:6=7; 7=10; 8:9=10; 10=3; 11:12=9; 13=18; 14=10; 15:16=6; 17=8; 18:19=15; 20:22=12; 23=0;
 				                        24:27=5; 28=1; 29=12; 30=7; 31=4; 37=0; 38=11; 39:42=0; 43:44=3; 45:49=16; 50=14; 51=6;
 				                        52:56=14; 57=6; 58:60=15; 61:62=2; 63=0; 64=13; 65:66=1; 67=14; 68=2; 69=16;
 				                        70=0; 71:72=7; 73=3; 74=5; 75=12; 76=15; 77=11; 78=7; 79=15; 80=16; 81=7; 82=15;
 				                        83=0; 84=14; 85=7; 86:87=3; 90=14; 91=0; 92=14; 93=8; 94=0; 95=3; 96=0; 97=7; 98=0; else=NA")
 val_labels(ces84$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
+                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Inflation=18, Housing=19)
 # table(ces84$mip)
 
 #Empty variables that are not available pre-88

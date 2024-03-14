@@ -662,8 +662,8 @@ ces21$satdem2<-Recode(as.numeric(ces21$cps21_demsat), "1=1; 2=0.75; 3=0.25; 4=0;
 table(ces21$satdem2, ces21$cps21_demsat, useNA = "ifany" )
 
 # Add mip as missing variable.
-ces21$mip<-rep(NA, nrow(ces21))
-
+#ces21$mip<-rep(NA, nrow(ces21))
+source("data-raw/recode_scripts/ces21_mip_recode.R")
 #Add sector
 source("data-raw/recode_scripts/ces21_sector_recode.R")
 
@@ -719,5 +719,6 @@ ces21$mode<-rep("Web", nrow(ces21))
 ces21$election<-rep(2021, nrow(ces21))
 #glimpse(ces21)
 table(ces21$occupation)
+
 # #### Resave the file in the .rda file
 save(ces21, file=here("data/ces21.rda"))

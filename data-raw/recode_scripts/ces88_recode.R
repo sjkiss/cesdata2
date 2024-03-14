@@ -582,11 +582,13 @@ val_labels(ces88$turnout)
 
 #recode Most Important Question (l1a)
 # look_for(ces88, "issue")
-ces88$mip<-Recode(ces88$l1a, "1=14; 2=10; 3=12; 4=15; 5=12; 6=10; 7=7; 8=6; 9= 5; 10=1; 11=0; 12=17; 13=8; 14=15;
-				                      15=13; 16=7; 17=0; 18=16; 19=12; 20=16; 21=3; 22=7; 23:24=15; 25=16; 26:27=9;
+ces88$l1a
+ces88$mip<-Recode(ces88$l1a, "1=14; 2=10; 3=12; 4=15; 5=12; 6=10; 7=7; 8=6; 9=5; 10=1; 11=0; 12=17; 13=8; 14=19;
+				                      15=13; 16=18; 17=0; 18=16; 19=12; 20=16; 21=3; 22=7; 23:24=15; 25=16; 26:27=9;
 				                      28=6; 29=14; 30=0; else=NA")
 val_labels(ces88$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
+                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18, Housing=19)
+#table(as_factor(ces88$mip))
 # table(ces88$mip)
 
 #recode welfare (qb6)
@@ -617,3 +619,4 @@ ces88$mode<-rep("Phone", nrow(ces88))
 ces88$election<-rep(1988, nrow(ces88))
 # Save the file
 save(ces88, file=here("data/ces88.rda"))
+

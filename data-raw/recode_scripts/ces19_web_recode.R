@@ -202,17 +202,13 @@ ces19web %>%
     cps19_sector==4~0,
     cps19_sector==2~1,
     cps19_sector==5~NA,
-    cps19_employment>3~ 0
+    cps19_employment>3&cps19_employment<13~ 0
   ))->ces19web
-val_labels(ces19web$sector)<-c(`Private`=1, `Public`=0)
-
-ces19web$sector
-with(ces19web, table(cps19_sector, sector))
-
+with(ces19web, table(cps19_sector, sector, useNA = "ifany"))
+val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
 #### Income
 lookfor(ces19web, "income")
 ces19web$cps19_income_number
-
 
 #Recode Income2 # Quintles
 ces19web$income2<-Recode(ces19web$cps19_income_number, "0:57500=1;
@@ -234,7 +230,7 @@ ces19web$income_tertile<-car::Recode(ces19web$cps19_income_number, "0:77500=1;
 77501:135000=2; 135001:99999999=3;else=NA")
 
 val_labels(ces19web$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
-
+with(ces19web, table(ces19web$cps19_sector, ces19web$sector, useNA = "ifany"))
 
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))
