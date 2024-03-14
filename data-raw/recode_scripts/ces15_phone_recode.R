@@ -660,13 +660,13 @@ ces15phone$education<-Recode(as.numeric(ces15phone$CPS15_34), "1=1; 3=0; 5=0.5; 
 
 #recode Most Important Question (CPS15_1)
 # look_for(ces15phone, "important")
-ces15phone$mip<-Recode(ces15phone$CPS15_1, "75=1; 71=2; 77=2; 18=2; 4=2; 5=3; 2=3; 12=3; 90:91=3; 65:66=4; 13=5; 39=5; 10=6;
-                                                  36=7; 15:16=7; 30=7; 29=7; 56:59=8; 14=9; 50=9; 20:26=10; 7=11; 11=11; 83=11;
+ces15phone$mip<-Recode(ces15phone$CPS15_1, "75=1; 71=2; 77=2; 18=2; 4=2; 5=3; 2=3; 12=3; 90:91=3; 65:66=4; 13=5; 39=18; 10=6;
+                                                  36=19; 15:16=7; 30=7; 29=18; 56:59=8; 14=9; 50=9; 20:26=10; 7=11; 11=11; 83=11;
                                                   48=12; 79=12; 34=13; 9=14; 55=14; 73:74=14; 76=14; 49=14; 60:64=15; 72=15;
                                                   80:82=16; 84=0; 92:93=11; 94:97=0; 6=0; 8=0; 46=11; 31:32=7; 33=8; 35=0; 1=0; else=NA")
 val_labels(ces15phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9,
-                              Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
-# table(ces15phone$mip)
+                              Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Inflation=18, Housing=19)
+ table(ces15phone$mip)
 
 #### Visible minority status####
 ces15phone$CPS15_85

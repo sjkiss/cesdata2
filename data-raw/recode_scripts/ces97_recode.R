@@ -662,12 +662,12 @@ ces97 %>%
 
 #recode Most Important Question (cpsa1)
 # (ces97, "issue")
-ces97$mip<-Recode(ces97$cpsa1, "10:16=6; 20:25=7; 26=10; 30:34=7; 35=0; 36:38=7; 40:41=10; 42:43=3; 44=13; 45=15;
+ces97$mip<-Recode(ces97$cpsa1, "10:16=6; 20:25=7; 26=10; 30=7; 31=18; 32:34=7; 35=0; 36:38=7; 40:41=10; 42:43=3; 44=13; 45=15;
 				                        46=12; 47=11; 48=0; 50:55=9; 57=8; 58=15; 59=8; 60:64=15; 65:67=4; 68:69=8; 70:71=14;
 				                        72=1; 73=14; 74=15; 75:79=2; 80:88=16; 89:90=0; 91=3; 92=0; 93=11; 94:95=0; 96-16; 97=0; else=NA")
 val_labels(ces97$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
-# (ces97$mip)
+                         Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18)
+ (ces97$mip)
 
 # recode satisfaction with democracy (cpsb9, pesa5b)
 # (ces97, "dem")

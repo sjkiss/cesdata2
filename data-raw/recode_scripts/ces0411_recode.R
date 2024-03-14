@@ -776,12 +776,12 @@ ces0411 %>%
 
 #### recode Most Important Question (ces04_CPS_A7) ####
 # look_for(ces0411, "important issue")
-ces0411$mip04<-Recode(ces0411$ces04_CPS_A7, "1=0; 10=6; 20:26=10; 30=7; 35:36=0; 39=5; 48=12; 50=9; 57:59=8; 60:64=15;
+ces0411$mip04<-Recode(ces0411$ces04_CPS_A7, "1=0; 10=6; 20:26=10; 30=7; 35:36=0; 39=18; 48=12; 50=9; 57:59=8; 60:64=15;
                                             65:66=4; 68=15; 69=8; 70=14; 71=2; 72=15; 73:74=14; 75=1; 76=14; 77=2; 78=1;
                                             79=12; 80:81=16; 90:91=3; 92:93=11; 94:95=0; else=NA")
 val_labels(ces0411$mip04)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
-# table(ces0411$mip04)
+                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18)
+ table(ces0411$mip04)
 
 #### recode satisfaction with democracy (ces04_CPS_B10, ces04_PES_A8) ####
 # look_for(ces0411, "dem")
@@ -1669,12 +1669,12 @@ val_labels(ces0411$turnout06)
 
 #### recode Most Important Question (ces06_CPS_A2) ####
 # look_for(ces0411, "important issue")
-ces0411$mip06<-Recode(ces0411$ces06_CPS_A2, "1:6=0; 10=6; 20:26=10; 30=7; 35:36=0; 39=5; 48=12; 50=9; 57:59=8; 60:64=15;
+ces0411$mip06<-Recode(ces0411$ces06_CPS_A2, "1:6=0; 10=6; 20:26=10; 30=7; 35:36=0; 39=18; 48=12; 50=9; 57:59=8; 60:64=15;
                                             65=4; 70=14; 71=2; 72=15; 73:74=14; 75=1; 76=14; 77=2; 78=13; 79=12; 80:82=16;
 					                                  83=11; 84=0; 90:91=3; 92:93=11; 94:95=0; else=NA")
 val_labels(ces0411$mip06)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
-# table(ces0411$mip06)
+                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18)
+ table(ces0411$mip06)
 
 #### recode satisfaction with democracy (ces06_CPS_A1, ces06_PES_B10) ####
 # look_for(ces0411, "dem")
@@ -2763,12 +2763,12 @@ ces0411 %>%
 
 #### recode Most Important Question (ces08_CPS_A2) ####
 # look_for(ces0411, "important issue")
-ces0411$mip08<-Recode(ces0411$ces08_CPS_A2, "1:6=0; 10=6; 20:26=10; 30:32=7; 33=8; 35:36=0; 39=5; 45=12; 46=11; 47=0; 48=12; 48=12;
+ces0411$mip08<-Recode(ces0411$ces08_CPS_A2, "1:6=0; 10=6; 20:26=10; 30:32=7; 33=8; 35:36=0; 39=18; 45=12; 46=11; 47=0; 48=12; 48=12;
 					                                  49=14; 50=9; 57:59=8; 60:64=15; 65=4; 70=14; 71=2; 72=15; 73:74=14; 75=1; 76=14; 77=2; 78=13;
 					                                  79=12; 80:82=16; 83=11; 84=0; 90:91=3; 92:93=11; 94:95=0; else=NA")
 val_labels(ces0411$mip08)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
-# table(ces0411$mip08)
+                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18)
+ table(ces0411$mip08)
 
 #### recode satisfaction with democracy (ces08_CPS_A1) ####
 # look_for(ces0411, "dem")
@@ -3505,12 +3505,12 @@ ces0411 %>%
 
 #### recode Most Important Question (CPS11_1) ####
 # look_for(ces0411, "important issue")
-ces0411$mip11<-Recode(ces0411$CPS11_1, "0=1=0; 2=3; 3=0; 4=3; 5=11; 6=0; 7=11; 10=6; 20:26=10; 29:32=7; 33=8; 34=13; 35=0;
-					                              39=5; 45=12; 46=11; 47=0; 48=12; 49=14; 50=9; 56:59=8; 60:64=14; 65=4; 71=2; 72=15;
+ces0411$mip11<-Recode(ces0411$CPS11_1, "0=1=0; 2=3; 3=0; 4=3; 5=11; 6=0; 7=11; 10=6; 20:26=10; 29=18; 30:32=7; 33=8; 34=13; 35=0;
+					                              39=18; 45=12; 46=11; 47=0; 48=12; 49=14; 50=9; 56:59=8; 60:64=14; 65=4; 71=2; 72=15;
 					                              73:74=14; 75=1; 76=14; 77=2; 79=12; 80:82=16; 83=11; 84=0; 90:91=3; 92:93=11; 94:96=0; else=NA")
 val_labels(ces0411$mip11)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
-                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17)
-# table(ces0411$mip11)
+                             Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18)
+ table(ces0411$mip11)
 
 #### recode satisfaction w democracy (CPS11_0) ####
 # look_for(ces0411, "dem")
