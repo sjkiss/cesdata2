@@ -226,7 +226,15 @@ ces65$mip<-Recode(ces65$v8a, "11=18; 12:13=7; 14=6; 15=0; 16:17=15; 18=8; 19=0; 
 			                       27:29=16; 30:32=11; 33:34=3; 35:36=0; 37=13; 38=2; 39=6; 40:81=0; else=NA")
 val_labels(ces65$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
                          Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Inflation=18)
- table(ces65$mip)
+#  table(ces65$mip)
+
+#recode Previous Vote (v261)
+# look_for(ces65, "vote")
+ces65$previous_vote<-Recode(ces65$v261, "12=1; 11=2; 13=3; 14:19=0; else=NA")
+val_labels(ces65$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces65$previous_vote)
+table(ces65$previous_vote)
 
 #Empty variables that are not available pre-88
 # ces65$redistribution<-rep(NA, nrow(ces65))

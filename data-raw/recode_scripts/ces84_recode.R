@@ -351,6 +351,14 @@ val_labels(ces84$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
                          Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Inflation=18, Housing=19)
 # table(ces84$mip)
 
+#recode Previous Vote (VAR157)
+# look_for(ces84, "vote")
+ces84$previous_vote<-Recode(ces84$VAR157, "1=1; 2=2; 3=3; 4:10=0; else=NA")
+val_labels(ces84$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+#val_labels(ces84$previous_vote)
+#table(ces84$previous_vote)
+
 #Empty variables that are not available pre-88
 # ces84$redistribution<-rep(NA, nrow(ces84))
 # ces84$market_liberalism<-rep(NA, nrow(ces84))

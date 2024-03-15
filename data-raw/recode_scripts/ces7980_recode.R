@@ -319,7 +319,15 @@ ces7980$mip<-Recode(ces7980$V1154, "1=18; 2=19; 3:7=7; 8=3; 9:10=9; 11:12=7; 13=
 					                          70=13; 71:76=0; 77:80=16; 81:82=15; 83=12; 84=3; 85=0; 86:87=2; else=NA")
 val_labels(ces7980$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
                            Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Inflation=18, Housing=19)
- table(ces7980$mip)
+ #table(ces7980$mip)
+
+ #recode Previous Vote (V1248)
+ # look_for(ces7980, "vote")
+ ces7980$previous_vote<-Recode(ces7980$V1248, "1=1; 2=2; 3=3; 4:5=0; else=NA")
+ val_labels(ces7980$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+ #checks
+ #val_labels(ces7980$previous_vote)
+ #table(ces7980$previous_vote)
 
 #--------------------------------------------------------------------------------------------------------------------
 ####1980
@@ -446,8 +454,15 @@ ces7980$ndp_rating80<-Recode(as.numeric(ces7980$V2088), "0=NA")
 
 # No Religiosity variable
 
-
 # table(ces7980$mip80)
+
+#recode Previous Vote (V1234)
+# look_for(ces7980, "vote")
+ces7980$previous_vote80<-Recode(ces7980$V1234, "1=1; 2=2; 3=3; 4:5=0; else=NA")
+val_labels(ces7980$previous_vote80)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+#val_labels(ces7980$previous_vote80)
+#table(ces7980$previous_vote80)
 #
 # #Empty variables that are not available pre-88
 # ces7980$redistribution<-rep(NA, nrow(ces7980))

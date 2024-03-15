@@ -370,7 +370,8 @@ ces93$immigration_rates<-Recode(ces93$CPSG5, "1=0; 3=1; 5=0.5; 8=0.5; else=NA", 
 #checks
 table(ces93$immigration_rates, useNA = "ifany")
 val_labels(ces93$immigration_rates)<-NULL
-#recode Environment (MBSA12)
+
+#### recode Environment vs Jobs (MBSA12)
 look_for(ces93, "env")
 table(ces93$MBSA12, useNA = "ifany")
 ces93$enviro<-Recode(as.numeric(ces93$MBSA12), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
@@ -743,7 +744,6 @@ table(ces93$satdem, ces93$PESL5, useNA = "ifany" )
 
 ces93$satdem2<-Recode(as.numeric(ces93$PESL5), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #val_labels(ces93$satdem2)<-NULL
-
 #checks
 table(ces93$satdem2, ces93$PESL5, useNA = "ifany" )
 
@@ -751,7 +751,6 @@ table(ces93$satdem2, ces93$PESL5, useNA = "ifany" )
 look_for(ces93, "sovereignty")
 ces93$quebec_sov<-Recode(as.numeric(ces93$CPSG11), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
 #val_labels(ces93$quebec_sov)<-NULL
-
 #checks
 table(ces93$quebec_sov, ces93$CPSG11, useNA = "ifany" )
 
@@ -796,6 +795,7 @@ ces93$pol_interest<-Recode(as.numeric(ces93$CPSB1), "1=1; 3=0.75; 5=0.25; 7=0; 8
 #checks
 table(ces93$pol_interest, ces93$CPSB1, useNA = "ifany" )
 #val_labels(ces93$pol_interest)<-NULL
+
 #recode foreign born (CPSO11)
 look_for(ces93, "birth")
 ces93$foreign<-Recode(ces93$CPSO11, "1=0; 2:22=1; 0=1; else=NA")
@@ -803,6 +803,23 @@ val_labels(ces93$foreign)<-c(No=0, Yes=1)
 #checks
 val_labels(ces93$foreign)
 table(ces93$foreign, ces93$CPSO11, useNA="ifany")
+
+#recode Previous Vote (CPSM6)
+# look_for(ces93, "vote")
+ces93$previous_vote<-Recode(ces93$CPSM6, "1=1; 2=2; 3=3; 4=2; 5=0; else=NA")
+val_labels(ces93$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces93$previous_vote)
+table(ces93$previous_vote)
+
+#recode Previous Vote splitting Conservatives (CPSM6)
+look_for(ces93, "vote")
+ces93$previous_vote3<-car::Recode(as.numeric(ces93$CPSM6), "1=1; 2=2; 3=3; 4=6; 5=0; else=NA")
+val_labels(ces93$previous_vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
+#checks
+val_labels(ces93$previous_vote3)
+table(ces93$previous_vote3)
+
 glimpse(ces93)
 lookfor(ces93, "election")
 lookfor(ces93, "referendum")
@@ -813,6 +830,7 @@ table(as_factor(ces93$RTYPE4), useNA = "ifany")
 table(as_factor(ces93$CESTYPE), as_factor(ces93$RTYPE3), useNA = "ifany")
 table(as_factor(ces93$RTYPE1), as_factor(ces93$RTYPE3), useNA = "ifany")
 table(as_factor(ces93$RTYPE2), as_factor(ces93$RTYPE3), useNA = "ifany")
+
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
 ces93 %>%
   filter(is.na(ces93$RTYPE4)) %>%

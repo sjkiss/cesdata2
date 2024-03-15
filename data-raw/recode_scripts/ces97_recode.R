@@ -321,7 +321,7 @@ ces97$immigration_rates<-Recode(as.numeric(ces97$cpsj18), "1=0; 3=1; 5=0.5; 8=0.
 #checks
 # (ces97$immigration_rates, useNA = "ifany")
 
-#### #recode Environment (mbsa6)####
+#### recode Environment vs Jobs (mbsa6)####
 # (ces97, "env")
 # (ces97$mbsa6, useNA="ifany")
 ces97$enviro<-Recode(as.numeric(ces97$mbsa6), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
@@ -734,6 +734,22 @@ val_labels(ces97$foreign)<-c(No=0, Yes=1)
 #checks
 #val_labels(ces97$foreign)
 # (ces97$foreign, ces97$cpsm11, useNA="ifany")
+
+#recode Previous Vote (cpsk6)
+# look_for(ces97, "vote")
+ces97$previous_vote<-Recode(ces97$cpsk6, "1=1; 2=2; 3=3; 4=2; 5=4; 0=0; else=NA")
+val_labels(ces97$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+#val_labels(ces97$previous_vote)
+#table(ces97$previous_vote)
+
+#recode Previous Vote splitting Conservatives (cpsk6)
+# look_for(ces97, "vote")
+ces97$previous_vote3<-car::Recode(as.numeric(ces97$cpsk6), "1=1; 2=2; 3=3; 4=5; 5=4; 0=0; else=NA")
+val_labels(ces97$previous_vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
+#checks
+#val_labels(ces97$previous_vote3)
+#table(ces97$previous_vote3)
 
 #Add mode
 ces97$mode<-rep("Phone", nrow(ces97))

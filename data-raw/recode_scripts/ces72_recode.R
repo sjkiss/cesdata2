@@ -237,6 +237,15 @@ ces72_nov %>%
 
 val_labels(ces72_nov$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
                          Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Inflation=18)
-table(as_factor(ces72_nov$mip))
+#table(as_factor(ces72_nov$mip))
+
+#recode Previous Vote (qiii)
+# look_for(ces72_nov, "vote")
+ces72_nov$previous_vote<-Recode(ces72_nov$qiii, "2=1; 1=2; 3=3; 4:5=0; else=NA")
+val_labels(ces72_nov$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+#val_labels(ces72_nov$previous_vote)
+#table(ces72_nov$previous_vote)
+
 
 save(ces72_nov, file=here("data/ces72_nov.rda"))

@@ -749,7 +749,8 @@ ces15phone$immigration_rates<-Recode(as.numeric(ces15phone$PES15_28), "1=0; 3=1;
 #checks
 # table(ces15phone$immigration_rates, ces15phone$PES15_28 , useNA = "ifany" )
 #val_labels(ces15phone$immigration_rates)<-NULL
-#recode Environment (MBS15_C14)
+
+#### recode Environment vs Jobs (MBS15_C14)
 # look_for(ces15phone, "env")
 ces15phone$enviro<-Recode(as.numeric(ces15phone$MBS15_C14), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
@@ -915,12 +916,12 @@ ces15phone$quebec_accom<-Recode(as.numeric(ces15phone$PES15_44), "1=0; 2=0.25; 3
 #checks
 # table(ces15phone$quebec_accom)
 #val_labels(ces15phone$quebec_accom)<-NULL
+
 #recode Ideology (MBS15_K5) (only 1250 respondents)
 # look_for(ces15phone, "scale")
 ces15phone$ideology<-Recode(as.numeric(ces15phone$MBS15_K5), "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA")
 #val_labels(ces15phone$ideology)<-c(Left=0, Right=1)
 #val_labels(ces15phone$ideology)<-NULL
-
 #checks
 #val_labels(ces15phone$ideology)
 # table(ces15phone$ideology)
@@ -1082,7 +1083,9 @@ ces15phone$enviro_spend<-Recode(as.numeric(ces15phone$CPS15_35), "5=0.5; 1=1; 3=
 #checks
 # table(ces15phone$enviro_spend , ces15phone$CPS15_35 , useNA = "ifany" )
 #val_labels(ces15phone$enviro_spend)<-NULL
+
 #glimpse(ces15phone)
+
 #recode duty (CPS15_62 )
 look_for(ces15phone, "duty")
 ces15phone$duty<-Recode(ces15phone$CPS15_62 , "1=1; 5=0; else=NA")
@@ -1090,6 +1093,14 @@ val_labels(ces15phone$duty)<-c(No=0, Yes=1)
 #checks
 val_labels(ces15phone$duty)
 table(ces15phone$duty, ces15phone$CPS15_62, useNA="ifany")
+
+#recode Previous Vote (CPS15_74)
+# look_for(ces15phone, "vote")
+ces15phone$previous_vote<-Recode(ces15phone$CPS15_74, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+val_labels(ces15phone$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces15phone$previous_vote)
+table(ces15phone$previous_vote)
 
 # add Election
 ces15phone$election<-rep(2015, nrow(ces15phone))

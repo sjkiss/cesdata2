@@ -470,11 +470,11 @@ ces21$immigration_rates<-Recode(as.numeric(ces21$cps21_imm), "1=0; 2=1; 3=0.5; 4
 #checks
 table(ces21$immigration_rates, ces21$cps21_imm , useNA = "ifany" )
 
-#recode Environment (cps21_spend_env) (spending question)
+#### recode Environment vs Jobs
 look_for(ces21, "env")
-ces21$enviro<-Recode(as.numeric(ces21$cps21_spend_env), "1=0; 2=0.5; 3=1; else=NA")
+ces21$enviro<-Recode(as.numeric(ces21$cps21_pos_jobs), "5=1; 4=0.75; 3=0.5; 2=0.25; 1=0; 6=0.5; else=NA")
 #checks
-table(ces21$enviro , ces21$cps21_spend_env , useNA = "ifany" )
+table(ces21$enviro , ces21$cps21_pos_jobs , useNA = "ifany" )
 
 #recode Capital Punishment (Missing)
 
@@ -701,13 +701,13 @@ val_labels(ces21$foreign)<-c(No=0, Yes=1)
 #checks
 #val_labels(ces21$foreign)
 table(ces21$foreign, ces21$cps21_bornin_canada, useNA="ifany")
-#
+
 #recode Environment Spend (cps21_spend_env)
 look_for(ces21, "env")
 ces21$enviro_spend<-Recode(as.numeric(ces21$cps21_spend_env), "1=0; 2=0.5; 3=1; else=NA")
 #checks
 table(ces21$enviro_spend , ces21$cps21_spend_env , useNA = "ifany" )
-#
+
 #recode duty (cps21_duty_choice )
 look_for(ces21, "duty")
 ces21$duty<-Recode(ces21$cps21_duty_choice , "1=1; 2=0; else=NA")
@@ -717,6 +717,22 @@ val_labels(ces21$duty)
 table(ces21$duty, ces21$cps21_duty_choice, useNA="ifany")
 ces21$mode<-rep("Web", nrow(ces21))
 ces21$election<-rep(2021, nrow(ces21))
+
+#### recode Quebec Sovereignty (cps21_quebec_sov) (Right=more sovereignty)
+# look_for(ces21, "sovereignty")
+ces21$quebec_sov<-Recode(as.numeric(ces21$cps21_quebec_sov), "1=1; 2=0.75; 5=0.5; 3=0.25; 4=0; else=NA")
+#checks
+# table(ces21$quebec_sov, ces21$cps21_quebec_sov, useNA = "ifany" )
+#val_labels(ces21$quebec_sov)<-NULL
+
+#recode Previous Vote (cps21_vote_2019)
+# look_for(ces21, "vote")
+ces21$previous_vote<-Recode(ces21$cps21_vote_2019, "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; else=NA")
+val_labels(ces21$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces21$previous_vote)
+table(ces21$previous_vote)
+
 #glimpse(ces21)
 table(ces21$occupation)
 

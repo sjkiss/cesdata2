@@ -650,12 +650,6 @@ ces19phone$immigration_rates<-Recode(as.numeric(ces19phone$q39), "1=0; 2=1; 3=0.
 #checks
 # table(ces19phone$immigration_rates, ces19phone$q39 , useNA = "ifany" )
 
-#recode Environment (q27_b) (spending question)
-# look_for(ces19phone, "env")
-ces19phone$enviro<-Recode(as.numeric(ces19phone$q27_b), "1=0; 2=1; 3=0.5; -9=0.5; else=NA")
-#checks
-# table(ces19phone$enviro , ces19phone$q27_b , useNA = "ifany" )
-
 #recode Capital Punishment (Missing)
 
 #recode Crime (q27_c) (spending question)
@@ -771,6 +765,13 @@ ces19phone$satdem2<-Recode(as.numeric(ces19phone$q6), "1=1; 2=0.75; 3=0.25; 4=0;
 #checks
 # table(ces19phone$satdem2, ces19phone$q6, useNA = "ifany" )
 
+# recode Quebec Sovereignty (q43) (Right=more sovereignty)
+# look_for(ces19phone, "sovereignty")
+ces19phone$quebec_sov<-Recode(as.numeric(ces19phone$q43), "1=1; 2=0.75; -9=0.5; 3=0.25; 4=0; else=NA")
+#checks
+# table(ces19phone$quebec_sov, ces19phone$q43, useNA = "ifany" )
+#val_labels(ces19phone$quebec_sov)<-NULL
+
 # recode immigration society (p22_b)
 # look_for(ces19phone, "culture")
 ces19phone$immigration_soc<-Recode(as.numeric(ces19phone$p22_b), "5=0; 4=0.25; 2=0.75; 1=1; 3=0.5; -9=0.5; else=NA", as.numeric=T)
@@ -809,7 +810,7 @@ val_labels(ces19phone$foreign)
 ces19phone$enviro_spend<-Recode(as.numeric(ces19phone$q27_b), "1=1; 2=0; 3=0.5; -9=0.5; else=NA")
 #checks
 # table(ces19phone$enviro_spend , ces19phone$q27_b , useNA = "ifany" )
-#
+
 #recode duty (q76 )
 look_for(ces19phone, "duty")
 ces19phone$duty<-Recode(ces19phone$q76 , "1=1; 2:3=0; else=NA")
@@ -817,7 +818,17 @@ val_labels(ces19phone$duty)<-c(No=0, Yes=1)
 #checks
 val_labels(ces19phone$duty)
 table(ces19phone$duty, ces19phone$q76, useNA="ifany")
+
+#recode Previous Vote (q60)
+# look_for(ces19phone, "vote")
+ces19phone$previous_vote<-Recode(ces19phone$q60, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; else=NA")
+val_labels(ces19phone$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19phone$previous_vote)
+table(ces19phone$previous_vote)
+
 #glimpse(ces19phone)
+
 # add mode
 ces19phone$mode<-rep("Phone", nrow(ces19phone))
 ces19phone$election<-rep(2019, nrow(ces19phone))

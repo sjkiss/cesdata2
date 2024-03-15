@@ -232,5 +232,32 @@ ces19web$income_tertile<-car::Recode(ces19web$cps19_income_number, "0:77500=1;
 val_labels(ces19web$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
 with(ces19web, table(ces19web$cps19_sector, ces19web$sector, useNA = "ifany"))
 
+#recode Quebec Accommodation (pes19_doneqc ) (Left=more accom)
+look_for(ces19web, "quebec")
+ces19web$quebec_accom<-Recode(as.numeric(ces19web$pes19_doneqc), "2=0.25; 1=0; 3=0.5; 4=0.75; 5=1; 6=0.5; else=NA")
+#checks
+table(ces19web$quebec_accom)
+
+#### recode Quebec Sovereignty (cps19_quebec_sov) (Right=more sovereignty)
+# look_for(ces19web, "sovereignty")
+ces19web$quebec_sov<-Recode(as.numeric(ces19web$cps19_quebec_sov), "1=1; 2=0.75; 5=0.5; 3=0.25; 4=0; else=NA")
+#checks
+# table(ces19web$quebec_sov, ces19web$cps19_quebec_sov, useNA = "ifany" )
+#val_labels(ces19web$quebec_sov)<-NULL
+
+#### recode Environment vs Jobs
+look_for(ces19web, "env")
+ces19web$enviro<-Recode(as.numeric(ces19web$cps19_pos_jobs), "5=1; 4=0.75; 3=0.5; 2=0.25; 1=0; 6=0.5; else=NA")
+#checks
+table(ces19web$enviro , ces19web$cps19_pos_jobs , useNA = "ifany" )
+
+#recode Previous Vote (cps19_vote_2015)
+# look_for(ces19web, "vote")
+ces19web$previous_vote<-Recode(ces19web$cps19_vote_2015, "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; else=NA")
+val_labels(ces19web$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19web$previous_vote)
+table(ces19web$previous_vote)
+
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))

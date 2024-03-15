@@ -432,7 +432,8 @@ ces0411$immigration_rates04<-Recode(as.numeric(ces0411$ces04_CPS_P9), "1=0; 3=1;
 #checks
 # table(ces0411$immigration_rates04)
 #val_labels(ces0411$immigration_rates04)<-NULL
-#### #recode Environment (ces04_MBS_A6)####
+
+#### recode Environment vs Jobs (ces04_MBS_A6)####
 # look_for(ces0411, "env")
 ces0411$enviro04<-Recode(as.numeric(ces0411$ces04_MBS_A6), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
@@ -800,24 +801,28 @@ ces0411$quebec_sov04<-Recode(as.numeric(ces0411$ces04_PES_C10), "1=1; 3=0.75; 5=
 #checks
 # table(ces0411$quebec_sov04, ces0411$ces04_PES_C10, useNA = "ifany" )
 #val_labels(ces0411$quebec_sov04)<-NULL
+
 #### recode provincial alienation (ces04_CPS_P5) ####
 # look_for(ces0411, "treat")
 ces0411$prov_alienation04<-Recode(as.numeric(ces0411$ces04_CPS_P5), "3=1; 1=0; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces0411$prov_alienation04, ces0411$ces04_CPS_P5, useNA = "ifany" )
 #val_labels(ces0411$prov_alienation04)<-NULL
+
 #### recode immigration society (ces04_MBS_G3) ####
 # look_for(ces0411, "fit")
 ces0411$immigration_soc04<-Recode(as.numeric(ces0411$ces04_MBS_G3), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces0411$immigration_soc04, ces0411$ces04_MBS_G3, useNA = "ifany" )
 #val_labels(ces0411$immigration_soc04)<-NULL
+
 #recode welfare (ces04_PES_D1B)
 # look_for(ces0411, "spend")
 ces0411$welfare04<-Recode(as.numeric(ces0411$ces04_PES_D1B), "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces0411$welfare04, ces0411$ces04_PES_D1B, useNA = "ifany" )
 #val_labels(ces0411$welfare04)<-NULL
+
 #### Postgrad (ces04_CPS_S3) ####
 # look_for(ces0411, "education")
 ces0411$postgrad04<-Recode(as.numeric(ces0411$ces04_CPS_S3), "10:11=1; 1:9=0; else=NA")
@@ -871,6 +876,21 @@ val_labels(ces0411$duty04)<-c(No=0, Yes=1)
 val_labels(ces0411$duty04)
 table(ces0411$duty04, ces0411$ces04_CPS_P16, useNA="ifany")
 
+#recode Previous Vote (ces04_CPS_Q6)
+# look_for(ces0411, "vote")
+ces0411$previous_vote04<-Recode(ces0411$ces04_CPS_Q6, "1=1; 2=2; 3=3; 4=4; 5:7=2; 8=5; 0=0; 9:10=0; else=NA")
+val_labels(ces0411$previous_vote04)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces0411$previous_vote04)
+table(ces0411$previous_vote04)
+
+#recode Previous Vote splitting Conservatives (ces04_CPS_Q6)
+# look_for(ces0411, "vote")
+ces0411$previous_vote043<-car::Recode(as.numeric(ces0411$ces04_CPS_Q6), "1=1; 2=2; 3=3; 4=4; 5:7=6; 8=5; 0=0; 10=0; else=NA")
+val_labels(ces0411$previous_vote043)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
+#checks
+val_labels(ces0411$previous_vote043)
+table(ces0411$previous_vote043)
 
 
 # Add election04 variable
@@ -1399,12 +1419,6 @@ ces0411$immigration_rates06<-Recode(as.numeric(ces0411$ces06_CPS_P7), "1=0; 3=1;
 #checks
 # table(ces0411$immigration_rates06, useNA = "ifany")
 
-#recode Environment (ces06_PES_D1F) (spending question)
-# look_for(ces0411, "env")
-ces0411$enviro06<-Recode(as.numeric(ces0411$ces06_PES_D1F), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
-#checks
-# table(ces0411$enviro06, useNA = "ifany" )
-
 #recode Capital Punishment (ces06_CPS_I11)
 # look_for(ces0411, "death")
 ces0411$death_penalty06<-Recode(as.numeric(ces0411$ces06_CPS_I11), "1=1; 3=0; 7=0.5; 8=0.5; else=NA")
@@ -1746,6 +1760,7 @@ val_labels(ces0411$foreign06)
 # look_for(ces0411, "env")
 ces0411$enviro_spend06<-Recode(as.numeric(ces0411$ces06_PES_D1F), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
 #checks
+# table(ces0411$enviro_spend06, useNA = "ifany" )
 
 #### recode duty (ces06_CPS_P5 )
 look_for(ces0411, "duty")
@@ -1755,14 +1770,19 @@ val_labels(ces0411$duty06)<-c(No=0, Yes=1)
 val_labels(ces0411$duty06)
 table(ces0411$duty06, ces0411$ces06_CPS_P5, useNA="ifany")
 
-# table(ces0411$enviro_spend06, useNA = "ifany" )
+#recode Previous Vote (ces06_CPS_Q6B)
+# look_for(ces0411, "vote")
+ces0411$previous_vote06<-Recode(ces0411$ces06_CPS_Q6B, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+val_labels(ces0411$previous_vote06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces0411$previous_vote06)
+table(ces0411$previous_vote06)
+
 ces0411 %>%
   mutate(election06=case_when(
     str_detect(survey, "06")~ 2006
   ))->ces0411
 table(ces0411$election06, useNA = "ifany")
-
-
 
 ####Recode 2008 3rd ####
 
@@ -2432,7 +2452,7 @@ ces0411$immigration_rates08<-Recode(as.numeric(ces0411$ces08_PES_P6), "1=0; 3=1;
 #checks
 # table(ces0411$immigration_rates08, useNA = "ifany" )
 
-#### #recode Environment (ces08_MBS_A15)####
+#### recode Environment vs Jobs (ces08_MBS_A15)####
 # look_for(ces0411, "env")
 ces0411$enviro08<-Recode(as.numeric(ces0411$ces08_MBS_A15), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
@@ -2847,6 +2867,7 @@ val_labels(ces0411$foreign08)<-c(No=0, Yes=1)
 #checks
 val_labels(ces0411$foreign08)
 # table(ces0411$foreign08, ces0411$ces08_CPS_S12, useNA="ifany")
+
 #### recode duty (ces08_CPS_P1 )
 look_for(ces0411, "duty")
 ces0411$duty08<-Recode(ces0411$ces08_CPS_P1 , "1=1; 2:7=0; else=NA")
@@ -2855,6 +2876,13 @@ val_labels(ces0411$duty08)<-c(No=0, Yes=1)
 val_labels(ces0411$duty08)
 table(ces0411$duty08, ces0411$ces08_CPS_P1, useNA="ifany")
 
+#recode Previous Vote (ces08_PES_K7)
+# look_for(ces0411, "vote")
+ces0411$previous_vote08<-Recode(ces0411$ces08_PES_K7, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+val_labels(ces0411$previous_vote08)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces0411$previous_vote08)
+table(ces0411$previous_vote08)
 
 ces0411 %>%
   mutate(election08=case_when(
@@ -2864,6 +2892,7 @@ ces0411 %>%
   filter(str_detect(survey, "CPS08")) %>%
   select(survey, election08)
 table(ces0411$election08, useNA = "ifany")
+
 #### recode Environment Spend (ces04_PES_D1F)
 # look_for(ces0411, "env")
 ces0411$enviro_spend08<-Recode(as.numeric(ces0411$ces08_PES_D1F), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
@@ -3189,7 +3218,7 @@ ces0411$immigration_rates11<-Recode(as.numeric(ces0411$PES11_28), "1=0; 3=1; 5=0
 #checks
 # table(ces0411$immigration_rates11, useNA = "ifany" )
 
-#### #recode Environment (MBS11_C14)####
+#### recode Environment vs Jobs (MBS11_C14)####
 # look_for(ces0411, "env")
 ces0411$enviro11<-Recode(as.numeric(ces0411$MBS11_C14), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
 #checks
@@ -3598,7 +3627,15 @@ val_labels(ces0411$duty11)<-c(No=0, Yes=1)
 val_labels(ces0411$duty11)
 table(ces0411$duty11, ces0411$CPS11_62, useNA="ifany")
 
-# Add 20011 Election Variable
+#recode Previous Vote (PES11_6)
+# look_for(ces0411, "vote")
+ces0411$previous_vote11<-Recode(ces0411$PES11_6, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+val_labels(ces0411$previous_vote11)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces0411$previous_vote11)
+table(ces0411$previous_vote11)
+
+# Add 2011 Election Variable
 table(ces0411$survey)
 ces0411 %>%
   mutate(election11=case_when(

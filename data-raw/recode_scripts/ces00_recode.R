@@ -365,7 +365,8 @@ ces00 %>%
 ces00$immigration_rates<-Recode(as.numeric(ces00$cpsj18), "1=0; 3=1; 5=0.5; 8=0.5; else=NA", as.numeric=T)
 #checks
 # table(ces00$immigration_rates)
-#### environment ####
+
+#### recode Environment vs Jobs
 #recode Environment (mbsa6)
 # look_for(ces00, "env")
 ces00$enviro<-Recode(as.numeric(ces00$mbsa6), "1=0; 2=0.25; 3=0.75; 4=1; 8=0.5; else=NA")
@@ -742,23 +743,32 @@ ces00$foreign<-Recode(as.numeric(ces00$cpsm11), "1=0; 2:97=1; 0=1; else=NA")
 #val_labels(ces00$foreign)<-c(No=0, Yes=1)
 #checks
 #val_labels(ces00$foreign)
-
-#recode duty (mbsc9 )
-look_for(ces00, "duty")
-ces00$duty<-Recode(ces00$mbsc9 , "1=1; 2:4=0; else=NA")
-val_labels(ces00$duty)<-c(No=0, Yes=1)
-#checks
-val_labels(ces00$duty)
-table(ces00$duty, ces00$mbsc9, useNA="ifany")
-#recode duty (mbsc9 )
-look_for(ces00, "duty")
-ces00$duty<-Recode(ces00$mbsc9 , "1=1; 2:4=0; else=NA")
-val_labels(ces00$duty)<-c(No=0, Yes=1)
-#checks
-val_labels(ces00$duty)
-table(ces00$duty, ces00$mbsc9, useNA="ifany")
-
 # table(ces00$foreign, ces00$cpsm11, useNA="ifany")
+
+#recode duty (mbsc9 )
+look_for(ces00, "duty")
+ces00$duty<-Recode(ces00$mbsc9 , "1=1; 2:4=0; else=NA")
+val_labels(ces00$duty)<-c(No=0, Yes=1)
+#checks
+val_labels(ces00$duty)
+table(ces00$duty, ces00$mbsc9, useNA="ifany")
+
+#recode Previous Vote (cpsk6)
+# look_for(ces00, "vote")
+ces00$previous_vote<-Recode(ces00$cpsk6, "1=1; 2=2; 3=3; 4=2; 5=4; else=NA")
+val_labels(ces00$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces00$previous_vote)
+table(ces00$previous_vote)
+
+#recode Previous Vote splitting Conservatives (cpsk6)
+# look_for(ces00, "vote")
+ces00$previous_vote3<-car::Recode(as.numeric(ces00$cpsk6), "1=1; 2=2; 3=3; 4=5; 5=4; else=NA")
+val_labels(ces00$previous_vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
+#checks
+val_labels(ces00$previous_vote3)
+table(ces00$previous_vote3)
+
 glimpse(ces00)
 #Add mode
 ces00$mode<-rep("Phone", nrow(ces00))

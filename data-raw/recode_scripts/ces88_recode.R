@@ -325,7 +325,7 @@ ces88 %>%
 #   select(immigration_rates, immigration_better, immigration_encourage) %>%
 #   cor(., use="complete.obs")
 
-#recode Environment (qf9) (Left-Right)
+#### recode Environment vs Jobs (qf9) (Left-Right)
 # look_for(ces88, "env")
 ces88$enviro<-Recode(as.numeric(ces88$qf9), "1=0; 2=1; 8=0.5; else=NA")
 #checks
@@ -504,6 +504,12 @@ ces88$quebec_accom<-Recode(as.numeric(ces88$qa9), "1=1; 2=0; 3=0.5; 8=0.5; else=
 #checks
 # table(ces88$quebec_accom)
 
+#recode Quebec Sovereignty (b10) (Quebec only & Right=more sovereignty)
+look_for(ces88, "independence")
+ces88$quebec_sov<-Recode(as.numeric(ces88$b10), "1=1; 2=0.75; 3=0.25; 4=0; 8=0.5; else=NA")
+#val_labels(ces88$quebec_sov)<-NULL
+#checks
+table(ces88$quebec_sov, ces88$b10, useNA = "ifany" )
 
 #recode Liberal leader (xe2b)
 # look_for(ces88, "Turner")
@@ -612,11 +618,21 @@ val_labels(ces88$foreign)<-c(No=0, Yes=1)
 #checks
 #val_labels(ces88$foreign)
 # table(ces88$foreign, ces88$n13, useNA="ifany")
+
+#recode Previous Vote (b7)
+# look_for(ces88, "vote")
+ces88$previous_vote<-Recode(ces88$b7, "1=1; 2=2; 3=3; 4=0; else=NA")
+val_labels(ces88$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+#val_labels(ces88$previous_vote)
+#table(ces88$previous_vote)
+
 glimpse(ces88)
 #Add mode
 ces88$mode<-rep("Phone", nrow(ces88))
 #Add Election
 ces88$election<-rep(1988, nrow(ces88))
+
 # Save the file
 save(ces88, file=here("data/ces88.rda"))
 
