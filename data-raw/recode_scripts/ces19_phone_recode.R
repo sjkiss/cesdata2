@@ -631,15 +631,15 @@ ces19phone$q7
 ces19phone$q7_lower
 #The variable that includes the recodes contained the Excel file is
 ces19phone$q7_out
-# table(as_factor(ces19phone$q7_out))
+ table(as_factor(ces19phone$q7_out))
 
 #recode Most Important Question (q7_out)
-ces19phone$mip<-Recode(ces19phone$q7_out, "75=1; 71=2; 77=2; 18=2; 5=3; 2=3; 90:91=3; 65:66=4; 13=5; 39=5; 10=6;
-                                          36=7; 15:16=7; 30=7; 29=7; 56:58=8; 14=9; 50=9; 20:26=10; 7=11; 83=11;
+ces19phone$mip<-Recode(ces19phone$q7_out, "75=1; 71=2; 77=2; 18=2; 5=3; 2=3; 90:91=3; 65:66=4; 13=5; 39=18; 10=6;
+                                          36=19; 15:16=7; 30=7; 29=18; 56:58=8; 14=9; 50=9; 22:26=10; 7=11; 83=11;
                                           48=12; 79=12; 34=13; 55=14; 73:74=14; 76=14; 49=14; 60:64=15; 72=15;
                                           80:82=16; 84=0; 92:93=11; 94:96=0; 8=0; 31:32=7; 35=0; 1=0; else=NA")
 val_labels(ces19phone$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9,
-                              Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16)
+                              Deficit_Debt=10, Democracy=11, Foreign_Affairs=12, Immigration=13, Socio_Cultural=14, Social_Programs=15, Brokerage=16, Inflation=18, Housing=19)
 
 
 source(here('data-raw/recode_scripts/ces19_phone_vismin_recode.R'))
