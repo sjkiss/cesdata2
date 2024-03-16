@@ -753,6 +753,20 @@ val_labels(ces00$duty)<-c(No=0, Yes=1)
 val_labels(ces00$duty)
 table(ces00$duty, ces00$mbsc9, useNA="ifany")
 
+#### recode Women - how much should be done (cpsc10) ####
+look_for(ces00, "women")
+table(ces00$cpsc10)
+ces00$women<-Recode(as.numeric(ces00$cpsc10), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces00$women,  useNA = "ifany")
+
+#### recode Race - how much should be done (cpsc11) ####
+look_for(ces00, "racial")
+table(ces00$cpsc11)
+ces00$race<-Recode(as.numeric(ces00$cpsc11), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces00$race,  useNA = "ifany")
+
 #recode Previous Vote (cpsk6)
 # look_for(ces00, "vote")
 ces00$previous_vote<-Recode(ces00$cpsk6, "1=1; 2=2; 3=3; 4=2; 5=4; else=NA")

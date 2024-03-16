@@ -735,6 +735,20 @@ val_labels(ces97$foreign)<-c(No=0, Yes=1)
 #val_labels(ces97$foreign)
 # (ces97$foreign, ces97$cpsm11, useNA="ifany")
 
+#### recode Women - how much should be done (pese1) ####
+look_for(ces97, "women")
+table(ces97$pese1)
+ces97$women<-Recode(as.numeric(ces97$pese1), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces97$women,  useNA = "ifany")
+
+#### recode Race - how much should be done (cpsf1) ####
+look_for(ces97, "racial")
+table(ces97$cpsf1)
+ces97$race<-Recode(as.numeric(ces97$cpsf1), "1=0; 2=1; 3=0.5; else=NA")
+#checks
+table(ces97$race,  useNA = "ifany")
+
 #recode Previous Vote (cpsk6)
 # look_for(ces97, "vote")
 ces97$previous_vote<-Recode(ces97$cpsk6, "1=1; 2=2; 3=3; 4=2; 5=4; 0=0; else=NA")

@@ -725,6 +725,20 @@ ces21$quebec_sov<-Recode(as.numeric(ces21$cps21_quebec_sov), "1=1; 2=0.75; 5=0.5
 # table(ces21$quebec_sov, ces21$cps21_quebec_sov, useNA = "ifany" )
 #val_labels(ces21$quebec_sov)<-NULL
 
+#### recode Women - how much should be done (pes21_donew) ####
+look_for(ces21, "women")
+table(ces21$pes21_donew)
+ces21$women<-Recode(as.numeric(ces21$pes21_donew), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces21$women,  useNA = "ifany")
+
+#### recode Race - how much should be done (pes21_donerm) ####
+look_for(ces21, "racial")
+table(ces21$pes21_donerm)
+ces21$race<-Recode(as.numeric(ces21$pes21_donerm), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces21$race,  useNA = "ifany")
+
 #recode Previous Vote (cps21_vote_2019)
 # look_for(ces21, "vote")
 ces21$previous_vote<-Recode(ces21$cps21_vote_2019, "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; else=NA")

@@ -619,6 +619,20 @@ val_labels(ces88$foreign)<-c(No=0, Yes=1)
 #val_labels(ces88$foreign)
 # table(ces88$foreign, ces88$n13, useNA="ifany")
 
+#recode Women - how much should be done (xk9)
+look_for(ces88, "women")
+table(ces88$xk9)
+ces88$women<-Recode(as.numeric(ces88$xk9), "1=0; 3=0.5; 5=1; else=NA")
+#checks
+table(ces88$women,  useNA = "ifany")
+
+#recode Race - how much should be done (xk5)
+look_for(ces88, "ethnic")
+table(ces88$xk5)
+ces88$race<-Recode(as.numeric(ces88$xk5), "1=0; 3=0.5; 5=1; else=NA")
+#checks
+table(ces88$race,  useNA = "ifany")
+
 #recode Previous Vote (b7)
 # look_for(ces88, "vote")
 ces88$previous_vote<-Recode(ces88$b7, "1=1; 2=2; 3=3; 4=0; else=NA")

@@ -804,6 +804,20 @@ val_labels(ces93$foreign)<-c(No=0, Yes=1)
 val_labels(ces93$foreign)
 table(ces93$foreign, ces93$CPSO11, useNA="ifany")
 
+#### recode Women - how much should be done (CPSK2A) ####
+look_for(ces93, "women")
+table(ces93$CPSK2A)
+ces93$women<-Recode(as.numeric(ces93$CPSK2A), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces93$women,  useNA = "ifany")
+
+#### recode Race - how much should be done (CPSK3A) ####
+look_for(ces93, "racial")
+table(ces93$CPSK3A)
+ces93$race<-Recode(as.numeric(ces93$CPSK3A), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces93$race,  useNA = "ifany")
+
 #recode Previous Vote (CPSM6)
 # look_for(ces93, "vote")
 ces93$previous_vote<-Recode(ces93$CPSM6, "1=1; 2=2; 3=3; 4=2; 5=0; else=NA")

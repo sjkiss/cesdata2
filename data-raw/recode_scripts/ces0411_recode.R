@@ -861,20 +861,34 @@ val_labels(ces0411$foreign04)<-c(No=0, Yes=1)
 val_labels(ces0411$foreign04)
 # table(ces0411$foreign04, ces0411$ces04_CPS_S12, useNA="ifany")
 
-#### recode Environment Spend (ces04_PES_D1F)
+#### recode Environment Spend (ces04_PES_D1F) ####
 # look_for(ces0411, "env")
 ces0411$enviro_spend04<-Recode(as.numeric(ces0411$ces04_PES_D1F), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
 #checks
 # table(ces0411$enviro_spend04, useNA = "ifany" )
 #val_labels(ces0411$enviro_spend04)<-NULL
 
-#### recode duty (ces04_CPS_P16 )
+#### recode duty (ces04_CPS_P16 ) ####
 look_for(ces0411, "duty")
 ces0411$duty04<-Recode(ces0411$ces04_CPS_P16 , "1=1; 2:7=0; else=NA")
 val_labels(ces0411$duty04)<-c(No=0, Yes=1)
 #checks
 val_labels(ces0411$duty04)
 table(ces0411$duty04, ces0411$ces04_CPS_P16, useNA="ifany")
+
+#### recode Women - how much should be done (ces04_CPS_F7) ####
+look_for(ces0411, "women")
+table(ces0411$ces04_CPS_F7)
+ces0411$women04<-Recode(as.numeric(ces0411$ces04_CPS_F7), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces0411$women04,  useNA = "ifany")
+
+#### recode Race - how much should be done (ces04_CPS_F8) ####
+look_for(ces0411, "racial")
+table(ces0411$ces04_CPS_F8)
+ces0411$race04<-Recode(as.numeric(ces0411$ces04_CPS_F8), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces0411$race04,  useNA = "ifany")
 
 #recode Previous Vote (ces04_CPS_Q6)
 # look_for(ces0411, "vote")
@@ -1756,19 +1770,33 @@ val_labels(ces0411$foreign06)<-c(No=0, Yes=1)
 val_labels(ces0411$foreign06)
 # table(ces0411$foreign06, ces0411$ces06_CPS_S12, useNA="ifany")
 
-#### recode Environment Spend (ces06_PES_D1F)
+#### recode Environment Spend (ces06_PES_D1F) ####
 # look_for(ces0411, "env")
 ces0411$enviro_spend06<-Recode(as.numeric(ces0411$ces06_PES_D1F), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
 #checks
 # table(ces0411$enviro_spend06, useNA = "ifany" )
 
-#### recode duty (ces06_CPS_P5 )
+#### recode duty (ces06_CPS_P5 ) ####
 look_for(ces0411, "duty")
 ces0411$duty06<-Recode(ces0411$ces06_CPS_P5 , "1=1; 2:7=0; else=NA")
 val_labels(ces0411$duty06)<-c(No=0, Yes=1)
 #checks
 val_labels(ces0411$duty06)
 table(ces0411$duty06, ces0411$ces06_CPS_P5, useNA="ifany")
+
+#### recode Women - how much should be done (ces06_PES_I4) ####
+look_for(ces0411, "women")
+table(ces0411$ces06_PES_I4)
+ces0411$women06<-Recode(as.numeric(ces0411$ces06_PES_I4), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces0411$women06,  useNA = "ifany")
+
+#### recode Race - how much should be done (ces06_PES_I3) ####
+look_for(ces0411, "racial")
+table(ces0411$ces06_PES_I3)
+ces0411$race06<-Recode(as.numeric(ces0411$ces06_PES_I3), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces0411$race06,  useNA = "ifany")
 
 #recode Previous Vote (ces06_CPS_Q6B)
 # look_for(ces0411, "vote")
@@ -2868,13 +2896,27 @@ val_labels(ces0411$foreign08)<-c(No=0, Yes=1)
 val_labels(ces0411$foreign08)
 # table(ces0411$foreign08, ces0411$ces08_CPS_S12, useNA="ifany")
 
-#### recode duty (ces08_CPS_P1 )
+#### recode duty (ces08_CPS_P1 ) ####
 look_for(ces0411, "duty")
 ces0411$duty08<-Recode(ces0411$ces08_CPS_P1 , "1=1; 2:7=0; else=NA")
 val_labels(ces0411$duty08)<-c(No=0, Yes=1)
 #checks
 val_labels(ces0411$duty08)
 table(ces0411$duty08, ces0411$ces08_CPS_P1, useNA="ifany")
+
+#### recode Women - how much should be done (ces08_PES_I4) ####
+look_for(ces0411, "women")
+table(ces0411$ces08_PES_I4)
+ces0411$women08<-Recode(as.numeric(ces0411$ces08_PES_I4), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces0411$women08,  useNA = "ifany")
+
+#### recode Women - how much should be done (ces08_PES_I3) ####
+look_for(ces0411, "racial")
+table(ces0411$ces08_PES_I3)
+ces0411$race08<-Recode(as.numeric(ces0411$ces08_PES_I3), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces0411$race08,  useNA = "ifany")
 
 #recode Previous Vote (ces08_PES_K7)
 # look_for(ces0411, "vote")
@@ -3626,6 +3668,20 @@ val_labels(ces0411$duty11)<-c(No=0, Yes=1)
 #checks
 val_labels(ces0411$duty11)
 table(ces0411$duty11, ces0411$CPS11_62, useNA="ifany")
+
+#### recode Women - how much should be done (PES11_43) ####
+look_for(ces0411, "women")
+table(ces0411$PES11_43)
+ces0411$women11<-Recode(as.numeric(ces0411$PES11_43), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces0411$women11,  useNA = "ifany")
+
+#### recode Race - how much should be done (PES11_42) ####
+look_for(ces0411, "racial")
+table(ces0411$PES11_42)
+ces0411$race11<-Recode(as.numeric(ces0411$PES11_42), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces0411$race11,  useNA = "ifany")
 
 #recode Previous Vote (PES11_6)
 # look_for(ces0411, "vote")

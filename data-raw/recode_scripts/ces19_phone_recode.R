@@ -819,6 +819,20 @@ val_labels(ces19phone$duty)<-c(No=0, Yes=1)
 val_labels(ces19phone$duty)
 table(ces19phone$duty, ces19phone$q76, useNA="ifany")
 
+#### recode Women - how much should be done (p35_b) ####
+look_for(ces19phone, "women")
+table(ces19phone$p35_b)
+ces19phone$women<-Recode(as.numeric(ces19phone$p35_b), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces19phone$women,  useNA = "ifany")
+
+#### recode Race - how much should be done (p35_a) ####
+look_for(ces19phone, "racial")
+table(ces19phone$p35_a)
+ces19phone$race<-Recode(as.numeric(ces19phone$p35_a), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces19phone$race,  useNA = "ifany")
+
 #recode Previous Vote (q60)
 # look_for(ces19phone, "vote")
 ces19phone$previous_vote<-Recode(ces19phone$q60, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; else=NA")

@@ -251,6 +251,20 @@ ces19web$enviro<-Recode(as.numeric(ces19web$cps19_pos_jobs), "5=1; 4=0.75; 3=0.5
 #checks
 table(ces19web$enviro , ces19web$cps19_pos_jobs , useNA = "ifany" )
 
+#### recode Women - how much should be done (pes19_donew) ####
+look_for(ces19web, "women")
+table(ces19web$pes19_donew)
+ces19web$women<-Recode(as.numeric(ces19web$pes19_donew), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces19web$women,  useNA = "ifany")
+
+#### recode Race - how much should be done (pes19_donerm) ####
+look_for(ces19web, "racial")
+table(ces19web$pes19_donerm)
+ces19web$race<-Recode(as.numeric(ces19web$pes19_donerm), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces19web$race,  useNA = "ifany")
+
 #recode Previous Vote (cps19_vote_2015)
 # look_for(ces19web, "vote")
 ces19web$previous_vote<-Recode(ces19web$cps19_vote_2015, "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; else=NA")
