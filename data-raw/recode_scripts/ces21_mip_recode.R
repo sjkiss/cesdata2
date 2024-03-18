@@ -77,6 +77,8 @@ ces21 %>%
     str_detect(mip_lower, "securité")~1,
     str_detect(mip_lower, "terroris*")~1,
     str_detect(mip_lower, "law")~1,
+    str_detect(mip_lower, "catch and release")~1,
+    str_detect(mip_lower, "protests")~1,
   ))->ces21
 #Ethics
 ces21 %>%
@@ -111,6 +113,10 @@ ces21 %>%
     str_detect(mip_lower, "vérité*")~1,
     str_detect(mip_lower, "decency")~1,
     str_detect(mip_lower, "honnête")~1,
+    str_detect(mip_lower, "promise*")~1,
+    str_detect(mip_lower, "bad behavior")~1,
+    str_detect(mip_lower, "in jail")~1,
+    str_detect(mip_lower, "promesses")~1,
   ))->ces21
 # Education
 ces21 %>%
@@ -118,6 +124,12 @@ ces21 %>%
     str_detect(mip_lower, "educat*")~1,
     str_detect(mip_lower, "éducat*")~1,
     str_detect(mip_lower, "educ")~1,
+    str_detect(mip_lower, "student loan*")~1,
+    str_detect(mip_lower, "student funding")~1,
+    str_detect(mip_lower, "student issue*")~1,
+    str_detect(mip_lower, "tuition")~1,
+    str_detect(mip_lower, "loans and grants")~1,
+    str_detect(mip_lower, "tuitition")~1,
   ))->ces21
 # Energy
 ces21 %>%
@@ -165,6 +177,19 @@ ces21 %>%
     str_detect(mip_lower, "ècon*")~1,
     str_detect(mip_lower, "ecenomy")~1,
     str_detect(mip_lower, "éconmique")~1,
+    str_detect(mip_lower, "fighting big tech")~1,
+    str_detect(mip_lower, "middle class")~1,
+    str_detect(mip_lower, "small business*")~1,
+    str_detect(mip_lower, "infrastructure*")~1,
+    str_detect(mip_lower, "richesse*")~1,
+    str_detect(mip_lower, "la.richesse")~1,
+    str_detect(mip_lower, "commerces")~1,
+    str_detect(mip_lower, "pay increase*")~1,
+    str_detect(mip_lower, "raises")~1,
+    str_detect(mip_lower, "the classes")~1,
+    str_detect(mip_lower, "rich and the rest")~1,
+    str_detect(mip_lower, "classe moyenne")~1,
+    str_detect(mip_lower, "middle/")~1,
     mip_lower=="$" ~1,
       ))->ces21
 # Health and Health Care
@@ -187,6 +212,7 @@ ces21 %>%
     str_detect(mip_lower, "optometr*")~1,
     str_detect(mip_lower, "overdose")~1,
     str_detect(mip_lower, "opiod")~1,
+    str_detect(mip_lower, "bill 124")~1,
   ))->ces21
 # Socio-Cultural
 ces21 %>%
@@ -237,6 +263,19 @@ ces21 %>%
     str_detect(mip_lower, "feminine")~1,
     str_detect(mip_lower, "islamophobia")~1,
     str_detect(mip_lower, "race")~1,
+    str_detect(mip_lower, "animal")~1,
+    str_detect(mip_lower, "arts")~1,
+    str_detect(mip_lower, "false information")~1,
+    str_detect(mip_lower, "desinformation")~1,
+    str_detect(mip_lower, "misinformation")~1,
+    str_detect(mip_lower, "unborn")~1,
+    str_detect(mip_lower, "media")~1,
+    str_detect(mip_lower, "land agreement*")~1,
+    str_detect(mip_lower, "family issue*")~1,
+    str_detect(mip_lower, "fake information")~1,
+    str_detect(mip_lower, "fake news")~1,
+    str_detect(mip_lower, "credible information")~1,
+    str_detect(mip_lower, "youth issue*")~1,
   ))->ces21
 # Social Programs
 ces21 %>%
@@ -292,6 +331,14 @@ ces21 %>%
     str_detect(mip_lower, "cpp")~1,
     str_detect(mip_lower, "âgé*")~1,
     str_detect(mip_lower, "wsib")~1,
+    str_detect(mip_lower, "benefits")~1,
+    str_detect(mip_lower, "family support")~1,
+    str_detect(mip_lower, "funding")~1,
+    str_detect(mip_lower, "funds")~1,
+    str_detect(mip_lower, "la population")~1,
+    str_detect(mip_lower, "famille*")~1,
+    str_detect(mip_lower, "soutien")~1,
+    str_detect(mip_lower, "fonds")~1,
   ))->ces21
 # Brokerage (Canada, Quebec Fed- Prov)
 ces21 %>%
@@ -314,6 +361,12 @@ ces21 %>%
     str_detect(mip_lower, "juridictions")~1,
     str_detect(mip_lower, "provinciale")~1,
     str_detect(mip_lower, "provincial")~1,
+    str_detect(mip_lower, "ubi")~1,
+    str_detect(mip_lower, "francais")~1,
+    str_detect(mip_lower, "franco*")~1,
+    str_detect(mip_lower, "qiebec")~1,
+    str_detect(mip_lower, "bill 96")~1,
+    str_detect(mip_lower, "bloc")~1,
   ))->ces21
 # Inflation
 ces21 %>%
@@ -328,7 +381,11 @@ ces21 %>%
     str_detect(mip_lower, "dépenses")~1,
     str_detect(mip_lower, "cout")~1,
     str_detect(mip_lower, "cost")~1,
-    str_detect(mip_lower, "price of food")~1,
+    str_detect(mip_lower, "base rate")~1,
+    str_detect(mip_lower, "food")~1,
+    str_detect(mip_lower, "phone plan*")~1,
+    str_detect(mip_lower, "price")~1,
+    str_detect(mip_lower, "prix")~1,
   ))->ces21
 # Housing, rent
 ces21 %>%
@@ -378,6 +435,8 @@ ces21 %>%
     str_detect(mip_lower, "normale")~1,
     str_detect(mip_lower, "vrai normal")~1,
     str_detect(mip_lower, "à normal")~1,
+    str_detect(mip_lower, "épidémie")~1,
+    str_detect(mip_lower, "return to normal")~1,
   ))->ces21
 # Taxes
 ces21 %>%
@@ -407,7 +466,9 @@ ces21 %>%
     str_detect(mip_lower, "bugdet*")~1,
     str_detect(mip_lower, "budgè*")~1,
     str_detect(mip_lower, "buget")~1,
-  ))->ces21
+    str_detect(mip_lower, "government waste")~1,
+    str_detect(mip_lower, "dept")~1,
+      ))->ces21
 # Democracy
 ces21 %>%
   mutate(democracy_mip=case_when(
@@ -420,6 +481,8 @@ ces21 %>%
     str_detect(mip_lower, "ballot*")~1,
     str_detect(mip_lower, "demovracy")~1,
     str_detect(mip_lower, "scrutin")~1,
+    str_detect(mip_lower, "constitution")~1,
+    str_detect(mip_lower, "federal")~1,
   ))->ces21
 # Foreign Affairs
 ces21 %>%
@@ -439,6 +502,7 @@ ces21 %>%
     str_detect(mip_lower, "israel")~1,
     str_detect(mip_lower, "jew*")~1,
     str_detect(mip_lower, "usa")~1,
+    str_detect(mip_lower, "travel restriction*")~1,
   ))->ces21
 # Immigration
 ces21 %>%
@@ -705,5 +769,6 @@ val_labels(ces21$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
                          Democracy=11, Foreign_Affairs=12,
                          Immigration=13, Socio_Cultural=14,
                          Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18, Housing=19, COVID19=20)
+
 
 
