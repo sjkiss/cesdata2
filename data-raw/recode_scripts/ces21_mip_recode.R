@@ -371,6 +371,7 @@ ces21 %>%
 # Inflation
 ces21 %>%
   mutate(inflation_mip=case_when(
+    str_detect(mip_lower, "le cou de la vie")~1,
     str_detect(mip_lower, "inflation")~1,
     str_detect(mip_lower, "prices")~1,
     str_detect(mip_lower, "cost of living")~1,
@@ -682,6 +683,16 @@ ces21 %>%
   count() %>%
   arrange(desc(n))%>%
   print(n=1000)
+
+# ces21 %>%
+#   filter(mip_total<1) %>%
+#   filter(mip_missing<1)%>%
+#   group_by(mip_lower) %>%
+#   count() %>%
+#   arrange(desc(n)) %>%
+#   write.csv(file=here("data-raw/2021_mip.csv"), fileEncoding = "UTF-8")
+#
+
 ### This will go quicker than you think.
 ### 1) For example, adding str_detect(mip_lower, "santé") combine multiple responses.
 ### As will housing.
