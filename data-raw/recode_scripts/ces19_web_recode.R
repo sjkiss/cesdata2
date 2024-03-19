@@ -11,6 +11,7 @@ ces19web <- read_sav(file=here("data-raw/CES-E-2019-online_F1.sav"), encoding="l
 #This script repairs those.
 source("data-raw/recode_scripts/ces19_web_problem_with_encodings.R")
 
+#### recode occupation ####
 ces19web %>%
   filter(str_detect(pes19_occ_text,"assembleur-m")) %>%
   select(cps19_ResponseId, pes19_occ_text)
@@ -75,6 +76,7 @@ table(is.na(ces19web$NOC))
 table(is.na(ces19web$NOC21_4))
 var_label(ces19web$occupation2)<-c("5 category class no self-employed from pre-existing categories provided to R")
 
+#### recode visible minority ####
 look_for(ces19web, "ethnic")
 ces19web$cps19_ethnicity_41_TEXT
 ces19web$cps19_ethnicity_23
@@ -92,6 +94,434 @@ ces19web %>%
 ces19web$cps19_ethnicity_41_TEXT
 prop.table(table(ces19web$vismin))
 
+#### recode Gender ####
+ces19web$male<-Recode(ces19web$cps19_gender, "1=1; 2=0; 3=0")
+val_labels(ces19web$male)<-c(`Male`=1, `Female`=0)
+
+# recode Union Household (cps19web_union)
+look_for(ces19web, "union")
+ces19web$union<-Recode(ces19web$cps19_union, "1=1; 2=0; else=NA")
+val_labels(ces19web$union)<-c(None=0, Union=1)
+# Checks
+val_labels(ces19web$union)
+table(ces19web$union , useNA = "ifany" )
+
+#Union Combined variable (identical copy of union) ### Respondent only
+ces19web$union_both<-ces19web$union
+#checks
+val_labels(ces19web$union_both)
+table(ces19web$union_both , useNA = "ifany" )
+
+#### recode Education (cps19_education) ####
+lookfor(ces19web, "degree")
+ces19web$degree<-Recode(ces19web$cps19_education, "1:8=0; 9:11=0; 12=NA")
+val_labels(ces19web$degree)<-c(`nodegree`=0, `degree`=1)
+
+#recode Region (cps19_province)
+look_for(ces19web, "province")
+ces19web$region<-Recode(ces19web$cps19_province, "14:16=3; 17:18=1; 20=1; 23=1; 22=2; 25=3; else=NA")
+val_labels(ces19web$region)<-c(Atlantic=1, Ontario=2, West=3)
+#checks
+val_labels(ces19web$region)
+table(ces19web$region , ces19web$cps19_province , useNA = "ifany" )
+
+#recode Quebec (cps19_province)
+look_for(ces19web, "province")
+ces19web$quebec<-Recode(ces19web$cps19_province, "14:18=0; 24=1; 20=0; 22:23=0; 26=0; else=NA")
+val_labels(ces19web$quebec)<-c(Other=0, Quebec=1)
+#checks
+val_labels(ces19web$quebec)
+table(ces19web$quebec, ces19web$cps19_province , useNA = "ifany" )
+
+#recode Age (cps19_age)
+look_for(ces19web, "age")
+ces19web$age<-ces19web$cps19_age
+#checks
+table(ces19web$age)
+
+#recode Religion (cps19_religion)
+look_for(ces19web, "relig")
+ces19web$religion<-Recode(ces19web$cps19_religion, "1:2=0; 3:7=3; 8:9=2; 10:11=1; 12:21=2; 22=3; else=NA")
+val_labels(ces19web$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
+#checks
+val_labels(ces19web$religion)
+table(ces19web$religion , ces19web$cps19_religion , useNA = "ifany" )
+
+#recode Language (cps19_Q_Language)
+look_for(ces19web, "language")
+ces19web$language<-Recode(ces19web$cps19_Q_Language, "'FR-CA'=0; 'EN'=1; else=NA")
+val_labels(ces19web$language)<-c(French=0, English=1)
+#checks
+val_labels(ces19web$language)
+table(ces19web$language)
+
+#recode Non-charter Language (pes19_lang)
+look_for(ces19web, "language")
+ces19web$non_charter_language<-Recode(ces19web$pes19_lang, "68:69=1; 70:84=0; else=NA")
+val_labels(ces19web$non_charter_language)<-c(Charter=0, Non_Charter=1)
+table(as_factor(ces19web$pes19_lang),ces19web$non_charter_language , useNA = "ifany" )
+#checks
+val_labels(ces19web$non_charter_language)
+table(ces19web$non_charter_language)
+
+#recode Employment (cps19_employment)
+look_for(ces19web, "employment")
+ces19web$employment<-Recode(ces19web$cps19_employment, "3:8=0; 1:2=1; 9:11=1; else=NA")
+val_labels(ces19web$employment)<-c(Unemployed=0, Employed=1)
+#checks
+val_labels(ces19web$employment)
+table(ces19web$employment , ces19web$cps19_employment , useNA = "ifany" )
+
+#### recode Sector ####
+lookfor(ces19web, "sector")
+lookfor(ces19web, "employ")
+ces19web$sector<-Recode(ces19web$cps19_sector, "1=0; 4=0; 2=1; 5=NA")
+ces19web %>%
+  mutate(sector=case_when(
+    cps19_sector==1~0,
+    cps19_sector==4~0,
+    cps19_sector==2~1,
+    cps19_sector==5~NA,
+    cps19_employment>3&cps19_employment<13~ 0
+  ))->ces19web
+with(ces19web, table(cps19_sector, sector, useNA = "ifany"))
+val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
+
+#### recode Income ####
+lookfor(ces19web, "income")
+ces19web$cps19_income_number
+
+#Recode Income2 # Quintles
+ces19web$income2<-Recode(ces19web$cps19_income_number, "0:57500=1;
+57501:87500=2; 87501:125000=3;
+       125001:187500=4; 187501:9999999999=5; else=NA")
+
+val_labels(ces19web$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+ces19web$income2
+
+#$55,000 to $59,999
+#$85,000 to $89,999
+#$120,000 to $129,999
+#$175,000 to $199,999
+
+# Tertiles
+# $75,000 to $79,999
+# $130,000 to $139,999
+ces19web$income_tertile<-car::Recode(ces19web$cps19_income_number, "0:77500=1;
+77501:135000=2; 135001:99999999=3;else=NA")
+
+val_labels(ces19web$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
+with(ces19web, table(ces19web$cps19_sector, ces19web$sector, useNA = "ifany"))
+
+# Can't get 2nd Bloc one to work
+#recode Party ID (pid_party_en)
+#look_for(ces19web, "pid")
+#ces19web$party_id<-Recode(ces19web$pid_party_en, "'Liberal Party'=1; 'Conservative Party'=2; 'NDP'=3; 'Bloc Québécois'=4; 'Bloc Qu\xe9b\xe9cois'=4; 'Green Party'=5; 'People's Party'=2; else=NA")
+#val_labels(ces19web$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+#val_labels(ces19web$party_id)
+#table(ces19web$party_id, ces19web$pid_party_en , useNA = "ifany" )
+#table(ces19web$party_id, useNA = "ifany" )
+
+#### recode Vote (pes21_votechoice2019) ####
+lookfor(ces19web, "vote")
+ces19web$vote<-Recode(ces19web$pes19_votechoice2019, "1=1; 2=2; 3=3; 4=4; 5=5; 6=2; 7=0; 8:9=NA")
+val_labels(ces19web$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+table(ces19web$vote , ces19web$pes19_votechoice2019 , useNA = "ifany" )
+
+#### recode Vote splitting Conservatives ####
+ces19web$vote3<-Recode(ces19web$pes19_votechoice2019, "1=1; 2=2; 3=3; 4=4; 5=5; 6=6; 7=0; 8:9=NA")
+val_labels(ces19web$vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, PPC=6)
+table(ces19web$vote3 , ces19web$pes19_votechoice2019 , useNA = "ifany" )
+
+#recode Religiosity (cps19_rel_imp)
+look_for(ces19web, "relig")
+ces19web$religiosity<-Recode(ces19web$cps19_rel_imp, "1=5; 2=4; 5=3; 3=2; 4=1; else=NA")
+val_labels(ces19web$religiosity)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces19web$religiosity)
+table(ces19web$religiosity, ces19web$cps19_rel_imp , useNA = "ifany")
+
+#recode Community Size (pes19_rural_urban)
+look_for(ces19web, "urban")
+ces19web$size<-Recode(ces19web$pes19_rural_urban, "1=1; 2=2; 3=3; 4=4; 5=5; else=NA")
+val_labels(ces19web$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+#checks
+val_labels(ces19web$size)
+table(ces19web$size, ces19web$pes19_rural_urban , useNA = "ifany" )
+
+#recode Native-born (cps19_bornin_canada)
+ces19web$native<-Recode(ces19web$cps19_bornin_canada, "1=1; 2=0; else=NA")
+val_labels(ces19web$native)<-c(Foreign=0, Native=1)
+#checks
+val_labels(ces19web$native)
+table(ces19web$native, ces19web$cps19_bornin_canada , useNA = "ifany" )
+
+#recode Immigration (cps19_imm)
+look_for(ces19web, "admit")
+ces19web$immigration_rates<-Recode(as.numeric(ces19web$cps19_imm), "1=0; 2=1; 3=0.5; 4=0.5; else=NA", as.numeric=T)
+#checks
+table(ces19web$immigration_rates, ces19web$cps19_imm , useNA = "ifany" )
+
+# recode Immigration sentiment (pes19_immigjobs)
+look_for(ces19web, "immigr")
+ces19web$immigration_job<-Recode(as.numeric(ces19web$pes19_immigjobs), "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+#checks
+table(ces19web$immigration_job, ces19web$pes19_immigjobs, useNA = "ifany" )
+
+# #recode Environment (cps19_spend_env)
+# look_for(ces19web, "enviro")
+# ces19web$environment<-Recode(as.numeric(ces19web$cps19_spend_env), "3=0.5; 1=1; 2=0; else=NA")
+# #val_labels(ces19web$environment)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+# #checks
+# #val_labels(ces19web$environment)
+# table(ces19web$environment, ces19web$cps19_spend_env , useNA = "ifany" )
+
+#recode Redistribution (pes19_gap)
+look_for(ces19web, "rich")
+ces19web$redistribution<-Recode(as.numeric(ces19web$pes19_gap), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
+#val_labels(ces19web$redistribution)<-c(Much_less=0, Somewhat_less=0.25, Same_amount=0.5, Somewhat_more=0.75, Much_more=1)
+#checks
+table(ces19web$redistribution)
+
+#recode Pro-Redistribution
+ces19web$pro_redistribution<-Recode(ces19web$pes19_gap, "1:2=1; 3:5=0; else=NA", as.numeric=T)
+val_labels(ces19web$pro_redistribution)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces19web$pro_redistribution)
+table(ces19web$pro_redistribution)
+
+#Calculate Cronbach's alpha
+library(psych)
+
+#recode Market Liberalism (pes21_privjobs and pes21_blame)
+look_for(ces19web, "leave")
+look_for(ces19web, "blame")
+
+ces19web$market1<-Recode(as.numeric(ces19web$pes19_privjobs), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+ces19web$market2<-Recode(as.numeric(ces19web$pes19_blame), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+#checks
+table(ces19web$market1, ces19web$pes19_privjobs , useNA = "ifany" )
+table(ces19web$market2, ces19web$pes19_blame , useNA = "ifany" )
+ces19web$market1
+ces19web %>%
+  mutate(market_liberalism=rowMeans(select(., num_range("market", 1:2)), na.rm=T))->ces19web
+
+ces19web %>%
+  select(starts_with("market")) %>%
+  summary()
+#Check distribution of market_liberalism
+qplot(ces19web$market_liberalism, geom="histogram")
+table(ces19web$market_liberalism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces19web %>%
+  select(market1, market2) %>%
+  alpha(.)
+#For some reason the cronbach's alpha doesn't work here.
+#Check correlation
+ces19web %>%
+  select(market1, market2) %>%
+  cor(., use="complete.obs")
+
+#recode Capital Punishment (Missing)
+
+#recode Crime (cps21_spend_just_law) (spending question)
+look_for(ces19web, "crime")
+ces19web$crime<-Recode(as.numeric(ces19web$cps19_spend_just_law), "1=0; 2=0; 3=1; else=NA")
+#checks
+table(ces19web$crime, ces19web$cps19_spend_just_law , useNA = "ifany" )
+
+#recode Gay Rights (pes21_donegl) (should do more question)
+look_for(ces19web, "gays")
+ces19web$gay_rights<-Recode(as.numeric(ces19web$pes19_donegl), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces19web$gay_rights, ces19web$pes19_donegl , useNA = "ifany" )
+
+#recode Abortion (pes21_abort2)
+look_for(ces19web, "abortion")
+ces19web$abortion<-Recode(as.numeric(ces19web$pes19_abort2), "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces19web$abortion, ces19web$pes19_abort2 , useNA = "ifany" )
+
+#recode Lifestyle (pes21_newerlife)
+look_for(ces19web, "lifestyle")
+ces19web$lifestyles<-Recode(as.numeric(ces19web$pes19_newerlife), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces19web$lifestyles, ces19web$pes19_newerlife, useNA = "ifany")
+
+#recode Women (pes19_womenhome)
+look_for(ces19web, "women")
+ces19web$stay_home<-Recode(as.numeric(ces19web$pes19_womenhome), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#checks
+table(ces19web$stay_home, ces19web$pes19_womenhome, useNA = "ifany")
+
+#recode Moral Trad (abortion, lifestyles, stay home, values, marriage, childen, morals)
+ces19web$trad1<-ces19web$stay_home
+ces19web$trad2<-ces19web$gay_rights
+ces19web$trad3<-ces19web$abortion
+table(ces19web$trad1)
+table(ces19web$trad2)
+table(ces19web$trad3)
+ces19web %>%
+  mutate(traditionalism=rowMeans(select(., num_range("trad", 1:3)), na.rm=T))->ces19web
+#Check distribution of traditionalism
+qplot(ces19web$traditionalism, geom="histogram")
+table(ces19web$traditionalism, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces19web %>%
+  select(trad1, trad2, trad3) %>%
+  psych::alpha(.)
+#Check correlation
+ces19web %>%
+  select(trad1, trad2, trad3) %>%
+  cor(., use="complete.obs")
+
+#recode Moral Traditionalism 2 (women & gay rights) (Left-Right)
+ces19web %>%
+  mutate(traditionalism2=rowMeans(select(., num_range("trad", 1:2)), na.rm=T))->ces19web
+
+#Check distribution of traditionalism2
+qplot(ces19web$traditionalism2, geom="histogram")
+table(ces19web$traditionalism2, useNA="ifany")
+
+#Calculate Cronbach's alpha
+ces19web %>%
+  select(trad1, trad2) %>%
+  psych::alpha(.)
+#Check correlation
+ces19web %>%
+  select(trad1, trad2) %>%
+  cor(., use="complete.obs")
+
+#recode 2nd Dimension (lifestyles, immigration, gay rights, crime)
+ces19web$author1<-ces19web$lifestyles
+ces19web$author2<-ces19web$immigration_rates
+ces19web$author3<-ces19web$gay_rights
+ces19web$author4<-ces19web$crime
+table(ces19web$author1)
+table(ces19web$author2)
+table(ces19web$author3)
+table(ces19web$author4)
+
+ces19web %>%
+  mutate(authoritarianism=rowMeans(select(. ,num_range("author", 1:4)), na.rm=T))->ces19web
+
+ces19web %>%
+  select(starts_with("author")) %>%
+  summary()
+tail(names(ces19web))
+#Check distribution of traditionalism
+qplot(ces19web$authoritarianism, geom="histogram")
+
+#Calculate Cronbach's alpha
+ces19web %>%
+  select(author1, author2, author3, author4) %>%
+  psych::alpha(.)
+
+#Check correlation
+ces19web %>%
+  select(author1, author2, author3, author4) %>%
+  cor(., use="complete.obs")
+
+
+#recode Personal Retrospective (cps19_own_fin_retro)
+look_for(ces19web, "situation")
+ces19web$personal_retrospective<-Recode(as.numeric(ces19web$cps19_own_fin_retro), "1=1; 2=0.5; 3=0; 4=0.5; else=NA", as.numeric=T)
+#val_labels(ces19web$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces19web$personal_retrospective)
+table(ces19web$personal_retrospective , ces19web$cps19_own_fin_retro, useNA = "ifany" )
+
+#recode National Retrospective (cps19_econ_retro)
+look_for(ces19web, "economy")
+ces19web$national_retrospective<-Recode(as.numeric(ces19web$cps19_econ_retro), "1=1; 2=0.5; 3=0; 4=0.5; else=NA", as.numeric=T)
+#val_labels(ces19web$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces19web$national_retrospective)
+table(ces19web$national_retrospective, ces19web$cps19_econ_retro, useNA = "ifany" )
+
+#recode Education (cps19_spend_educ)
+look_for(ces19web, "education")
+ces19web$education<-Recode(as.numeric(ces19web$cps19_spend_educ), "3:4=0.5; 1=1; 2=0; else=NA")
+#val_labels(ces19web$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
+#checks
+#val_labels(ces19web$education)
+table(ces19web$education, ces19web$cps19_spend_educ , useNA = "ifany" )
+
+#recode Ideology (cps19_lr_scale_bef_1)
+look_for(ces19web, "scale")
+ces19web$ideology<-Recode(as.numeric(ces19web$cps19_lr_scale_bef_1), "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; -99=NA; else=NA")
+#val_labels(ces19web$ideology)<-c(Left=0, Right=1)
+#checks
+#val_labels(ces19web$ideology)
+table(ces19web$ideology, ces19web$cps19_lr_scale_bef_1 , useNA = "ifany" )
+
+# recode turnout (pes19_turnout2019 & pes19_turnout2019_v2)
+look_for(ces19web, "turnout")
+ces19web %>%
+  mutate(turnout=case_when(
+    pes19_turnout2019==1 ~1,
+    pes19_turnout2019==2 ~0,
+    pes19_turnout2019==3 ~0,
+    pes19_turnout2019==4 ~0,
+    pes19_turnout2019==5 ~0,
+    pes19_turnout2019==6 ~0,
+    pes19_turnout2019==8 ~NA_real_ ,
+    pes19_turnout2019_v2==1 ~1,
+    pes19_turnout2019_v2==2 ~0,
+    pes19_turnout2019_v2==3 ~0,
+    pes19_turnout2019_v2==4 ~NA_real_ ,
+  ))->ces19web
+val_labels(ces19web$turnout)<-c(No=0, Yes=1)
+#checks
+val_labels(ces19web$turnout)
+table(ces19web$turnout)
+table(ces19web$turnout, ces19web$vote)
+
+# recode satisfaction with democracy (cps19_demsat & pes19_dem_sat)
+look_for(ces19web, "dem")
+ces19web$satdem<-Recode(as.numeric(ces19web$pes19_dem_sat), "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+#checks
+table(ces19web$satdem, ces19web$pes19_dem_sat, useNA = "ifany" )
+
+ces19web$satdem2<-Recode(as.numeric(ces19web$cps19_demsat), "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+#checks
+table(ces19web$satdem2, ces19web$cps19_demsat, useNA = "ifany" )
+
+#recode Postgrad (cps19_education)
+look_for(ces19web, "education")
+ces19web$postgrad<-Recode(as.numeric(ces19web$cps19_education), "10:11=1; 1:9=0; else=NA")
+#checks
+table(ces19web$postgrad)
+
+#recode Perceive Inequality (pes19_inequal)
+look_for(ces19web, "ineq")
+ces19web$inequality<-Recode(as.numeric(ces19web$pes19_inequal), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; 6=0.5; else=NA")
+#checks
+table(ces19web$inequality)
+table(ces19web$inequality, ces19web$pes19_inequal)
+
+# recode political interest (cps19_interest_gen_1)
+look_for(ces19web, "interest")
+ces19web$pol_interest<-Recode(as.numeric(ces19web$cps19_interest_gen_1), "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checks
+table(ces19web$pol_interest, ces19web$cps19_interest_gen_1, useNA = "ifany" )
+
+# recode foreign born (cps19_bornin_canada)
+look_for(ces19web, "born")
+ces19web$foreign<-Recode(ces19web$cps19_bornin_canada, "1=0; 2=1; else=NA")
+val_labels(ces19web$foreign)<-c(No=0, Yes=1)
+#checks
+#val_labels(ces19web$foreign)
+table(ces19web$foreign, ces19web$cps19_bornin_canada, useNA="ifany")
+
+# recode Environment Spend (cps19_spend_env)
+look_for(ces19web, "env")
+ces19web$enviro_spend<-Recode(as.numeric(ces19web$cps19_spend_env), "1=0; 2=0.5; 3=1; else=NA")
+#checks
+table(ces19web$enviro_spend , ces19web$cps19_spend_env , useNA = "ifany" )
 
 #### recode political efficacy ####
 #recode No Say (cps19_govt_say)
@@ -176,62 +606,6 @@ table(ces19web$duty, ces19web$cps19_duty_choice, useNA="ifany")
 ces19web$mode<-rep("Web", nrow(ces19web))
 ces19web$election<-rep(2019, nrow(ces19web))
 
-# table(ces19web$cps19_sector, ces19web$sector)
-lookfor(ces19web, "vote")
-
-ces19web$vote<-Recode(ces19web$pes19_votechoice2019, "1=1; 2=2; 3=3; 4=4; 5=5; 6=2; 7=0; 8:9=NA")
-val_labels(ces19web$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
-
-lookfor(ces19web, "degree")
-ces19web$degree<-Recode(ces19web$cps19_education, "1:8=0; 9:11=0; 12=NA")
-val_labels(ces19web$degree)<-c(`nodegree`=0, `degree`=1)
-
-ces19web$male<-Recode(ces19web$cps19_gender, "1=1; 2=0; 3=0")
-val_labels(ces19web$male)<-c(`Male`=1, `Female`=0)
-
-#glimpse(ces19web)
-ces19web$degree
-ces19web$vote
-ces19web$male
-lookfor(ces19web, "sector")
-lookfor(ces19web, "employ")
-ces19web$sector<-Recode(ces19web$cps19_sector, "1=0; 4=0; 2=1; 5=NA")
-ces19web %>%
-  mutate(sector=case_when(
-    cps19_sector==1~0,
-    cps19_sector==4~0,
-    cps19_sector==2~1,
-    cps19_sector==5~NA,
-    cps19_employment>3&cps19_employment<13~ 0
-  ))->ces19web
-with(ces19web, table(cps19_sector, sector, useNA = "ifany"))
-val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
-#### Income
-lookfor(ces19web, "income")
-ces19web$cps19_income_number
-
-#Recode Income2 # Quintles
-ces19web$income2<-Recode(ces19web$cps19_income_number, "0:57500=1;
-57501:87500=2; 87501:125000=3;
-       125001:187500=4; 187501:9999999999=5; else=NA")
-
-val_labels(ces19web$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
-ces19web$income2
-
-#$55,000 to $59,999
-#$85,000 to $89,999
-#$120,000 to $129,999
-#$175,000 to $199,999
-
-# Tertiles
-# $75,000 to $79,999
-# $130,000 to $139,999
-ces19web$income_tertile<-car::Recode(ces19web$cps19_income_number, "0:77500=1;
-77501:135000=2; 135001:99999999=3;else=NA")
-
-val_labels(ces19web$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
-with(ces19web, table(ces19web$cps19_sector, ces19web$sector, useNA = "ifany"))
-
 #recode Quebec Accommodation (pes19_doneqc ) (Left=more accom)
 look_for(ces19web, "quebec")
 ces19web$quebec_accom<-Recode(as.numeric(ces19web$pes19_doneqc), "2=0.25; 1=0; 3=0.5; 4=0.75; 5=1; 6=0.5; else=NA")
@@ -251,12 +625,12 @@ ces19web$enviro<-Recode(as.numeric(ces19web$cps19_pos_jobs), "5=1; 4=0.75; 3=0.5
 #checks
 table(ces19web$enviro , ces19web$cps19_pos_jobs , useNA = "ifany" )
 
-#### recode Women - how much should be done (pes19_donew) ####
-look_for(ces19web, "women")
-table(ces19web$pes19_donew)
-ces19web$women<-Recode(as.numeric(ces19web$pes19_donew), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
-#checks
-table(ces19web$women,  useNA = "ifany")
+# #### recode Women - how much should be done (pes19_donew) #### (coded above for moral trad)
+# look_for(ces19web, "women")
+# table(ces19web$pes19_donew)
+# ces19web$women<-Recode(as.numeric(ces19web$pes19_donew), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+# #checks
+# table(ces19web$women,  useNA = "ifany")
 
 #### recode Race - how much should be done (pes19_donerm) ####
 look_for(ces19web, "racial")

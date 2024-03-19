@@ -67,6 +67,7 @@ ces19phone$age
 ces19phone$age2<-(ces19phone$age /100)
 #checks
 # table(ces19phone$age2)
+
 #recode Religion (q62)
 # look_for(ces19phone, "relig")
 ces19phone$religion<-Recode(ces19phone$q62, "21=0; 6=1; 8=1; 1=2; 3:4=2; 5=2; 7=2; 9=2; 12:14=2; 2=3; 5=3; 10:11=3; 15=3; 22=3; 16:20=2; 21=0; else=NA")
