@@ -267,6 +267,12 @@ val_labels(ces21$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, 
 val_labels(ces21$income)
 table(ces21$income, ces21$cps21_income_cat , useNA = "ifany" )
 
+#### recode Household size (cps21_household)####
+# look_for(ces21, "household")
+ces21$household<-Recode(ces21$cps21_household, "1=0.5; 2=1; 3=1.5; 4=2; 5=2.5; 6=3; 7=3.5; 8=4; 9=4.5; 10=5; 11=5.5; 14=7; 17:63=8.5; else=NA")
+#checks
+#table(ces21$household, useNA = "ifany" )
+
 #recode Religiosity (cps21_rel_imp)
 look_for(ces21, "relig")
 ces21$religiosity<-Recode(ces21$cps21_rel_imp, "1=5; 2=4; 5=3; 3=2; 4=1; else=NA")

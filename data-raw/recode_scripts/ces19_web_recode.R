@@ -213,6 +213,12 @@ ces19web$income_tertile<-car::Recode(ces19web$cps19_income_number, "0:77500=1;
 val_labels(ces19web$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
 with(ces19web, table(ces19web$cps19_sector, ces19web$sector, useNA = "ifany"))
 
+#### recode Household size (cps19_household)####
+# look_for(ces19web, "household")
+ces19web$household<-Recode(ces19web$cps19_household, "1=0.5; 2=1; 3=1.5; 4=2; 5=2.5; 6=3; 7=3.5; 8=4; 9=4.5; 10=5; 11=5.5; 12=6; 13=6.5; 15:501=7.5; else=NA")
+#checks
+# table(ces19web$household, useNA = "ifany" )
+
 # Can't get 2nd Bloc one to work
 #recode Party ID (pid_party_en)
 #look_for(ces19web, "pid")
