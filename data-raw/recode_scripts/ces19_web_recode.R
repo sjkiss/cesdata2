@@ -114,7 +114,7 @@ table(ces19web$union_both , useNA = "ifany" )
 
 #### recode Education (cps19_education) ####
 lookfor(ces19web, "degree")
-ces19web$degree<-Recode(ces19web$cps19_education, "1:8=0; 9:11=0; 12=NA")
+ces19web$degree<-Recode(ces19web$cps19_education, "1:8=0; 9:11=1; 12=NA")
 val_labels(ces19web$degree)<-c(`nodegree`=0, `degree`=1)
 
 #recode Region (cps19_province)
@@ -190,6 +190,25 @@ val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
 #### recode Income ####
 lookfor(ces19web, "income")
 ces19web$cps19_income_number
+
+#recode Income (cps19_income_cat, cps19_income_number)
+look_for(ces19web, "income")
+ces19web %>%
+  mutate(income=case_when(
+    cps19_income_cat==1 | cps19_income_number> -1 & cps19_income_number < 30001 ~ 1,
+    cps19_income_cat==2 | cps19_income_number> -1 & cps19_income_number < 30001 ~ 1,
+    cps19_income_cat==3 | cps19_income_number> 30000 & cps19_income_number < 60001 ~ 2,
+    cps19_income_cat==4 | cps19_income_number> 60000 & cps19_income_number < 90001 ~ 3,
+    cps19_income_cat==5 | cps19_income_number> 90000 & cps19_income_number < 150001 ~ 4,
+    cps19_income_cat==6 | cps19_income_number> 90000 & cps19_income_number < 150001 ~ 4,
+    cps19_income_cat==7 | cps19_income_number> 150000 & cps19_income_number < 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 ~ 5,
+    cps19_income_cat==8 | cps19_income_number> 150000 & cps19_income_number < 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 ~ 5,
+  ))->ces19web
+
+val_labels(ces19web$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces19web$income)
+table(ces19web$income)
 
 #Recode Income2 # Quintles
 ces19web$income2<-Recode(ces19web$cps19_income_number, "0:57500=1;

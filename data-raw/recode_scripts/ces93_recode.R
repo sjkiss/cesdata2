@@ -259,7 +259,7 @@ table(ces93$income)
 
 #####recode Household size (cpshhwgt)####
 look_for(ces93, "house")
-ces93$household<-Recode(ces93$CPSHHWGT, "0.506=0.5; 1.012=1; 1.517=1.5; 2.023=2; 2.529=2.5; 3.035=3; 3.541=3.5; 4.047=4; 5.058=5")
+ces93$household<-Recode(ces93$CPSHHWGT, "0.506=0.5; 1.012=1; 1.517=1.5; 2.023=2; 2.529=2.5; 3.035=3; 3.541=3.5; 4.047=4; 5.058=5; else=NA")
 #checks
 table(ces93$household)
 
