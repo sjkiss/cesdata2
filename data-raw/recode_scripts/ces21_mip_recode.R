@@ -704,7 +704,8 @@ ces21 %>%
 
 # How many respondents had multiple entries
 table(ces21$mip_total)
-
+ces21 %>%
+  select(ends_with("_mip")) %>% View()
 # What were the biggest combinations
 ces21 %>%
   filter(mip_total==2) %>%
@@ -717,27 +718,22 @@ ces21 %>%
     mip_total==1~ 1
   ))->ces21
 lookfor(ces21, "id")
+names(ces21)
 ces21 %>%
-  #group respondents by respondent id to avoid messiness
-  group_by(cps21_ResponseId) %>%
-  #pivot all _mip dichtomous variables longer
-  pivot_longer(cols=ends_with("_mip")) %>%
- # select(cps21_ResponseId, name, value,mip_single)
-  #select(cps21_ResponseId,name, value) %>%
-  #Note: store the text of the coded mip variable in mip2
-  mutate(mip2=case_when(
-    #If a respondent in the pivotted down data frame has a value of
-    # 1 for mip_single, that means they only picked one issue
-    # If one of the mip issues in the folded down data frame is not missing
-    # then set the values of mip2 to be the value of name.
-    mip_single==1&!is.na(value)~ name
-  )) %>%
-  # select(contains("mip")) %>%
- # filter(!is.na(mip)) %>%
-  #select(cps21_ResponseId, name, value,mip_single, mip) %>%
-  #Repivot wider
-pivot_wider(., names_from=name, values_from = c(value)) %>%
-  ungroup()->ces21
+  select(ends_with("_mip"), id=cps21_ResponseId)->df
+names(df)
+colnms <- colnames(df[,1:19])
+cbind(df,
+      mip2 = as.factor(unlist(
+        ifelse(rowSums(df[,1:19], na.rm=T) == 1,
+               apply(df[,1:19], 1, \(x) colnms[which(!is.na(x))]),
+               NA))))->df
+
+names(df)
+ces21 %>%
+  left_join(., df, by=c("cps21_ResponseId"="id"))->ces21
+ces21$cps21_ResponseId
+ces21$mip
 #Now set mip to be a numeric value that maps our coding scheme
 # based on mip2
 #  select(contains("mip")|ends_with("_mip"))
@@ -769,6 +765,6 @@ val_labels(ces21$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
                          Democracy=11, Foreign_Affairs=12,
                          Immigration=13, Socio_Cultural=14,
                          Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18, Housing=19, COVID19=20)
-
+table(as_factor(ces21$mip))
 
 

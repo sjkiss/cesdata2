@@ -10,7 +10,7 @@ library(stringr)
 library(here)
 #Load data
 ces21<-read_dta(file=here("data-raw/ces21.dta"))
-
+n_on_import<-nrow(ces21)
 
 #recode Gender
 ces21$male<-Recode(ces21$cps21_genderid, "1=1; 2=0; else=NA")
@@ -216,15 +216,18 @@ val_labels(ces21$employment)
 table(ces21$employment , ces21$cps21_employment , useNA = "ifany" )
 
 #No Sector available
-
+nrow(ces21)
 #recode Party ID (pid_party_en)
 look_for(ces21, "pid")
-ces21$party_id<-Recode(ces21$pid_party_en, "'Liberal Party'=1; 'Conservative Party'=2; 'NDP'=3; 4='Bloc Québécois'; 'Green Party'=5; else=NA")
+nrow(ces21)
+with(ces21, table(pid_party_en, pid_party_fr, useNA = "ifany"))
+ces21$party_id<-Recode(ces21$pid_party_en, "'Liberal Party'=1; 'Conservative Party'=2; 'NDP'=3; 'Bloc Québécois'=4; 'Green Party'=5; else=NA")
 val_labels(ces21$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces21$party_id)
+with(ces21, table(as_factor(party_id)))
 table(ces21$party_id, ces21$pid_party_en , useNA = "ifany" )
-
+nrow(ces21)
 #recode Vote (pes21_votechoice2021)
 look_for(ces21, "party did you vote")
 ces21$vote<-Recode(ces21$pes21_votechoice2021, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
@@ -755,6 +758,6 @@ table(ces21$previous_vote)
 
 #glimpse(ces21)
 table(ces21$occupation)
-
+nrow(ces21)
 # #### Resave the file in the .rda file
 save(ces21, file=here("data/ces21.rda"))
