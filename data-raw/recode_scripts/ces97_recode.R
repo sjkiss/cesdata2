@@ -46,6 +46,14 @@ val_labels(ces97$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces97$region)
 # (ces97$region)
 
+####recode Province (province) ####
+# look_for(ces97, "province")
+ces97$prov<-Recode(ces97$province, "10=1; 11=2; 12=3; 13=4; 24=5; 35=6; 46=7; 47=8; 48=9; 59=10; else=NA")
+val_labels(ces97$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces97$prov)
+table(ces97$prov)
+
 #### recode Quebec (province) ####
 # (ces97, "province")
 ces97$quebec<-Recode(ces97$province, "10:13=0; 35:59=0; 24=1; else=NA")
@@ -114,22 +122,21 @@ val_labels(ces97$sector)
 # (ces97$sector)
 
 #### recode Party ID (cpsk1 and cpsk4)####
-
-# (ces97, "federal")
+look_for (ces97, "federal")
 ces97 %>%
   mutate(party_id=case_when(
     cpsk1==1 | cpsk4==1 ~ 1,
     cpsk1==2 | cpsk4==2 ~ 2,
     cpsk1==3 | cpsk4==3 ~ 3,
     cpsk1==4 | cpsk4==4 ~ 2,
-    cpsk1==5 | cpsk4==5 ~ 0,
+    cpsk1==5 | cpsk4==5 ~ 4,
     cpsk1==6 | cpsk4==6 ~ 0,
   ))->ces97
 
 val_labels(ces97$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces97$party_id)
-# (ces97$party_id)
+table(ces97$party_id)
 
 ####recode Vote (pesa4) ####
 # (ces97, "vote")

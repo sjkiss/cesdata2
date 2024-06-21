@@ -5,7 +5,7 @@ library(labelled)
 library(modelsummary)
 #Install cesdata2
 # Uncomment and install if necessary
-#devtools::install_github("sjkiss/cesdata2")
+devtools::install_github("sjkiss/cesdata2")
 #load cesdata2
 library(cesdata2)
 
@@ -107,7 +107,7 @@ common_vars<-c('male',
                'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
                'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
                'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend', 'mode', 'election',
-               'race', 'women', 'previous_vote', 'previous_vote3', 'duty', 'welfare', 'ideology', 'quebec_sov', 'quebec_accom', 'size')
+               'race', 'women', 'previous_vote', 'previous_vote3', 'duty', 'welfare', 'ideology', 'quebec_sov', 'quebec_accom', 'size', 'prov')
 
 ces.list %>%
   map(., select, any_of(common_vars))%>%

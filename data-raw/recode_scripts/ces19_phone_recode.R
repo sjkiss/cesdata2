@@ -46,6 +46,14 @@ val_labels(ces19phone$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces19phone$region)
 # table(ces19phone$region , ces19phone$q4 , useNA = "ifany" )
 
+#recode Province (q4)
+# look_for(ces19phone, "province")
+ces19phone$prov<-Recode(ces19phone$q4, "1=1; 2=2; 3=3; 4=4; 5=5; 6=6; 7=7; 8=8; 9=9; 10=10; else=NA")
+val_labels(ces19phone$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces19phone$prov)
+table(ces19phone$prov)
+
 #recode Quebec (q4)
 # look_for(ces19phone, "province")
 ces19phone$quebec<-Recode(ces19phone$q4, "1:4=0; 6:10=0; 5=1; else=NA")
@@ -121,11 +129,11 @@ val_labels(ces19phone$sector)
 
 #recode Party ID (p47)
 # look_for(ces19phone, "closest")
-ces19phone$party_id<-Recode(ces19phone$p47, "1=1; 2=2; 3=3; 4=4; 5=0; 7=0; 6=2; else=NA")
+ces19phone$party_id<-Recode(ces19phone$p47, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
 val_labels(ces19phone$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4)
 #checks
 val_labels(ces19phone$party_id)
-# table(ces19phone$party_id, ces19phone$p47 , useNA = "ifany" )
+table(ces19phone$party_id, ces19phone$p47 , useNA = "ifany" )
 
 #recode Vote (p3)
 # look_for(ces19phone, "party did you vote")
@@ -185,11 +193,11 @@ val_labels(ces19phone$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middl
 ces19phone$income2<-Recode(ces19phone$q70r, "1:2=1; 3=2; 4=3; 5:6=4; 7:8=5; else=NA")
 val_labels(ces19phone$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 
-ces19phone$income_tertile<-Recode(ces19phone$q70r, "1:3=1; 4=2;  5:8=3; else=NA")
+ces19phone$income_tertile<-Recode(ces19phone$q70r, "1:3=1; 4:5=2;  6:8=3; else=NA")
 val_labels(ces19phone$income_tertile)<-c(Lowest=1, Middle=2, Highest=3)
 #checks
 val_labels(ces19phone$income)
-# table(ces19phone$income_tertile, ces19phone$q70r , useNA = "ifany" )
+ table(ces19phone$income_tertile, ces19phone$q70r , useNA = "ifany" )
 val_labels(ces19phone$q70r)
 
 #recode Religiosity (q63)

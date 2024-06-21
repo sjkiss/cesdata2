@@ -50,6 +50,15 @@ val_labels(ces00$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces00$region)
 # table(ces00$region)
 
+#### Province ####
+#recode Province (province)
+# look_for(ces00, "province")
+ces00$prov<-Recode(ces00$province, "10=1; 11=2; 12=3; 13=4; 24=5; 35=6; 46=7; 47=8; 48=9; 59=10; else=NA")
+val_labels(ces00$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces00$prov)
+table(ces00$prov)
+
 #### quebec####
 #recode Quebec (province)
 # look_for(ces00, "province")
@@ -128,7 +137,7 @@ val_labels(ces00$sector)
 
 ####party id ####
 #recode Party ID (pesk1a and pesk1ab)
-# look_for(ces00, "yourself")
+look_for(ces00, "yourself")
 ces00 %>%
   mutate(party_id=case_when(
     pesk1a==1 | pesk1b==1 ~ 1,
@@ -136,13 +145,13 @@ ces00 %>%
     pesk1a==3 | pesk1b==3 ~ 3,
     pesk1a==4 | pesk1b==4 ~ 2,
     pesk1a==0 | pesk1b==0 ~ 0,
-    pesk1a==5 | pesk1b==5 ~ 0,
+    pesk1a==5 | pesk1b==5 ~ 4,
   ))->ces00
 
 val_labels(ces00$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces00$party_id)
-# table(ces00$party_id)
+table(ces00$party_id)
 
 ####vote ####
 #recode Vote (pesa3a and pesa3b)

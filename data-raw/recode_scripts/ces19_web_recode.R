@@ -125,6 +125,14 @@ val_labels(ces19web$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces19web$region)
 table(ces19web$region , ces19web$cps19_province , useNA = "ifany" )
 
+#recode Province (cps19_province)
+# look_for(ces19web, "province")
+ces19web$prov<-Recode(ces19web$cps19_province, "18=1; 23=2; 20=3; 17=4; 24=5; 22=6; 16=7; 25=8; 14=9; 15=10; else=NA")
+val_labels(ces19web$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces19web$prov)
+table(ces19web$prov)
+
 #recode Quebec (cps19_province)
 look_for(ces19web, "province")
 ces19web$quebec<-Recode(ces19web$cps19_province, "14:18=0; 24=1; 20=0; 22:23=0; 26=0; else=NA")
@@ -218,18 +226,31 @@ ces19web$income2<-Recode(ces19web$cps19_income_number, "0:57500=1;
 val_labels(ces19web$income2)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 ces19web$income2
 
-#$55,000 to $59,999
-#$85,000 to $89,999
-#$120,000 to $129,999
-#$175,000 to $199,999
+# #$55,000 to $59,999
+# #$85,000 to $89,999
+# #$120,000 to $129,999
+# #$175,000 to $199,999
+#
+# # Tertiles
+# # $75,000 to $79,999
+# # $130,000 to $139,999
+# ces19web$income_tertile<-car::Recode(ces19web$cps19_income_number, "0:60000=1;
+# 60001:115000=2; 115001:99999999=3;else=NA")
 
-# Tertiles
-# $75,000 to $79,999
-# $130,000 to $139,999
-ces19web$income_tertile<-car::Recode(ces19web$cps19_income_number, "0:77500=1;
-77501:135000=2; 135001:99999999=3;else=NA")
+ces19web %>%
+  mutate(income_tertile=case_when(
+    cps19_income_cat==1 | cps19_income_number> -1 & cps19_income_number < 30001 ~ 1,
+    cps19_income_cat==2 | cps19_income_number> -1 & cps19_income_number < 30001 ~ 1,
+    cps19_income_cat==3 | cps19_income_number> 30000 & cps19_income_number < 60001 ~ 1,
+    cps19_income_cat==4 | cps19_income_number> 60000 & cps19_income_number < 90001 ~ 2,
+    cps19_income_cat==5 | cps19_income_number> 90000 & cps19_income_number < 110001 ~ 2,
+    cps19_income_cat==6 | cps19_income_number> 110000 & cps19_income_number < 150001 ~ 3,
+    cps19_income_cat==7 | cps19_income_number> 150000 & cps19_income_number < 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 ~ 3,
+    cps19_income_cat==8 | cps19_income_number> 150000 & cps19_income_number < 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 ~ 3,
+  ))->ces19web
 
 val_labels(ces19web$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
+table(ces19web$income_tertile)
 with(ces19web, table(ces19web$cps19_sector, ces19web$sector, useNA = "ifany"))
 
 #### recode Household size (cps19_household)####
