@@ -259,15 +259,13 @@ ces19web$household<-Recode(ces19web$cps19_household, "1=0.5; 2=1; 3=1.5; 4=2; 5=
 #checks
 # table(ces19web$household, useNA = "ifany" )
 
-# Can't get 2nd Bloc one to work
-#recode Party ID (pid_party_en)
-#look_for(ces19web, "pid")
-#ces19web$party_id<-Recode(ces19web$pid_party_en, "'Liberal Party'=1; 'Conservative Party'=2; 'NDP'=3; 'Bloc Québécois'=4; 'Bloc Qu\xe9b\xe9cois'=4; 'Green Party'=5; 'People's Party'=2; else=NA")
-#val_labels(ces19web$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#recode Party ID (cps19_fed_id)
+look_for(ces19web, "fed_id")
+ces19web$party_id<-Recode(ces19web$cps19_fed_id, "1=1; 2=2; 3=3; 4=4; 5=5; 6=2; 7=0; 8:9=NA")
+val_labels(ces19web$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
-#val_labels(ces19web$party_id)
-#table(ces19web$party_id, ces19web$pid_party_en , useNA = "ifany" )
-#table(ces19web$party_id, useNA = "ifany" )
+val_labels(ces19web$party_id)
+table(ces19web$party_id, ces19web$cps19_fed_id , useNA = "ifany" )
 
 #### recode Vote (pes21_votechoice2019) ####
 lookfor(ces19web, "vote")
