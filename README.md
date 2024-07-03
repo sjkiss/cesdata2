@@ -1054,12 +1054,7 @@ ces80 %>%
 # in the ces780
 names(ces80)<-str_remove_all(names(ces80), "80")
 #Check
-tail(names(ces80))
-#> [1] "previous_vote" "mode"          "mip"           "foreign"      
-#> [5] "turnout"       "election"
-```
-
-``` r
+#tail(names(ces80))
 
 ### Decide On CES 1993 sample
 # this command includes only those respondents that completed the 1993 Campaign and Post-Election Survey
