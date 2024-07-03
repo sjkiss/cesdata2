@@ -177,6 +177,7 @@ val_labels(ces0411$sector04)<-c(Private=0, Public=1)
 val_labels(ces0411$sector04)
 # table(ces0411$sector04)
 
+
 #### #recode Party ID (ces04_CPS_Q1A@3 and  ces04_CPS_Q1B@3`) ***note needs `...` to recognize the variable***####
 # look_for(ces0411, "yourself")
 ces0411 %>%
@@ -208,6 +209,7 @@ val_labels(ces0411$vote04)
 #### #recode Occupation (ces04_PINPORR)####
 # look_for(ces0411, "occupation")
 # look_for(ces0411, "pinporr")
+lookfor(ces0411, "occupation")
 #ces0411$occupation04<-Recode(ces0411$ces04_PINPORR, "1:2:=1; 4:5=1; 3=2; 6:7=2; 9=3; 12=3; 14=3; 8=4; 10=4; 13=4; 15:16=5; else=NA")
 #ces0411$occupation08<-Recode(ces0411$ces08_PES_S3_NOCS, "1:1000=2; 1100:1199=1; 2100:3300=1; 4100:6300=1; 1200:1500=3; 6400:6700=3; 3400:3500=3; 7200:7399=4; 7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
 #Panel respondents are added in from ces08 - ces04_rtype1==1 indicates that a respondent participated in the ces04 survey
@@ -1100,7 +1102,53 @@ val_labels(ces0411$sector06)<-c(Private=0, Public=1)
 #checks
 val_labels(ces0411$sector06)
 # table(ces0411$sector06)
+ces0411$ces06_CPS_S5
+ces0411 %>%
+  mutate(sector_welfare06=case_when(
+    #Community and social service workers
+ces0411$ces06_CPS_S5==5&ces06_PES_SD3 ==4212~ 1,
+ces0411$ces06_CPS_S5==5&ces06_PES_SD3 ==4213~ 1,
+ces0411$ces06_CPS_S5==5&ces06_PES_SD3 ==4214~1,
+ces0411$ces06_CPS_S5==5&ces06_PES_SD3 ==4215~1,
+ces0411$ces06_CPS_S5==5&ces06_PES_SD3 ==4216~1,
+ces0411$ces06_CPS_S5==5&ces06_PES_SD3 ==4212~1,
+#University professors
+ces0411$ces06_CPS_S5==5&(ces06_PES_SD3>4120 &ces06_PES_SD3<4153) ~1,
+#Health
+ces0411$ces06_CPS_S5==5&(ces06_PES_SD3>3110 &ces06_PES_SD3<3415) ~1,
+#probation officers
+ces0411$ces06_CPS_S5==5&(ces06_PES_SD3==4155)~1,
+#PRivate sector
+ces0411$ces06_CPS_S5==1~0,
+#Self-employed
+ces06_CPS_S4==1 ~0,
+#Not working
+ces06_CPS_S4==0 ~0,
+TRUE~ NA))->ces0411
 
+# Public Sector Security
+ces0411 %>%
+  mutate(sector_security06=case_when(
+    #Police officers
+    ces0411$ces06_CPS_S5==5&  ces06_PES_SD3==6261~1,
+    #Security Guards
+    ces06_PES_SD3==6651~1,
+    # CAF officers
+    ces0411$ces06_CPS_S5==5& ces06_PES_SD3==0643~1,
+    #CAF occupations
+    ces0411$ces06_CPS_S5==5&ces06_PES_SD3==6464~1,
+    #PRivate sector
+    ces0411$ces06_CPS_S5==1~0,
+    #Self-employed
+    ces06_CPS_S4==1 ~0,
+    #Not working
+    ces06_CPS_S4==0 ~0,
+    TRUE~ NA
+  )
+         )->ces0411
+
+table(ces0411$sector_welfare06)
+table(ces0411$sector_security06)
 #### #recode Party ID (ces06_CPS_Q1A and ces06_CPS_Q1B)####
 # look_for(ces0411, "yourself")
 ces0411 %>%
@@ -2036,6 +2084,48 @@ ces0411 %>%
 val_labels(ces0411$sector08)<-c(Private=0, Public=1)
 #checks
 val_labels(ces0411$sector08)
+ces0411 %>%
+  mutate(sector_welfare08=case_when(
+    #Community and social service workers
+  ces08_CPS_S5==5&ces08_PES_S3_NOCS ==4212~ 1,
+   ces08_CPS_S5==5&ces08_PES_S3_NOCS ==4213~ 1,
+    ces08_CPS_S5==5&ces08_PES_S3_NOCS ==4214~1,
+    ces08_CPS_S5==5&ces08_PES_S3_NOCS ==4215~1,
+   ces08_CPS_S5==5&ces08_PES_S3_NOCS ==4216~1,
+    ces08_CPS_S5==5&ces08_PES_S3_NOCS ==4212~1,
+    #University professors
+    ces08_CPS_S5==5&(ces08_PES_S3_NOCS>4120 &ces08_PES_S3_NOCS<4153) ~1,
+    #Health
+    ces08_CPS_S5==5&(ces08_PES_S3_NOCS>3110 &ces08_PES_S3_NOCS<3415) ~1,
+    #probation officers
+    ces08_CPS_S5==5&(ces08_PES_S3_NOCS==4155)~1,
+     ces08_CPS_S5==1 ~0,
+    ces08_CPS_S5==0 ~0,
+    ces08_CPS_S4==1 ~0,
+    ces08_CPS_S4> 2 & ces08_CPS_S4< 12 ~ 0,
+    ces08_CPS_S5==9 ~NA_real_ ,
+    ces08_CPS_S5==8 ~NA_real_))->ces0411
+# Sector Security 08
+ces0411 %>%
+  mutate(sector_security08=case_when(
+    #Police officers
+    ces08_CPS_S5==5&  ces08_PES_S3_NOCS==6261~1,
+    #Security Guards
+    ces08_PES_S3_NOCS==6651~1,
+    # CAF officers
+    ces08_CPS_S5==5& ces08_PES_S3_NOCS==0643~1,
+    #CAF occupations
+   ces08_CPS_S5==5&ces08_PES_S3_NOCS==6464~1,
+    #PRivate sector
+    ces08_CPS_S5==1~0,
+    #Self-employed
+    ces08_CPS_S4==1 ~0,
+    #Not working
+    ces08_CPS_S4==0 ~0,
+    TRUE~ NA
+  )
+  )->ces0411
+
 # table(ces0411$sector08)
 
 #recode Party ID (ces08_PES_K1)
@@ -3057,6 +3147,64 @@ val_labels(ces0411$sector11)<-c(Private=0, Public=1)
 #checks
 val_labels(ces0411$sector11)
 # table(ces0411$sector11, useNA = "ifany" )
+ces0411 %>%
+  mutate(sector11=case_when(
+    PES11_92==5 ~1,
+    PES11_92==1 ~0,
+    PES11_92==0 ~0,
+    CPS11_91==1 ~0,
+    CPS11_91> 2 & CPS11_91< 12 ~ 0,
+    PES11_92==9 ~NA_real_ ,
+    PES11_92==8 ~NA_real_ ,
+  ))->ces0411
+
+#### Sector Welfare
+lookfor(ces0411, "occupation")
+ces0411$NOC_PES11
+#Unclass NOC_PES11
+ces0411$out<-unclass(ces0411$NOC_PES11)
+#Convert to numeric
+ces0411$out<-as.numeric(ces0411$out)
+#Convert to labelled double
+ces0411$NOC_PES11<-labelled(ces0411$out, labels=attr(ces0411$out, "labels"))
+
+ces0411 %>%
+  mutate(sector_welfare11=case_when(
+    #Health
+    PES11_92==5&(NOC_PES11>3010&NOC_PES11<3415) ~1,
+    #Education
+    PES11_92==5&(NOC_PES11>4010&NOC_PES11<4034) ~1,
+    #Social Workers, Counsellors
+    PES11_92==5&(NOC_PES11>4151&NOC_PES11<4157) ~1,
+    #Social Workers, Counsellors
+    PES11_92==5&(NOC_PES11>4210&NOC_PES11<4216) ~1,
+    PES11_92==1 ~0,
+    PES11_92==0 ~0,
+    CPS11_91==1 ~0,
+    CPS11_91> 2 & CPS11_91< 12 ~ 0,
+    PES11_92==9 ~NA_real_ ,
+    PES11_92==8 ~NA_real_ ,
+  ))->ces0411
+
+#### SEctor security
+
+  ces0411 %>%
+  mutate(sector_security11=case_when(
+    #Police
+    PES11_92==5&(NOC_PES11==4311) ~1,
+    #CAF
+    PES11_92==5&(NOC_PES11==4313) ~1,
+    #comissioned police
+    PES11_92==5&(NOC_PES11==0431) ~1,
+    #Security guards
+    (NOC_PES11==6541) ~1,
+    PES11_92==1 ~0,
+    PES11_92==0 ~0,
+    CPS11_91==1 ~0,
+    CPS11_91> 2 & CPS11_91< 12 ~ 0,
+    PES11_92==9 ~NA_real_ ,
+    PES11_92==8 ~NA_real_ ,
+  ))->ces0411
 
 #### #recode Party ID (PES11_59a)####
 # look_for(ces0411, "identify")
@@ -3078,8 +3226,7 @@ val_labels(ces0411$vote11)
 # look_for(ces0411, "occupation")
 class(ces0411$NOC_PES11)
 val_labels(ces0411$NOC_PES11)
-#This removes value labels
-ces0411$NOC_PES11<-remove_val_labels(ces0411$NOC_PES11)
+
 ces0411$occupation11<-Recode(as.numeric(ces0411$NOC_PES11), "1:1099=2; 1100:1199=1;
 2100:2199=1;
  3000:3199=1;

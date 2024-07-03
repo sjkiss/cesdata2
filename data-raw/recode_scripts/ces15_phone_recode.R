@@ -127,7 +127,45 @@ val_labels(ces15phone$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces15phone$sector)
 # table(ces15phone$sector, useNA = "ifany" )
+ces15phone$PES15_92
+ces15phone %>%
+  mutate(sector_welfare=case_when(
+    #Health
+    PES15_92==5&(PES15_NOC>3010&PES15_NOC<3415) ~1,
+    #Education
+    PES15_92==5&(PES15_NOC>4010&PES15_NOC<4034) ~1,
+    #Social Workers, Counsellors
+    PES15_92==5&(PES15_NOC>4151&PES15_NOC<4157) ~1,
+    #Social Workers, Counsellors
+    PES15_92==5&(PES15_NOC>4210&PES15_NOC<4216) ~1,
+    PES15_92==1 ~0,
+    PES15_92==0 ~0,
+    CPS15_91==1 ~0,
+    CPS15_91> 2 & CPS15_91< 12 ~ 0,
+    PES15_92==9 ~NA_real_ ,
+    PES15_92==8 ~NA_real_ ,
+  ))->ces15phone
+#### SEctor security
 
+ces15phone %>%
+  mutate(sector_security=case_when(
+    #Police
+    PES15_92==5&(PES15_NOC==4311) ~1,
+    #CAF
+    PES15_92==5&(PES15_NOC==4313) ~1,
+    #comissioned police
+    PES15_92==5&(PES15_NOC==0431) ~1,
+    #Security guards
+    (PES15_NOC==6541) ~1,
+    #Correctional
+    PES15_92==5&(PES15_NOC==4422) ~1,
+    PES15_92==1 ~0,
+    PES15_92==0 ~0,
+    CPS15_91==1 ~0,
+    CPS15_91> 2 & CPS15_91< 12 ~ 0,
+    PES15_92==9 ~NA_real_ ,
+    PES15_92==8 ~NA_real_ ,
+  ))->ces15phone
 #recode Party ID (PES15_59a)
 # look_for(ces15phone, "identify")
 ces15phone$party_id<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5:6=0; 0=0; else=NA")

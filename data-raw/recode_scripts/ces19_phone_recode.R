@@ -118,6 +118,51 @@ val_labels(ces19phone$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces19phone$sector)
 # table(ces19phone$sector , ces19phone$p53 , useNA = "ifany" )
+lookfor(ces19phone, "occupation")
+## Sector Health
+ces19phone %>%
+  mutate(sector_welfare=case_when(
+    #Health
+    p53==1 &(p52>3010&p52<3415)~1,
+    #Education
+    p53==1 &(p52>4010&p52<4034)~1,
+    #Social Services
+    p53==1 &(p52>40150&p52<4157)~1,
+    #Social Services
+    p53==1 &(p52>4211&p52<4216)~1,
+    p53==2 ~0,
+    p53==3 ~0,
+    p53==4 ~0,
+    q68>2 & q68< 12 ~ 0,
+    p53==-9 ~NA_real_ ,
+    p53==-8 ~NA_real_ ,
+  ))->ces19phone
+
+ces19phone %>%
+  mutate(sector_security=case_when(
+    #Police officers
+    p53==1 &p52==4311~1,
+    #Forces
+    p53==1 &p52==4313~1,
+    #Sherrifs
+    p53==1 &p52==4421~1,
+    #Correctional Service Officers
+    p53==1 &p52==4422~1,
+    #CAF Officers
+    p53==1 &p52==0433~1,
+    #Security Guards
+   p52==6541~1,
+    p53==2 ~0,
+    p53==3 ~0,
+    p53==4 ~0,
+    q68>2 & q68< 12 ~ 0,
+    p53==-9 ~NA_real_ ,
+    p53==-8 ~NA_real_ ,
+  ))->ces19phone
+#val_labels(ces19phone$sector)<-c(Private=0, Public=1)
+#checks
+#val_labels(ces19phone$sector)
+# table(ces19phone$sector , ces19phone$p53 , useNA = "ifany" )
 
 #recode Party ID (p47)
 # look_for(ces19phone, "closest")

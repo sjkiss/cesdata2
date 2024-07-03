@@ -275,6 +275,7 @@ val_labels(ces97$pro_redistribution)<-c(Non_Pro=0, Pro=1)
 
 # (ces97, "private")
 # (ces97, "blame")
+
 ces97$market1<-Recode(as.numeric(ces97$cpsf6), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 ces97$market2<-Recode(as.numeric(ces97$pese19), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA", as.numeric=T)
 #checks

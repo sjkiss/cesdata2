@@ -187,6 +187,51 @@ ces19web %>%
 with(ces19web, table(cps19_sector, sector, useNA = "ifany"))
 val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
 
+
+#### recode Sector Health and Welfare ####
+ces19web %>%
+  mutate(sector_welfare=case_when(
+    cps19_sector==1~0,
+    cps19_sector==4~0,
+    #Health
+    cps19_sector==2&(NOC>30000&NOC<33110)~1,
+    #Education, welfare social services  Managers
+    cps19_sector==2&(NOC>40020&NOC<40031)~1,
+    cps19_sector==2&(NOC>30000&NOC<33110)~1,
+    #Teachers
+    cps19_sector==2&(NOC>41199&NOC<41222)~1,
+    #Teachers assistants
+    cps19_sector==2&(NOC>43099&NOC<43110)~1,
+    #Social Services
+    cps19_sector==2&(NOC>41299&NOC<41302)~1,
+    #employment counsellors
+    cps19_sector==2&(NOC>41319&NOC<41322)~1,
+    #home workers
+    cps19_sector==2&(NOC>44099&NOC<44102)~1,
+    cps19_sector==5~NA,
+    cps19_employment>3&cps19_employment<13~ 0
+  ))->ces19web
+with(ces19web, table(cps19_sector, sector, useNA = "ifany"))
+val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
+#### recode SectorSecurity ####
+ces19web %>%
+  mutate(sector_security=case_when(
+    cps19_sector==1~0,
+    cps19_sector==4~0,
+    #Police
+    cps19_sector==2&(NOC>41309&NOC<41322)~1,
+    #Sherrifs and correctional services
+    cps19_sector==2&(NOC>43199&NOC<43202)~1,
+    #Forces
+    cps19_sector==2&(NOC==42102)~1,
+    #Forces
+    cps19_sector==2&(NOC==43204)~1,
+    #Forces
+    cps19_sector==2&(NOC==44200)~1,
+    NOC==64410~1,
+    cps19_sector==5~NA,
+    cps19_employment>3&cps19_employment<13~ 0
+  ))->ces19web
 #### recode Income ####
 lookfor(ces19web, "income")
 ces19web$cps19_income_number

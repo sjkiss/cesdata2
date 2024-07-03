@@ -860,5 +860,33 @@ ces93$mode<-rep("Phone", nrow(ces93))
 # Wants to include Rs from the 1992 referendum or not.
 #
 ces93$election<-rep(1993, nrow(ces93))
+#
+# lookfor(ces93, "occupation")
+# table(ces93$CPSJOB4)
+# lookfor(ces93, "sector")
+#
+# # 1= administration
+# # 2= production
+# # 3 public health and education
+# ces93 %>%
+#   mutate(public_branch=case_when(
+# CPSJOB4==1113  ~ 1,
+# CPSJOB4==1115  ~ 2,
+# CPSJOB4==1116~ 1,
+# CPSJOB4==1119~ 1,
+# CPSJOB4==1130~ 1,
+# CPSJOB4==1131~ 2,
+# CPSJOB4==1132~ 3,
+# CPSJOB4==1133~ 3,
+# CPSJOB4==1134~ 3,
+#   ))
+#
+# ces93 %>%
+#   group_by(CPSJOB5) %>%
+#   count(CPSJOB4) %>%
+#   filter(CPSJOB5!=1) %>%
+#   arrange(desc(n)) %>%
+#   as_factor() %>% view()
+library(tidyverse)
 # Save the file
 save(ces93, file=here("data/ces93.rda"))
