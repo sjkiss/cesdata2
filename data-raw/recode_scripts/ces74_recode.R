@@ -43,12 +43,20 @@ val_labels(ces74$degree)
 table(ces74$degree)
 
 #recode Region (V6)
-# look_for(ces74, "province")
+ look_for(ces74, "province")
 ces74$region<-Recode(ces74$V6, "0:3=1; 5=2; 6:9=3; 4=NA; 99=NA")
 val_labels(ces74$region)<-c(Atlantic=1, Ontario=2, West=3)
 #checks
 val_labels(ces74$region)
 table(ces74$region)
+
+#recode Province (V6)
+# look_for(ces74, "province")
+ces74$prov<-Recode(ces74$V6, "0=1; 1=2; 2=3; 3=4; 4=5; 5=6; 6=7; 7=8; 8=9; 9=10")
+val_labels(ces74$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces74$prov)
+table(ces74$prov)
 
 #recode Quebec (V6)
 # look_for(ces74, "province")

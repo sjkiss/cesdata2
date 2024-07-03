@@ -168,6 +168,14 @@ val_labels(ces21$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces21$region)
 table(ces21$region , ces21$cps21_province , useNA = "ifany" )
 
+#recode Province (cps21_province)
+# look_for(ces21, "province")
+ces21$prov<-Recode(ces21$cps21_province, "5=1; 10=2; 7=3; 4=4; 11=5; 9=6; 3=7; 12=8; 1=9; 2=10; else=NA")
+val_labels(ces21$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces21$prov)
+table(ces21$prov)
+
 #recode Quebec (cps21_province)
 look_for(ces21, "province")
 ces21$quebec<-Recode(ces21$cps21_province, "1:5=0; 7=0; 9:10; 11=1; 12=0; else=NA")
@@ -217,6 +225,7 @@ table(ces21$employment , ces21$cps21_employment , useNA = "ifany" )
 
 #No Sector available
 nrow(ces21)
+
 #recode Party ID (pid_party_en)
 look_for(ces21, "pid")
 nrow(ces21)
@@ -228,6 +237,7 @@ val_labels(ces21$party_id)
 with(ces21, table(as_factor(party_id)))
 table(ces21$party_id, ces21$pid_party_en , useNA = "ifany" )
 nrow(ces21)
+
 #recode Vote (pes21_votechoice2021)
 look_for(ces21, "party did you vote")
 ces21$vote<-Recode(ces21$pes21_votechoice2021, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")
@@ -260,15 +270,36 @@ look_for(ces21, "income")
 ces21 %>%
   mutate(income=case_when(
     cps21_income_cat==1 | cps21_income_number> -1 & cps21_income_number < 31001 ~ 1,
-    cps21_income_cat==2 | cps21_income_number> 30000 & cps21_income_number < 61001 ~ 2,
-    cps21_income_cat==3 | cps21_income_number> 60000 & cps21_income_number < 91001 ~ 3,
-    cps21_income_cat==4 | cps21_income_number> 90000 & cps21_income_number < 151001 ~ 4,
-    cps21_income_cat==5 | cps21_income_number> 150000 & cps21_income_number < 99999999999999999 ~ 5,
+    cps21_income_cat==2 | cps21_income_number> -1 & cps21_income_number < 31001 ~ 1,
+    cps21_income_cat==3 | cps21_income_number> 30000 & cps21_income_number < 61001 ~ 2,
+    cps21_income_cat==4 | cps21_income_number> 60000 & cps21_income_number < 91001 ~ 3,
+    cps21_income_cat==5 | cps21_income_number> 90000 & cps21_income_number < 151001 ~ 4,
+    cps21_income_cat==6 | cps21_income_number> 90000 & cps21_income_number < 151001 ~ 4,
+    cps21_income_cat==7 | cps21_income_number> 150000 & cps21_income_number < 99999999999999999 ~ 5,
+    cps21_income_cat==8 | cps21_income_number> 150000 & cps21_income_number < 99999999999999999 ~ 5,
   ))->ces21
 val_labels(ces21$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
 val_labels(ces21$income)
 table(ces21$income, ces21$cps21_income_cat , useNA = "ifany" )
+
+# Income Tertile
+#ces21$income_tertile<-car::Recode(ces19web$cps19_income_number, "0:60000=1; 60001:115000=2; 115001:99999999=3;else=NA")
+
+ces21 %>%
+  mutate(income_tertile=case_when(
+    cps21_income_cat==1 | cps21_income_number> -1 & cps21_income_number < 30001 ~ 1,
+    cps21_income_cat==2 | cps21_income_number> -1 & cps21_income_number < 30001 ~ 1,
+    cps21_income_cat==3 | cps21_income_number> 30000 & cps21_income_number < 60001 ~ 1,
+    cps21_income_cat==4 | cps21_income_number> 60000 & cps21_income_number < 90001 ~ 2,
+    cps21_income_cat==5 | cps21_income_number> 90000 & cps21_income_number < 110001 ~ 2,
+    cps21_income_cat==6 | cps21_income_number> 110000 & cps21_income_number < 150001 ~ 3,
+    cps21_income_cat==7 | cps21_income_number> 150000 & cps21_income_number < 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 ~ 3,
+    cps21_income_cat==8 | cps21_income_number> 150000 & cps21_income_number < 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 ~ 3,
+  ))->ces21
+
+val_labels(ces19web$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
+table(ces19web$income_tertile)
 
 #### recode Household size (cps21_household)####
 # look_for(ces21, "household")

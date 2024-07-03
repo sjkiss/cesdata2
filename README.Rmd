@@ -128,11 +128,20 @@ This is an incomplete list of recoded and renamed variables.
 
 | Concept | Variable Name | notes|
 |:---------------------------| ----------------------:|:----------------------:|
-| This | This| This |
-| column  | column | column | 
-| will | be | aligned |
-| left | right | center |
-
+| Demographics| | |
+| Public Sector Employee| `sector`|Dichotomous variable distinguishes public sector from private sector employees |
+| Public Sector Health Welfare and Education   |`sector_welfare` | Binary variable distinguishing public sector health, welfare and education employees from all other employees; only available from 2006 on| 
+| Security   |`sector_security` | Binary variable distinguishing security (police, forces, security guards, corrections) from all other employees; only available from 2006 on | 
+|gender   |`male` | Binary variable distinguishing males from others | 
+|education|`degree` | Binary variable distinguishing BA holders from others | 
+| Political| |
+|Vote Choice | `vote` |respondent vote choice from PES: groups reform, PCs, CA and Conservatives, includes BQ, Green and Other|
+|Vote Choice | `vote3` |respondent vote choice separates out PPC|
+|Previous vote | `previous_vote` | respondent previous recalled vote, no split conservatives|
+|Previous vote | `previous_vote3` | respondent previous recalled vote, splitting PPC|
+| Ideology | | |
+| These have normally been coded to run from 0 to 1, liberal to conservative| | |
+| Gay Rights | `gay_rights`| Gay couples should be allowed to marry, usually from MBS |  
 # Establishing A Usable Time Series
 
 

@@ -46,6 +46,14 @@ val_labels(ces88$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces88$region)
 # table(ces88$region)
 
+#recode Province (province)
+# look_for(ces88, "province")
+ces88$prov<-Recode(ces88$province, "0=1; 1=2; 2=3; 3=4; 4=5; 5=6; 6=7; 7=8; 8=9; 9=10")
+val_labels(ces88$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces88$prov)
+table(ces88$prov)
+
 #recode Quebec (province)
 # look_for(ces88, "province")
 ces88$quebec<-Recode(ces88$province, "0:3=0; 5:9=0; 4=1")

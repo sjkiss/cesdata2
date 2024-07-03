@@ -59,6 +59,14 @@ val_labels(ces15phone$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces15phone$region)
 # table(ces15phone$region)
 
+#recode Province (CPS15_PROVINCE)
+# look_for(ces15phone, "province")
+ces15phone$prov<-Recode(ces15phone$CPS15_PROVINCE, "10=1; 11=2; 12=3; 13=4; 24=5; 35=6; 46=7; 47=8; 48=9; 59=10; else=NA")
+val_labels(ces15phone$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces15phone$prov)
+table(ces15phone$prov)
+
 #recode Quebec (CPS15_PROVINCE)
 # look_for(ces15phone, "province")
 ces15phone$quebec<-Recode(ces15phone$CPS15_PROVINCE, "10:13=0; 35:59=0; 24=1; else=NA")
@@ -167,12 +175,12 @@ ces15phone %>%
     PES15_92==8 ~NA_real_ ,
   ))->ces15phone
 #recode Party ID (PES15_59a)
-# look_for(ces15phone, "identify")
-ces15phone$party_id<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5:6=0; 0=0; else=NA")
-val_labels(ces15phone$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4)
+look_for(ces15phone, "identify")
+ces15phone$party_id<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 6=10; 0=0; else=NA")
+val_labels(ces15phone$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, None=10)
 #checks
 val_labels(ces15phone$party_id)
-# table(ces15phone$party_id)
+table(ces15phone$party_id)
 
 #recode Vote (PES15_6)
 # look_for(ces15phone, "party did you vote")

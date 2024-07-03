@@ -49,6 +49,14 @@ val_labels(ces72_nov$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces72_nov$region)
 table(ces72_nov$region)
 
+#recode Province (m_area_a)
+# look_for(ces72_nov, "province")
+ces72_nov$prov<-Recode(ces72_nov$m_area_a, "0=6; 1=5; 2=10; 3=9; 4=8; 5=7; 6=3; 7=4; 8=1; 9=2")
+val_labels(ces72_nov$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces72_nov$prov)
+table(ces72_nov$prov)
+
 #recode Quebec (m_area_a)
 # look_for(ces72_nov, "area")
 ces72_nov$quebec<-Recode(ces72_nov$m_area_a, "0=0; 2:9=0; 1=1")

@@ -64,6 +64,15 @@ val_labels(ces93$region)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces93$region)
 table(ces93$region)
 
+#### Province ####
+#recode Province (CPSPROV)
+# look_for(ces93, "province")
+ces93$prov<-Recode(ces93$CPSPROV, "0=1; 1=2; 2=3; 3=4; 4=5; 5=6; 6=7; 7=8; 8=9; 9=10")
+val_labels(ces93$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces93$prov)
+table(ces93$prov)
+
 #### quebec####
 #recode Quebec (CPSPROV)
 look_for(ces93, "province")
@@ -149,7 +158,7 @@ table(ces93$sector)
 ####party id ####
 #recode Party ID (PESL1)
 look_for(ces93, "identification")
-ces93$party_id<-Recode(ces93$PESL1, "1=1; 2=2; 3=3; 4=2; 5:6=0; else=NA")
+ces93$party_id<-Recode(ces93$PESL1, "1=1; 2=2; 3=3; 4=2; 5=4; 6=0; else=NA")
 val_labels(ces93$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces93$party_id)

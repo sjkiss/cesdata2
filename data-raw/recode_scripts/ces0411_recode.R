@@ -77,6 +77,14 @@ val_labels(ces0411$region04)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces0411$region04)
 # table(ces0411$region04)
 
+####recode Province (ces04_PROVINCE)####
+# look_for(ces0411, "province")
+ces0411$prov04<-Recode(ces0411$ces04_PROVINCE, "10=1; 11=2; 12=3; 13=4; 24=5; 35=6; 46=7; 47=8; 48=9; 59=10; else=NA")
+val_labels(ces0411$prov04)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces0411$prov04)
+table(ces0411$prov04)
+
 #recode Quebec (ces04_PROVINCE)
 # look_for(ces0411, "province")
 ces0411$quebec04<-Recode(ces0411$ces04_PROVINCE, "10:13=0; 35:59=0; 24=1; else=NA")
@@ -179,23 +187,25 @@ val_labels(ces0411$sector04)
 
 
 #### #recode Party ID (ces04_CPS_Q1A@3 and  ces04_CPS_Q1B@3`) ***note needs `...` to recognize the variable***####
-# look_for(ces0411, "yourself")
+look_for(ces0411, "yourself")
 ces0411 %>%
   mutate(party_id04=case_when(
     `ces04_CPS_Q1A@3`==1 | `ces04_CPS_Q1B@3`==1 ~ 1,
     `ces04_CPS_Q1A@3`==2 | `ces04_CPS_Q1B@3`==2 ~ 2,
     `ces04_CPS_Q1A@3`==3 | `ces04_CPS_Q1B@3`==3 ~ 3,
     `ces04_CPS_Q1A@3`==5 | `ces04_CPS_Q1B@3`==5 ~ 2,
-    `ces04_CPS_Q1A@3`==0 | `ces04_CPS_Q1B@3`==0 ~ 0,
     `ces04_CPS_Q1A@3`==6 | `ces04_CPS_Q1B@3`==6 ~ 2,
-    `ces04_CPS_Q1A@3`==8 | `ces04_CPS_Q1B@3`==8 ~ 0,
-    `ces04_CPS_Q1A@3`==4 | `ces04_CPS_Q1B@3`==4 ~ 0,
+    `ces04_CPS_Q1A@3`==8 | `ces04_CPS_Q1B@3`==8 ~ 5,
+    `ces04_CPS_Q1A@3`==4 | `ces04_CPS_Q1B@3`==4 ~ 4,
+    `ces04_CPS_Q1A@3`==9 | `ces04_CPS_Q1B@3`==9 ~ 0,
+    `ces04_CPS_Q1A@3`==10 | `ces04_CPS_Q1B@3`==10 ~ 0,
+    `ces04_CPS_Q1A@3`==97 | `ces04_CPS_Q1B@3`==97 ~ 0,
   ))->ces0411
 
 val_labels(ces0411$party_id04)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id04)
-# table(ces0411$party_id04)
+table(ces0411$party_id04)
 
 #### #recode Vote (ces04_PES_A3@3')####
 # ***note needs `...`` to recognize the variable***
@@ -258,10 +268,10 @@ ces0411$ces04_CPS_S4
 
 #recode Occupation3 as 6 class schema with self-employed (ces04_CPS_S4)
 # look_for(ces0411, "employ")
-ces0411$occupation043<-ifelse(ces0411$ces04_CPS_S4==1, 6, ces0411$occupation04)
-val_labels(ces0411$occupation043)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+ces0411$occupation04_3<-ifelse(ces0411$ces04_CPS_S4==1, 6, ces0411$occupation04)
+val_labels(ces0411$occupation04_3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
-val_labels(ces0411$occupation043)
+val_labels(ces0411$occupation04_3)
 # table(ces0411$occupation04_3)
 ####  #recode Income (ces04_CPS_S18)####
 # look_for(ces0411, "income")
@@ -976,6 +986,14 @@ val_labels(ces0411$region06)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces0411$region06)
 # table(ces0411$region06)
 
+####recode Province (ces06_PROVINCE)####
+# look_for(ces0411, "province")
+ces0411$prov06<-Recode(ces0411$ces06_PROVINCE, "10=1; 11=2; 12=3; 13=4; 24=5; 35=6; 46=7; 47=8; 48=9; 59=10; else=NA")
+val_labels(ces0411$prov06)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces0411$prov06)
+table(ces0411$prov06)
+
 #### #recode Quebec (ces06_PROVINCE)####
 # look_for(ces0411, "province")
 ces0411$quebec06<-Recode(ces0411$ces06_PROVINCE, "10:13=0; 35:59=0; 24=1; else=NA")
@@ -1156,16 +1174,16 @@ ces0411 %>%
     ces06_CPS_Q1A==1 | ces06_CPS_Q1B==1 ~ 1,
     ces06_CPS_Q1A==2 | ces06_CPS_Q1B==2 ~ 2,
     ces06_CPS_Q1A==3 | ces06_CPS_Q1B==3 ~ 3,
-    ces06_CPS_Q1A==5 | ces06_CPS_Q1B==5 ~ 0,
+    ces06_CPS_Q1A==5 | ces06_CPS_Q1B==5 ~ 5,
     ces06_CPS_Q1A==0 | ces06_CPS_Q1B==0 ~ 0,
-    ces06_CPS_Q1A==4 | ces06_CPS_Q1B==4 ~ 0,
+    ces06_CPS_Q1A==4 | ces06_CPS_Q1B==4 ~ 4,
     ces06_CPS_Q1A==9 | ces06_CPS_Q1B==9 ~ 0,
   ))->ces0411
 
 val_labels(ces0411$party_id06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id06)
-# table(ces0411$party_id06)
+table(ces0411$party_id06)
 
 #### #recode Vote (ces06_PES_B4A and ces06_PES_B4B) ####
 # look_for(ces0411, "party did you vote")
@@ -1251,11 +1269,11 @@ val_labels(ces0411$occupation06)
 
 #recode Occupation3 as 6 class schema with self-employed (ces06_CPS_S4)
 # look_for(ces0411, "employ")
-ces0411$occupation063<-ifelse(ces0411$ces06_CPS_S4==1, 6, ces0411$occupation06)
+ces0411$occupation06_3<-ifelse(ces0411$ces06_CPS_S4==1, 6, ces0411$occupation06)
 #ces0411$occupation06_3<-ifelse((ces0411$ces04_CPS_S4==1 & ces0411$ces06_RECALL==1), 6, ces0411$occupation06)
-val_labels(ces0411$occupation063)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+val_labels(ces0411$occupation06_3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
-val_labels(ces0411$occupation063)
+val_labels(ces0411$occupation06_3)
 # table(ces0411$occupation06_3)
 
 #### #recode Income (ces06_CPS_S18)####
@@ -1921,6 +1939,14 @@ val_labels(ces0411$region08)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces0411$region08)
 # table(ces0411$region08)
 
+####recode Province (ces08_PROVINCE)####
+# look_for(ces0411, "province")
+ces0411$prov08<-Recode(ces0411$ces08_PROVINCE, "10=1; 11=2; 12=3; 13=4; 24=5; 35=6; 46=7; 47=8; 48=9; 59=10; else=NA")
+val_labels(ces0411$prov08)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces0411$prov08)
+table(ces0411$prov08)
+
 #### #recode Quebec (ces08_PROVINCE)####
 # look_for(ces0411, "province")
 ces0411$quebec08<-Recode(ces0411$ces08_PROVINCE, "10:13=0; 35:59=0; 24=1; else=NA")
@@ -2128,21 +2154,21 @@ ces0411 %>%
 
 # table(ces0411$sector08)
 
-#recode Party ID (ces08_PES_K1)
-# look_for(ces0411, "yourself")
-ces0411$party_id08<-Recode(ces0411$ces08_PES_K1, "1=1; 2=2; 3=3; 4:5=0; 0=0; else=NA")
-val_labels(ces0411$party_id08)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
-#checks
-val_labels(ces0411$party_id08)
-# table(ces0411$party_id08)
-
 #recode Vote (ces08_PES_B4B)
-# look_for(ces0411, "party did you vote")
+look_for(ces0411, "party did you vote")
 ces0411$vote08<-Recode(ces0411$ces08_PES_B4B, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
 val_labels(ces0411$vote08)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces0411$vote08)
-# table(ces0411$vote08)
+table(ces0411$vote08)
+
+#recode Party ID (ces08_PES_K1)
+# look_for(ces0411, "yourself")
+ces0411$party_id08<-Recode(ces0411$ces08_PES_K1, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+val_labels(ces0411$party_id08)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces0411$party_id08)
+table(ces0411$party_id08)
 
 #### #recode Occupation (ces08_PES_S3_NOCS)####
 # look_for(ces0411, "occupation")
@@ -2215,10 +2241,10 @@ ces0411 %>%
 
 #recode Occupation3 as 6 class schema with self-employed (ces08_CPS_S4)
 # look_for(ces0411, "employ")
-ces0411$occupation083<-ifelse(ces0411$ces08_CPS_S4==1, 6, ces0411$occupation08)
-val_labels(ces0411$occupation083)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+ces0411$occupation08_3<-ifelse(ces0411$ces08_CPS_S4==1, 6, ces0411$occupation08)
+val_labels(ces0411$occupation08_3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
-val_labels(ces0411$occupation083)
+val_labels(ces0411$occupation08_3)
 # table(ces0411$occupation08_3)
 
 #### #recode Income (ces08_CPS_S18A, ces08_CPS_S18B, ces08_PES_S9A, ces08_PES_S9B) ####
@@ -3078,6 +3104,14 @@ val_labels(ces0411$region11)<-c(Atlantic=1, Ontario=2, West=3)
 val_labels(ces0411$region11)
 # table(ces0411$region11, useNA = "ifany" )
 
+####recode Province (PROVINCE11)####
+# look_for(ces0411, "province")
+ces0411$prov11<-Recode(ces0411$PROVINCE11, "10=1; 11=2; 12=3; 13=4; 24=5; 35=6; 46=7; 47=8; 48=9; 59=10; else=NA")
+val_labels(ces0411$prov11)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+#checks
+val_labels(ces0411$prov11)
+table(ces0411$prov11)
+
 ####= #recode Quebec (PROVINCE11)####
 # look_for(ces0411, "province")
 ces0411$quebec11<-Recode(ces0411$PROVINCE11, "10:13=0; 35:59=0; 24=1; else=NA")
@@ -3208,11 +3242,11 @@ ces0411 %>%
 
 #### #recode Party ID (PES11_59a)####
 # look_for(ces0411, "identify")
-ces0411$party_id11<-Recode(ces0411$PES11_59a, "1=1; 2=2; 3=3; 4:5=0; 0=0; else=NA")
+ces0411$party_id11<-Recode(ces0411$PES11_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
 val_labels(ces0411$party_id11)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id11)
-# table(ces0411$party_id11, useNA = "ifany" )
+table(ces0411$party_id11, useNA = "ifany" )
 
 #### #recode Vote (PES11_6)####
 # look_for(ces0411, "party did you vote")
@@ -3260,11 +3294,11 @@ ces0411 %>%
 # table(ces0411$occupation11, useNA = "ifany")
 ces0411$CPS11_91
 
-ces0411$occupation113<-ifelse(ces0411$CPS11_91==1, 6, ces0411$occupation11)
-val_labels(ces0411$occupation113)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+ces0411$occupation11_3<-ifelse(ces0411$CPS11_91==1, 6, ces0411$occupation11)
+val_labels(ces0411$occupation11_3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 # table(ces0411$occupation11, ces0411$occupation11_3)
 #checks
-val_labels(ces0411$occupation113)
+val_labels(ces0411$occupation11_3)
 # table(ces0411$occupation11_3, useNA = "ifany" )
 
 #### #recode Income (CPS11_92 and CPS11_93) ####

@@ -1,26 +1,18 @@
 
-- <a href="#introduction" id="toc-introduction">Introduction</a>
-  - <a href="#installation" id="toc-installation">Installation</a>
-- <a href="#how-to-use-it" id="toc-how-to-use-it">How to use it.</a>
-- <a href="#package-structure" id="toc-package-structure">Package
-  Structure</a>
-  - <a href="#recoding-conventions" id="toc-recoding-conventions">Recoding
-    conventions</a>
-- <a href="#establishing-a-usable-time-series"
-  id="toc-establishing-a-usable-time-series">Establishing A Usable Time
-  Series</a>
-  - <a href="#issues-and-special-cases"
-    id="toc-issues-and-special-cases">Issues and Special Cases</a>
-- <a href="#future-recodes" id="toc-future-recodes">Future recodes</a>
-  - <a href="#adding-recoded-variables"
-    id="toc-adding-recoded-variables">Adding recoded variables</a>
-- <a href="#outstanding-issues" id="toc-outstanding-issues">Outstanding
-  Issues</a>
-  - <a href="#template-for-constructing-a-ces"
-    id="toc-template-for-constructing-a-ces">Template For Constructing A
-    CES</a>
-- <a href="#credit" id="toc-credit">Credit</a>
-- <a href="#references" id="toc-references">References</a>
+- [Introduction](#introduction)
+  - [Installation](#installation)
+- [How to use it.](#how-to-use-it)
+- [Package Structure](#package-structure)
+  - [Recoding conventions](#recoding-conventions)
+- [Establishing A Usable Time
+  Series](#establishing-a-usable-time-series)
+  - [Issues and Special Cases](#issues-and-special-cases)
+- [Future recodes](#future-recodes)
+  - [Adding recoded variables](#adding-recoded-variables)
+- [Outstanding Issues](#outstanding-issues)
+  - [Template For Constructing A CES](#template-for-constructing-a-ces)
+- [Credit](#credit)
+- [References](#references)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -70,6 +62,9 @@ ces21 %>%
 #> $ Status                <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
 #> $ Progress              <dbl> 100, 100, 100, 100, 100, 100, 100, 100, 100, 100…
 #> $ Duration__in_seconds_ <dbl> 818, 1403, 775, 825, 1660, 1332, 1240, 1594, 945…
+```
+
+``` r
 
 #As is CES1965
 
@@ -124,24 +119,28 @@ list.files(path="data-raw")
 #>  [2] "1984.sav"                                            
 #>  [3] "2016-unique-occupations-updated.xls"                 
 #>  [4] "2019 Canadian Election Study - Phone Survey v1.0.dta"
-#>  [5] "2021_occupations_coded.xlsx"                         
-#>  [6] "CES_04060811_ISR_revised.sav"                        
-#>  [7] "CES-E-1972-jun-july_F1.sav"                          
-#>  [8] "CES-E-1972-nov_F1.sav"                               
-#>  [9] "CES-E-1972-sept_F1.sav"                              
-#> [10] "CES-E-1974_F1.sav"                                   
-#> [11] "CES-E-1993_F1.sav"                                   
-#> [12] "CES-E-1997_F1.sav"                                   
-#> [13] "CES-E-2000_F1.sav"                                   
-#> [14] "CES-E-2019-online_F1.sav"                            
-#> [15] "CES15_CPS+PES_Web_SSI Full.dta"                      
-#> [16] "ces1965.dta"                                         
-#> [17] "ces1968.dta"                                         
-#> [18] "CES1988.sav"                                         
-#> [19] "CES2015_CPS-PES-MBS_complete.sav"                    
-#> [20] "ces21.dta"                                           
-#> [21] "mip_2019.xlsx"                                       
-#> [22] "recode_scripts"
+#>  [5] "2021_mip_unique.csv"                                 
+#>  [6] "2021_occupations_coded_government.xlsx"              
+#>  [7] "2021_occupations_coded.xlsx"                         
+#>  [8] "CES_04060811_ISR_revised.sav"                        
+#>  [9] "CES-E-1972-jun-july_F1.sav"                          
+#> [10] "CES-E-1972-nov_F1.sav"                               
+#> [11] "CES-E-1972-sept_F1.sav"                              
+#> [12] "CES-E-1974_F1.sav"                                   
+#> [13] "CES-E-1993_F1.sav"                                   
+#> [14] "CES-E-1997_F1.sav"                                   
+#> [15] "CES-E-2000_F1.sav"                                   
+#> [16] "CES-E-2019-online_F1.sav"                            
+#> [17] "CES15_CPS+PES_Web_SSI Full.dta"                      
+#> [18] "ces1965.dta"                                         
+#> [19] "ces1968.dta"                                         
+#> [20] "CES1988.sav"                                         
+#> [21] "CES2015_CPS-PES-MBS_complete.sav"                    
+#> [22] "ces21.dta"                                           
+#> [23] "mip_2019.xlsx"                                       
+#> [24] "NOC_2021_4_job_titles.xlsx"                          
+#> [25] "NOC_2021_5_job_titles.xlsx"                          
+#> [26] "recode_scripts"
 ```
 
 2.  An `.rda` file for each that contains the results of our recode
@@ -190,12 +189,22 @@ Wherever possible, the following conventions have been used.
 
 This is an incomplete list of recoded and renamed variables.
 
-| Concept | Variable Name |  notes  |
-|:--------|--------------:|:-------:|
-| This    |          This |  This   |
-| column  |        column | column  |
-| will    |            be | aligned |
-| left    |         right | center  |
+| Concept                                                                    |     Variable Name |                                                                    notes                                                                     |
+|:---------------------------------------------------------------------------|------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------:|
+| Demographics                                                               |                   |                                                                                                                                              |
+| Public Sector Employee                                                     |          `sector` |                                Dichotomous variable distinguishes public sector from private sector employees                                |
+| Public Sector Health Welfare and Education                                 |  `sector_welfare` |  Binary variable distinguishing public sector health, welfare and education employees from all other employees; only available from 2006 on  |
+| Security                                                                   | `sector_security` | Binary variable distinguishing security (police, forces, security guards, corrections) from all other employees; only available from 2006 on |
+| gender                                                                     |            `male` |                                               Binary variable distinguishing males from others                                               |
+| education                                                                  |          `degree` |                                            Binary variable distinguishing BA holders from others                                             |
+| Political                                                                  |                   |                                                                                                                                              |
+| Vote Choice                                                                |            `vote` |                   respondent vote choice from PES: groups reform, PCs, CA and Conservatives, includes BQ, Green and Other                    |
+| Vote Choice                                                                |           `vote3` |                                                   respondent vote choice separates out PPC                                                   |
+| Previous vote                                                              |   `previous_vote` |                                          respondent previous recalled vote, no split conservatives                                           |
+| Previous vote                                                              |  `previous_vote3` |                                               respondent previous recalled vote, splitting PPC                                               |
+| Ideology                                                                   |                   |                                                                                                                                              |
+| These have normally been coded to run from 0 to 1, liberal to conservative |                   |                                                                                                                                              |
+| Gay Rights                                                                 |      `gay_rights` |                                           Gay couples should be allowed to marry, usually from MBS                                           |
 
 # Establishing A Usable Time Series
 
@@ -256,9 +265,15 @@ names(ces.list)<-c(1984,1988, 1993, 1997, 2000)
 # Check to see if ces84 gay_rights exists
 length(ces84$gay_rights) # Zero indicates it does not exist
 #> [1] 0
+```
+
+``` r
 #Check to see if ces88 gay_rights exists
 length(ces88$gay_rights) #3609 cases of gay_rights values
 #> [1] 3609
+```
+
+``` r
 # Construct common variables
 myvars<-c("gender", "vote", "gay_rights", "election")
 #Make data frame
@@ -332,17 +347,17 @@ data-set.
 
 ``` r
 lookfor(ces7980, "FILTER")
-#>  pos  variable label              col_type values          
-#>  487  V1007    1979 FILTER:1      dbl                      
-#>  1023 V2005    1980 FILTER:1      dbl                      
-#>  1221 V4002    1979 FILTER:1      dbl                      
-#>  1227 V4008    1980 FILTER:1      dbl                      
-#>  1233 V4014    P74-79-80 FILTER:1 dbl                      
-#>  1239 V4020    P74-79 FILTER:1    dbl                      
-#>  1245 V4026    P79-80 FILTER:1    dbl                      
-#>  1251 V4032    P74-80 FILTER:1    dbl                      
-#>  1261 filter_$ V4008=1 (FILTER)   dbl+lbl  [0] Not Selected
-#>                                            [1] Selected
+#>  pos  variable label              col_type missing values          
+#>  487  V1007    1979 FILTER:1      dbl      0                       
+#>  1023 V2005    1980 FILTER:1      dbl      0                       
+#>  1221 V4002    1979 FILTER:1      dbl      0                       
+#>  1227 V4008    1980 FILTER:1      dbl      0                       
+#>  1233 V4014    P74-79-80 FILTER:1 dbl      0                       
+#>  1239 V4020    P74-79 FILTER:1    dbl      0                       
+#>  1245 V4026    P79-80 FILTER:1    dbl      0                       
+#>  1251 V4032    P74-80 FILTER:1    dbl      0                       
+#>  1261 filter_$ V4008=1 (FILTER)   dbl+lbl  0       [0] Not Selected
+#>                                                    [1] Selected
 ```
 
 It is possible though that the recode script may need to be modified in
@@ -658,6 +673,9 @@ ces04
 #One can compare the rows
 nrow(ces0411)
 #> [1] 13097
+```
+
+``` r
 nrow(ces04)
 #> [1] 2324
 ```
@@ -680,20 +698,22 @@ ces0411 %>%
   filter(str_detect(survey, "PES08")) %>% 
 select(survey, contains('vote')) %>% 
   as_factor()
-#> # A tibble: 3,689 × 6
-#>    survey                       ces08_PES_PROV_VOTE1 vote04 vote06 vote08 vote11
-#>    <fct>                        <fct>                <fct>  <fct>  <fct>  <fct> 
-#>  1 Panel - CPS04 PES04 MBS04 C… NDP (New Democrats)  Green  NDP    NDP    Conse…
-#>  2 Panel - CPS04 PES04 MBS04 C… NDP (New Democrats)  Liber… Liber… Liber… Liber…
-#>  3 Panel - CPS04 PES04 MBS04 C… R volunteers: It de… <NA>   Liber… <NA>   NDP   
-#>  4 Panel - CPS04 PES04 MBS04 C… NDP (New Democrats)  Liber… Liber… NDP    NDP   
-#>  5 Panel - CPS04 PES04 MBS04 C… Other                Bloc   NDP    NDP    NDP   
-#>  6 Panel - CPS04 PES04 MBS04 C… L'Action Democratiq… Bloc   NDP    NDP    NDP   
-#>  7 Panel - CPS04 PES04 MBS04 C… refused              <NA>   Conse… <NA>   Conse…
-#>  8 Panel - CPS04 PES04 MBS04 C… Liberal (Grits)      Green  Green  Liber… Green 
-#>  9 Panel - CPS04 PES04 MBS04 C… Liberal (Grits)      Bloc   NDP    Bloc   Conse…
-#> 10 Panel - CPS04 PES04 MBS04 C… Liberal (Grits)      Liber… Conse… Conse… Conse…
+#> # A tibble: 3,689 × 11
+#>    survey    ces08_PES_PROV_VOTE1 vote04 previous_vote04 previous_vote043 vote06
+#>    <fct>     <fct>                <fct>  <fct>           <fct>            <fct> 
+#>  1 Panel - … NDP (New Democrats)  Green  Liberal         Liberal          NDP   
+#>  2 Panel - … NDP (New Democrats)  Liber… Liberal         Liberal          Liber…
+#>  3 Panel - … R volunteers: It de… <NA>   Conservative    Conservative     Liber…
+#>  4 Panel - … NDP (New Democrats)  Liber… Liberal         Liberal          Liber…
+#>  5 Panel - … Other                Bloc   Bloc            Bloc             NDP   
+#>  6 Panel - … L'Action Democratiq… Bloc   Bloc            Bloc             NDP   
+#>  7 Panel - … refused              <NA>   Bloc            Bloc             Conse…
+#>  8 Panel - … Liberal (Grits)      Green  NDP             NDP              Green 
+#>  9 Panel - … Liberal (Grits)      Bloc   Bloc            Bloc             NDP   
+#> 10 Panel - … Liberal (Grits)      Liber… Liberal         Liberal          Conse…
 #> # ℹ 3,679 more rows
+#> # ℹ 5 more variables: previous_vote06 <fct>, vote08 <fct>,
+#> #   previous_vote08 <fct>, vote11 <fct>, previous_vote11 <fct>
 ```
 
 The problem is that in other, non-panel datasets, there is no need to
@@ -704,19 +724,19 @@ For example, in the 2000 dataset, `vote` is just that.
 ``` r
 ces00 %>% 
   select(election, contains('vote'))
-#> # A tibble: 3,651 × 3
-#>    election              vote             vote3
-#>       <dbl>         <dbl+lbl>         <dbl+lbl>
-#>  1     2000 NA                NA               
-#>  2     2000  2 [Conservative]  2 [Conservative]
-#>  3     2000 NA                NA               
-#>  4     2000 NA                NA               
-#>  5     2000  2 [Conservative]  2 [Conservative]
-#>  6     2000 NA                NA               
-#>  7     2000  2 [Conservative]  2 [Conservative]
-#>  8     2000  0 [Other]         0 [Other]       
-#>  9     2000  1 [Liberal]       1 [Liberal]     
-#> 10     2000  2 [Conservative]  2 [Conservative]
+#> # A tibble: 3,651 × 5
+#>    election vote              vote3             previous_vote     previous_vote3
+#>       <dbl> <dbl+lbl>         <dbl+lbl>         <dbl+lbl>         <dbl+lbl>     
+#>  1     2000 NA                NA                NA                NA            
+#>  2     2000  2 [Conservative]  2 [Conservative]  2 [Conservative]  2 [Conservat…
+#>  3     2000 NA                NA                NA                NA            
+#>  4     2000 NA                NA                 2 [Conservative]  2 [Conservat…
+#>  5     2000  2 [Conservative]  2 [Conservative] NA                NA            
+#>  6     2000 NA                NA                NA                NA            
+#>  7     2000  2 [Conservative]  2 [Conservative]  2 [Conservative]  2 [Conservat…
+#>  8     2000  0 [Other]         0 [Other]        NA                NA            
+#>  9     2000  1 [Liberal]       1 [Liberal]       1 [Liberal]       1 [Liberal]  
+#> 10     2000  2 [Conservative]  2 [Conservative]  3 [NDP]           3 [NDP]      
 #> # ℹ 3,641 more rows
 ```
 
@@ -749,19 +769,20 @@ ces04 %>%
   select(contains('vote'), contains('trad')) %>% 
   #Show the names of the variables
   names()
-#>  [1] "ces08_PES_PROV_VOTE1" "vote04"               "vote06"              
-#>  [4] "vote08"               "vote11"               "trad043"             
-#>  [7] "trad047"              "trad041"              "trad044"             
-#> [10] "trad045"              "trad046"              "trad042"             
-#> [13] "traditionalism04"     "traditionalism204"    "trad063"             
-#> [16] "trad062"              "trad061"              "traditionalism06"    
-#> [19] "traditionalism206"    "trad083"              "trad087"             
-#> [22] "trad081"              "trad084"              "trad085"             
-#> [25] "trad086"              "trad082"              "traditionalism08"    
-#> [28] "traditionalism208"    "trad113"              "trad117"             
-#> [31] "trad111"              "trad114"              "trad115"             
-#> [34] "trad116"              "trad112"              "traditionalism11"    
-#> [37] "traditionalism211"
+#>  [1] "ces08_PES_PROV_VOTE1" "vote04"               "previous_vote04"     
+#>  [4] "previous_vote043"     "vote06"               "previous_vote06"     
+#>  [7] "vote08"               "previous_vote08"      "vote11"              
+#> [10] "previous_vote11"      "trad043"              "trad047"             
+#> [13] "trad041"              "trad044"              "trad045"             
+#> [16] "trad046"              "trad042"              "traditionalism04"    
+#> [19] "traditionalism204"    "trad063"              "trad062"             
+#> [22] "trad061"              "traditionalism06"     "traditionalism206"   
+#> [25] "trad083"              "trad087"              "trad081"             
+#> [28] "trad084"              "trad085"              "trad086"             
+#> [31] "trad082"              "traditionalism08"     "traditionalism208"   
+#> [34] "trad113"              "trad117"              "trad111"             
+#> [37] "trad114"              "trad115"              "trad116"             
+#> [40] "trad112"              "traditionalism11"     "traditionalism211"
 ```
 
 Here it is apparent that there are consistent variables for `04`, `06`
@@ -778,19 +799,20 @@ ces04 %>%
   #Show the names of the variables
   names() %>% 
   str_remove_all(., "04")
-#>  [1] "ces08_PES_PROV_VOTE1" "vote"                 "vote06"              
-#>  [4] "vote08"               "vote11"               "trad3"               
-#>  [7] "trad7"                "trad1"                "trad4"               
-#> [10] "trad5"                "trad6"                "trad2"               
-#> [13] "traditionalism"       "traditionalism2"      "trad063"             
-#> [16] "trad062"              "trad061"              "traditionalism06"    
-#> [19] "traditionalism206"    "trad083"              "trad087"             
-#> [22] "trad081"              "trad084"              "trad085"             
-#> [25] "trad086"              "trad082"              "traditionalism08"    
-#> [28] "traditionalism208"    "trad113"              "trad117"             
-#> [31] "trad111"              "trad114"              "trad115"             
-#> [34] "trad116"              "trad112"              "traditionalism11"    
-#> [37] "traditionalism211"
+#>  [1] "ces08_PES_PROV_VOTE1" "vote"                 "previous_vote"       
+#>  [4] "previous_vote3"       "vote06"               "previous_vote06"     
+#>  [7] "vote08"               "previous_vote08"      "vote11"              
+#> [10] "previous_vote11"      "trad3"                "trad7"               
+#> [13] "trad1"                "trad4"                "trad5"               
+#> [16] "trad6"                "trad2"                "traditionalism"      
+#> [19] "traditionalism2"      "trad063"              "trad062"             
+#> [22] "trad061"              "traditionalism06"     "traditionalism206"   
+#> [25] "trad083"              "trad087"              "trad081"             
+#> [28] "trad084"              "trad085"              "trad086"             
+#> [31] "trad082"              "traditionalism08"     "traditionalism208"   
+#> [34] "trad113"              "trad117"              "trad111"             
+#> [37] "trad114"              "trad115"              "trad116"             
+#> [40] "trad112"              "traditionalism11"     "traditionalism211"
 ```
 
 Now, for example, in the `ces04` data frame, `vote04` has become `vote`,
@@ -836,6 +858,9 @@ head(as_factor(ces))
 #> 4 <NA>               0.75  0.25     2000 Phone
 #> 5 Conservative       0.25  0.75     2000 Phone
 #> 6 <NA>               0     0.25     2000 Phone
+```
+
+``` r
 #Summarize
 summary(as_factor(ces))
 #>            vote        gay_rights         trad1           election   
@@ -886,8 +911,8 @@ package has been installed.
 
 ``` r
 .libPaths()
-#> [1] "/Users/skiss/Library/R/x86_64/4.1/library"                     
-#> [2] "/Library/Frameworks/R.framework/Versions/4.1/Resources/library"
+#> [1] "/Users/skiss/Library/R/x86_64/4.4/library"                            
+#> [2] "/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library"
 ```
 
 You can open your Finder, or your PC equivalent and actually see it.
@@ -1030,8 +1055,11 @@ ces80 %>%
 names(ces80)<-str_remove_all(names(ces80), "80")
 #Check
 tail(names(ces80))
-#> [1] "ndp_rating" "mode"       "mip"        "foreign"    "turnout"   
-#> [6] "election"
+#> [1] "previous_vote" "mode"          "mip"           "foreign"      
+#> [5] "turnout"       "election"
+```
+
+``` r
 
 ### Decide On CES 1993 sample
 # this command includes only those respondents that completed the 1993 Campaign and Post-Election Survey
@@ -1117,7 +1145,7 @@ glimpse(ces)
 #> $ vote                   <dbl+lbl>  1,  1,  2,  1,  1,  1,  2,  2,  2,  1,  2,…
 #> $ income                 <dbl+lbl>  1,  2,  2,  2,  3,  2,  3,  2,  3,  2,  1,…
 #> $ turnout                <dbl+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
-#> $ mip                    <dbl+lbl>  9,  0, 15, 15, 15,  6, 11,  9, 16, 15, 15,…
+#> $ mip                    <dbl+lbl> 18,  0, 15, 15, 15,  6, 11, 18, 16, 15, 15,…
 #> $ personal_retrospective <dbl> 0.5, 0.0, 0.0, 1.0, 1.0, 0.5, 1.0, 0.5, 1.0, 0.…
 #> $ efficacy_external      <dbl> 0, 1, 1, 1, 1, 0, NA, 0, 1, 0, 0, NA, 0, 1, 1, …
 #> $ efficacy_external2     <dbl> 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, NA, 0, 0, 1…
