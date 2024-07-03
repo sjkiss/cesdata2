@@ -786,7 +786,7 @@ table(ces00$previous_vote)
 
 #recode Previous Vote splitting Conservatives (cpsk6)
 # look_for(ces00, "vote")
-ces00$previous_vote3<-car::Recode(as.numeric(ces00$cpsk6), "1=1; 2=2; 3=3; 4=5; 5=4; else=NA")
+ces00$previous_vote3<-car::Recode(as.numeric(ces00$cpsk6), "1=1; 2=2; 3=3; 4=6; 5=4; else=NA")
 val_labels(ces00$previous_vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
 #checks
 val_labels(ces00$previous_vote3)

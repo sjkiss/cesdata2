@@ -767,12 +767,12 @@ val_labels(ces97$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 #table(ces97$previous_vote)
 
 #recode Previous Vote splitting Conservatives (cpsk6)
-# look_for(ces97, "vote")
-ces97$previous_vote3<-car::Recode(as.numeric(ces97$cpsk6), "1=1; 2=2; 3=3; 4=5; 5=4; 0=0; else=NA")
+ look_for(ces97, "vote")
+ces97$previous_vote3<-car::Recode(as.numeric(ces97$cpsk6), "1=1; 2=2; 3=3; 4=6; 5=4; 0=0; else=NA")
 val_labels(ces97$previous_vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, Reform=6)
 #checks
-#val_labels(ces97$previous_vote3)
-#table(ces97$previous_vote3)
+val_labels(ces97$previous_vote3)
+table(ces97$previous_vote3)
 
 #Add mode
 ces97$mode<-rep("Phone", nrow(ces97))
