@@ -197,29 +197,31 @@ val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
 
 
 #### recode Sector Health and Welfare ####
+ces19web$NOC21_4
+ces19web$cps19_sector
 ces19web %>%
   mutate(sector_welfare=case_when(
     cps19_sector==1~0,
     cps19_sector==4~0,
     #Health
-    cps19_sector==2&(NOC>30000&NOC<33110)~1,
+    cps19_sector==2&(NOC21_4>3000&NOC21_4<3311)~1,
     #Education, welfare social services  Managers
-    cps19_sector==2&(NOC>40020&NOC<40031)~1,
-    cps19_sector==2&(NOC>30000&NOC<33110)~1,
+    cps19_sector==2&(NOC21_4>4001&NOC21_4<4004)~1,
+    cps19_sector==2&(NOC21_4>3000&NOC21_4<3312)~1,
     #Teachers
-    cps19_sector==2&(NOC>41199&NOC<41222)~1,
+    cps19_sector==2&(NOC21_4>4119&NOC21_4<4123)~1,
     #Teachers assistants
-    cps19_sector==2&(NOC>43099&NOC<43110)~1,
+    cps19_sector==2&NOC21_4==4310~1,
     #Social Services
-    cps19_sector==2&(NOC>41299&NOC<41302)~1,
+    cps19_sector==2&(NOC21_4>4129&NOC<4131)~1,
     #employment counsellors
-    cps19_sector==2&(NOC>41319&NOC<41322)~1,
+    cps19_sector==2&NOC21_4==4132~1,
     #home workers
-    cps19_sector==2&(NOC>44099&NOC<44102)~1,
+    cps19_sector==2&(NOC21_4==4410)~1,
     cps19_sector==5~NA,
     cps19_employment>3&cps19_employment<13~ 0
   ))->ces19web
-with(ces19web, table(cps19_sector, sector, useNA = "ifany"))
+with(ces19web, table(cps19_sector, sector_welfare, useNA = "ifany"))
 val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
 #### recode SectorSecurity ####
 ces19web %>%

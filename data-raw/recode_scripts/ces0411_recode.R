@@ -184,8 +184,23 @@ val_labels(ces0411$sector04)<-c(Private=0, Public=1)
 #checks
 val_labels(ces0411$sector04)
 # table(ces0411$sector04)
-
-
+lookfor(ces0411, "occupation")
+ces0411 %>%
+  mutate(sector_welfare04=case_when(
+    #Socioal Scientists
+    sector04==1&( ces0411$ces04_PES_SD3 >2312& ces0411$ces04_PES_SD3 <2320)~1,
+    #Social Workers
+    sector04==1&( ces0411$ces04_PES_SD3 >2330& ces0411$ces04_PES_SD3 <2340)~1,
+    #Counsellors
+    sector04==1& ces0411$ces04_PES_SD3 ==2391~1,
+        # Education
+    sector04==1&( ces0411$ces04_PES_SD3 >2710& ces0411$ces04_PES_SD3 <2800)~1,
+    #Health
+    sector04==1&( ces0411$ces04_PES_SD3 >3111& ces0411$ces04_PES_SD3 <3160)~1,
+    sector04==0 ~0,
+TRUE~ NA
+  ))->ces0411
+with(ces0411, table(ces0411$sector_welfare04, useNA = "ifany"))
 #### #recode Party ID (ces04_CPS_Q1A@3 and  ces04_CPS_Q1B@3`) ***note needs `...` to recognize the variable***####
 look_for(ces0411, "yourself")
 ces0411 %>%

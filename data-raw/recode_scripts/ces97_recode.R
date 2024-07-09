@@ -121,8 +121,26 @@ val_labels(ces97$sector)<-c(Private=0, Public=1)
 val_labels(ces97$sector)
 # (ces97$sector)
 
+lookfor(ces97, "firm")
+ces97 %>%
+  mutate(sector_welfare=case_when(
+    #Socioal Scientists
+    sector==1&( cpsm6 >2312& cpsm6 <2320)~1,
+    #Social Workers
+    sector==1&( cpsm6 >2330& cpsm6 <2340)~1,
+    #Counsellors
+    sector==1& cpsm6 ==2391~1,
+    # Education
+    sector==1&( cpsm6 >2710& cpsm6 <2800)~1,
+    #Health
+    sector==1&( cpsm6 >3111& cpsm6 <3160)~1,
+    sector==0 ~0,
+    TRUE~ NA
+  ))->ces97
+table(ces97$sector_welfare)
 #### recode Party ID (cpsk1 and cpsk4)####
 look_for (ces97, "federal")
+lookfor(ces97, "occupation")
 ces97 %>%
   mutate(party_id=case_when(
     cpsk1==1 | cpsk4==1 ~ 1,
