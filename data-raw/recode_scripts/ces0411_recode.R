@@ -1864,6 +1864,12 @@ ces0411$race06<-Recode(as.numeric(ces0411$ces06_PES_I3), "1=0; 2=0.25; 3=0.5; 4=
 #checks
 table(ces0411$race06,  useNA = "ifany")
 
+#recode daycare (ces06_PES_G14)
+# look_for(ces0411, "daycare")
+ces0411$daycare06<-Recode(ces0411$ces06_PES_G14, "1=0; 5=1; 8=0.5; else=NA")
+#checks
+table(ces0411$daycare06, ces0411$ces06_PES_G14, useNA = "ifany" )
+
 #recode Previous Vote (ces06_CPS_Q6B)
 # look_for(ces0411, "vote")
 ces0411$previous_vote06<-Recode(ces0411$ces06_CPS_Q6B, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
@@ -3034,6 +3040,12 @@ ces0411$race08<-Recode(as.numeric(ces0411$ces08_PES_I3), "1=0; 2=0.25; 3=0.5; 4=
 #checks
 table(ces0411$race08,  useNA = "ifany")
 
+#recode daycare (ces08_PES_G14)
+# look_for(ces0411, "daycare")
+ces0411$daycare08<-Recode(ces0411$ces08_PES_G14, "1=0; 5=1; 8=0.5; else=NA")
+#checks
+table(ces0411$daycare08, ces0411$ces08_PES_G14, useNA = "ifany" )
+
 #recode Previous Vote (ces08_PES_K7)
 # look_for(ces0411, "vote")
 ces0411$previous_vote08<-Recode(ces0411$ces08_PES_K7, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
@@ -3871,6 +3883,12 @@ val_labels(ces0411$previous_vote11)<-c(Other=0, Liberal=1, Conservative=2, NDP=3
 #checks
 val_labels(ces0411$previous_vote11)
 table(ces0411$previous_vote11)
+
+#recode daycare (PES11_56)
+# look_for(ces0411, "daycare")
+ces0411$daycare11<-Recode(ces0411$PES11_56, "1=0; 5=1; 8=0.5; else=NA")
+#checks
+table(ces0411$daycare11, ces0411$PES11_56, useNA = "ifany" )
 
 # Add 2011 Election Variable
 table(ces0411$survey)

@@ -1162,6 +1162,12 @@ val_labels(ces15phone$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=
 val_labels(ces15phone$previous_vote)
 table(ces15phone$previous_vote)
 
+#recode daycare (PES15_56)
+# look_for(ces15phone, "daycare")
+ces15phone$daycare<-Recode(as.numeric(ces15phone$PES15_56), "1=0; 5=1; 8=0.5; else=NA")
+#checks
+ table(ces15phone$daycare, ces15phone$PES15_56 , useNA = "ifany" )
+
 # add Election
 ces15phone$election<-rep(2015, nrow(ces15phone))
 # Add Mode
