@@ -21,6 +21,7 @@ table(ces21$male)
 #Source the script in data-raw that reads in the 2021 occupation codes
 # and merges it with ces21
 source("data-raw/recode_scripts/ces21_NOC_recode.R")
+
 # Occupation
 tail(names(ces21))
 ces21$NOC21_4
@@ -237,6 +238,19 @@ val_labels(ces21$party_id)
 with(ces21, table(as_factor(party_id)))
 table(ces21$party_id, ces21$pid_party_en , useNA = "ifany" )
 nrow(ces21)
+
+#recode Party ID 2 (pid_party_en)
+#look_for(ces21, "fed_id")
+#ces21$party_id2<-Recode(ces21$cps21_fed_id, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=6; else=NA")
+#val_labels(ces21$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, PPC=6)
+#checks
+#val_labels(ces21$party_id2)
+#with(ces21, table(as_factor(party_id2)))
+#table(ces21$party_id2, cps21_fed_id , useNA = "ifany" )
+
+# keep these 2 variables an code in Stata
+#look_for(ces21, "cps21_ResponseId")
+#look_for(ces21, "cps21_fed_id_6_TEXT")
 
 #recode Vote (pes21_votechoice2021)
 look_for(ces21, "party did you vote")

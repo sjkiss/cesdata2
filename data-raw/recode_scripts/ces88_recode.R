@@ -127,6 +127,14 @@ val_labels(ces88$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces88$party_id)
 # table(ces88$party_id)
 
+#recode Party ID 2 (i1)
+# look_for(ces88, "identification")
+ces88$party_id2<-Recode(ces88$i1, "1=1; 2=2; 3=3; else=NA")
+val_labels(ces88$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces88$party_id2)
+ table(ces88$party_id2, ces88$i1)
+
 #recode Vote (xb2)
 # look_for(ces88, "vote")
 ces88$vote<-car::Recode(as.numeric(ces88$xb2), "2=1; 1=2; 3=3; 4=2; 5=0; else=NA")

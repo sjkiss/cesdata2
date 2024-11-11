@@ -174,6 +174,7 @@ ces15phone %>%
     PES15_92==9 ~NA_real_ ,
     PES15_92==8 ~NA_real_ ,
   ))->ces15phone
+
 #recode Party ID (PES15_59a)
 look_for(ces15phone, "identify")
 ces15phone$party_id<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 6=10; 0=0; else=NA")
@@ -181,6 +182,14 @@ val_labels(ces15phone$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 #checks
 val_labels(ces15phone$party_id)
 table(ces15phone$party_id)
+
+#recode Party ID 2 (PES15_59a)
+look_for(ces15phone, "identify")
+ces15phone$party_id2<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 6=10; 0=0; else=NA")
+val_labels(ces15phone$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, None=10)
+#checks
+val_labels(ces15phone$party_id2)
+table(ces15phone$party_id2)
 
 #recode Vote (PES15_6)
 # look_for(ces15phone, "party did you vote")

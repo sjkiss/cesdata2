@@ -207,6 +207,27 @@ val_labels(ces0411$party_id04)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces0411$party_id04)
 table(ces0411$party_id04)
 
+#recode Party ID 2 (ces04_CPS_Q1A@3 and  ces04_CPS_Q1B@3`) ***note needs `...` to recognize the variable***
+look_for(ces0411, "yourself")
+ces0411 %>%
+  mutate(party_id204=case_when(
+    `ces04_CPS_Q1A@3`==1 | `ces04_CPS_Q1B@3`==1 ~ 1,
+    `ces04_CPS_Q1A@3`==2 | `ces04_CPS_Q1B@3`==2 ~ 2,
+    `ces04_CPS_Q1A@3`==3 | `ces04_CPS_Q1B@3`==3 ~ 3,
+    `ces04_CPS_Q1A@3`==5 | `ces04_CPS_Q1B@3`==5 ~ 2,
+    `ces04_CPS_Q1A@3`==6 | `ces04_CPS_Q1B@3`==6 ~ 2,
+    `ces04_CPS_Q1A@3`==8 | `ces04_CPS_Q1B@3`==8 ~ 5,
+    `ces04_CPS_Q1A@3`==4 | `ces04_CPS_Q1B@3`==4 ~ 4,
+    `ces04_CPS_Q1A@3`==9 | `ces04_CPS_Q1B@3`==9 ~ 0,
+    `ces04_CPS_Q1A@3`==10 | `ces04_CPS_Q1B@3`==10 ~ 0,
+    `ces04_CPS_Q1A@3`==97 | `ces04_CPS_Q1B@3`==97 ~ 0,
+  ))->ces0411
+
+val_labels(ces0411$party_id204)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces0411$party_id204)
+table(ces0411$party_id204)
+
 #### #recode Vote (ces04_PES_A3@3')####
 # ***note needs `...`` to recognize the variable***
 # look_for(ces0411, "party did you vote")
@@ -1167,6 +1188,7 @@ ces0411 %>%
 
 table(ces0411$sector_welfare06)
 table(ces0411$sector_security06)
+
 #### #recode Party ID (ces06_CPS_Q1A and ces06_CPS_Q1B)####
 # look_for(ces0411, "yourself")
 ces0411 %>%
@@ -1184,6 +1206,24 @@ val_labels(ces0411$party_id06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id06)
 table(ces0411$party_id06)
+
+#recode Party ID 2 (ces06_CPS_Q1A and ces06_CPS_Q1B)
+# look_for(ces0411, "yourself")
+ces0411 %>%
+  mutate(party_id206=case_when(
+    ces06_CPS_Q1A==1 | ces06_CPS_Q1B==1 ~ 1,
+    ces06_CPS_Q1A==2 | ces06_CPS_Q1B==2 ~ 2,
+    ces06_CPS_Q1A==3 | ces06_CPS_Q1B==3 ~ 3,
+    ces06_CPS_Q1A==5 | ces06_CPS_Q1B==5 ~ 5,
+    ces06_CPS_Q1A==0 | ces06_CPS_Q1B==0 ~ 0,
+    ces06_CPS_Q1A==4 | ces06_CPS_Q1B==4 ~ 4,
+    ces06_CPS_Q1A==9 | ces06_CPS_Q1B==9 ~ 0,
+  ))->ces0411
+
+val_labels(ces0411$party_id206)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces0411$party_id206)
+table(ces0411$party_id206)
 
 #### #recode Vote (ces06_PES_B4A and ces06_PES_B4B) ####
 # look_for(ces0411, "party did you vote")
@@ -2175,6 +2215,14 @@ val_labels(ces0411$party_id08)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id08)
 table(ces0411$party_id08)
+
+#recode Party ID 2 (ces08_PES_K1)
+# look_for(ces0411, "yourself")
+ces0411$party_id208<-Recode(ces0411$ces08_PES_K1, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+val_labels(ces0411$party_id208)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces0411$party_id208)
+table(ces0411$party_id208)
 
 #### #recode Occupation (ces08_PES_S3_NOCS)####
 # look_for(ces0411, "occupation")
@@ -3259,6 +3307,14 @@ val_labels(ces0411$party_id11)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id11)
 table(ces0411$party_id11, useNA = "ifany" )
+
+#recode Party ID 2 (PES11_59a)
+# look_for(ces0411, "identify")
+ces0411$party_id211<-Recode(ces0411$PES11_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+val_labels(ces0411$party_id211)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces0411$party_id211)
+table(ces0411$party_id211, useNA = "ifany" )
 
 #### #recode Vote (PES11_6)####
 # look_for(ces0411, "party did you vote")

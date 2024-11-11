@@ -164,6 +164,14 @@ val_labels(ces93$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces93$party_id)
 table(ces93$party_id)
 
+#recode Party ID 2 (PESL1)
+look_for(ces93, "identification")
+ces93$party_id2<-Recode(ces93$PESL1, "1=1; 2=2; 3=3; 4=6; 5=4; 6=0; else=NA")
+val_labels(ces93$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces93$party_id2)
+table(ces93$party_id2, ces93$PESL1)
+
 #### vote####
 #recode Vote (PESA4)
 look_for(ces93, "vote")
