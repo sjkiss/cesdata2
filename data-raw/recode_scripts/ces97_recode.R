@@ -135,9 +135,12 @@ ces97 %>%
     #Health
     sector==1&( cpsm6 >3111& cpsm6 <3160)~1,
     sector==0 ~0,
-    TRUE~ NA
+    TRUE~ NA_integer_
   ))->ces97
-table(ces97$sector_welfare)
+ces97 %>%
+  group_by(sector, sector_welfare) %>%
+  count() %>%
+  as_factor()
 #### recode Party ID (cpsk1 and cpsk4)####
 look_for (ces97, "federal")
 lookfor(ces97, "occupation")

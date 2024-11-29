@@ -119,7 +119,8 @@ ces74 %>%
     V381> 0 & V381 < 7 ~ 0,
     V381==50 ~ 0,
   ))->ces74
-
+ces74$V395
+ces74$V395
 val_labels(ces74$sector)<-c(Private=0, Public=1)
 #checks
 val_labels(ces74$sector)

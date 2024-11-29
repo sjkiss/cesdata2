@@ -19,6 +19,7 @@
 # Introduction
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 The goal of this package is to facilitate collaboration and research on
@@ -62,9 +63,6 @@ ces21 %>%
 #> $ Status                <dbl+lbl> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
 #> $ Progress              <dbl> 100, 100, 100, 100, 100, 100, 100, 100, 100, 100…
 #> $ Duration__in_seconds_ <dbl> 818, 1403, 775, 825, 1660, 1332, 1240, 1594, 945…
-```
-
-``` r
 
 #As is CES1965
 
@@ -83,22 +81,22 @@ ces65 %>%
 These are the datasets currently available with the names with which
 they can be called.
 
-| Dataset title           |     Filename |                                                                                                 Notes                                                                                                  |
-|:------------------------|-------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| CES 1965                |      `ces65` |                                                                                                                                                                                                        |
-| CES 1968                |      `ces68` |                                                                                                                                                                                                        |
-| CES 1972                |  `ces72_nov` |                                                                          Only the November, post-election dataset is included                                                                          |
-| CES 1974-1979-1980      |      ces7980 |                                                               Notes about who is included in the 1980 dataset, how variables were used??                                                               |
-| CES 1984                |      `ces84` |                                                                                                                                                                                                        |
-| CES 1988                |      `ces88` |                                                                                                                                                                                                        |
-| CES 1993                |      `ces93` |                                                                                 Notes about Quebec referendum sample?                                                                                  |
-| CES 2000                |      `ces00` |                                                                                                                                                                                                        |
-| CES 2004-2006-2008-2011 |    `ces0411` | this is the combined file for campaign period, post-election and mailback surveys for each of four federal elections. It requires special handling in the construction of a master dataset. See below. |
-| CES 2015 Phone          | `ces15phone` |                                                                                         Phone survey from 2015                                                                                         |
-| CES 2015 Web            |   `ces15web` |                                                                                          Web survey from 2015                                                                                          |
-| CES 2019 Phone          | `ces19phone` |                                                                                         Phone survey from 2019                                                                                         |
-| CES 2019 Web            |   `ces19web` |                                                                                         Phone survey from 2019                                                                                         |
-| CES 2021 Web            |      `ces21` |                                                                                         Werb survey from 2021                                                                                          |
+| Dataset title | Filename | Notes |
+|:---|---:|:--:|
+| CES 1965 | `ces65` |  |
+| CES 1968 | `ces68` |  |
+| CES 1972 | `ces72_nov` | Only the November, post-election dataset is included |
+| CES 1974-1979-1980 | ces7980 | Notes about who is included in the 1980 dataset, how variables were used?? |
+| CES 1984 | `ces84` |  |
+| CES 1988 | `ces88` |  |
+| CES 1993 | `ces93` | Notes about Quebec referendum sample? |
+| CES 2000 | `ces00` |  |
+| CES 2004-2006-2008-2011 | `ces0411` | this is the combined file for campaign period, post-election and mailback surveys for each of four federal elections. It requires special handling in the construction of a master dataset. See below. |
+| CES 2015 Phone | `ces15phone` | Phone survey from 2015 |
+| CES 2015 Web | `ces15web` | Web survey from 2015 |
+| CES 2019 Phone | `ces19phone` | Phone survey from 2019 |
+| CES 2019 Web | `ces19web` | Phone survey from 2019 |
+| CES 2021 Web | `ces21` | Werb survey from 2021 |
 
 # Package Structure
 
@@ -189,22 +187,32 @@ Wherever possible, the following conventions have been used.
 
 This is an incomplete list of recoded and renamed variables.
 
-| Concept                                                                    |     Variable Name |                                                                    notes                                                                     |
-|:---------------------------------------------------------------------------|------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------:|
-| Demographics                                                               |                   |                                                                                                                                              |
-| Public Sector Employee                                                     |          `sector` |                                Dichotomous variable distinguishes public sector from private sector employees                                |
-| Public Sector Health Welfare and Education                                 |  `sector_welfare` |  Binary variable distinguishing public sector health, welfare and education employees from all other employees; only available from 2006 on  |
-| Security                                                                   | `sector_security` | Binary variable distinguishing security (police, forces, security guards, corrections) from all other employees; only available from 2006 on |
-| gender                                                                     |            `male` |                                               Binary variable distinguishing males from others                                               |
-| education                                                                  |          `degree` |                                            Binary variable distinguishing BA holders from others                                             |
-| Political                                                                  |                   |                                                                                                                                              |
-| Vote Choice                                                                |            `vote` |                   respondent vote choice from PES: groups reform, PCs, CA and Conservatives, includes BQ, Green and Other                    |
-| Vote Choice                                                                |           `vote3` |                                                   respondent vote choice separates out PPC                                                   |
-| Previous vote                                                              |   `previous_vote` |                                          respondent previous recalled vote, no split conservatives                                           |
-| Previous vote                                                              |  `previous_vote3` |                                               respondent previous recalled vote, splitting PPC                                               |
-| Ideology                                                                   |                   |                                                                                                                                              |
-| These have normally been coded to run from 0 to 1, liberal to conservative |                   |                                                                                                                                              |
-| Gay Rights                                                                 |      `gay_rights` |                                           Gay couples should be allowed to marry, usually from MBS                                           |
+| Concept | Variable Name | notes |
+|:---|---:|:--:|
+| Demographics |  |  |
+| Public Sector Employee | `sector` | Dichotomous variable distinguishes public sector from private sector employees |
+| Public Sector Health Welfare and Education | `sector_welfare` | Binary variable distinguishing public sector health, welfare and education employees from all other employees; only available from 2006 on |
+| Security | `sector_security` | Binary variable distinguishing security (police, forces, security guards, corrections) from all other employees; only available from 2006 on |
+| gender | `male` | Binary variable distinguishing males from others |
+| education | `degree` | Binary variable distinguishing BA holders from others |
+| Employment Status | `employment` | Binary variable, 1=employed, 2=unemployed |
+| Union Status | `union` | Respondent is member of a union;1=R is a member of a union, 0 =not a member of a union; not available for all years |
+| Union Status | `union_both` | Binary variable, 1=one member of household is union, 0=neither, available in most datasets |
+| Region | `region` | Labelled variable, 1=Atlantic, 2=Ontario, 3=West, northerners excluded |
+| Quebec | `quebec` | Labelled variable, 1=Quebec, 0=Not; northerners excluded |
+| Income | `income` | Household income, 5 category labelled variable, categories built on pre-existing income categories in provided datasets; 1=Lowest, 2=Lower Middle, 3=Middle, 4=Upper Middle, 5=Upper |
+| Income | `income2` | Same as `income` except attempts were made to map boundaries to nearest census quintiles |
+| Income | `income_tertile` | Same as `income2` except attempts were made to map boundaries to nearest census tertile |
+| Age | `age` | Age in years at time of survey |
+| Political |  |  |
+| Vote Choice | `vote` | respondent vote choice from PES: groups reform, PCs, CA and Conservatives, includes BQ, Green and Other |
+| Vote Choice | `vote3` | respondent vote choice separates out PPC |
+| Previous vote | `previous_vote` | respondent previous recalled vote, no split conservatives |
+| Previous vote | `previous_vote3` | respondent previous recalled vote, splitting PPC |
+| Ideology |  |  |
+| These have normally been coded to run from 0 to 1, liberal to conservative |  |  |
+| Gay Rights | `gay_rights` | Gay couples should be allowed to marry, usually from MBS |
+| Redistribution | `redistribution` |  |
 
 # Establishing A Usable Time Series
 
@@ -265,15 +273,9 @@ names(ces.list)<-c(1984,1988, 1993, 1997, 2000)
 # Check to see if ces84 gay_rights exists
 length(ces84$gay_rights) # Zero indicates it does not exist
 #> [1] 0
-```
-
-``` r
 #Check to see if ces88 gay_rights exists
 length(ces88$gay_rights) #3609 cases of gay_rights values
 #> [1] 3609
-```
-
-``` r
 # Construct common variables
 myvars<-c("gender", "vote", "gay_rights", "election")
 #Make data frame
@@ -401,13 +403,13 @@ The underlying data files look like this the following table, for *each*
 respondent, there are variables for the 2004, 2006, and 2008 surveys
 *whether or not* the respondent actually completed the surveys.
 
-| Respondent ID |    Survey     | `ces04_PES_K5A` |     `ces06_PES_B4A`     | `ces08_PES_B4B` |
-|:-------------:|:-------------:|:---------------:|:-----------------------:|:---------------:|
-|       1       |     2004      |    `Refused`    |           NA            |       NA        |
-|       2       |     2006      |       NA        | Liberal Party of Canada |       NA        |
-|       3       |     2008      |       NA        |           NA            |       NDP       |
-|       4       | 2004 and 2006 |      Other      | Liberal Party of Canada |       NA        |
-|       5       | 2006 and 2008 |       NA        |                         |                 |
+| Respondent ID | Survey | `ces04_PES_K5A` | `ces06_PES_B4A` | `ces08_PES_B4B` |
+|:--:|:--:|:--:|:--:|:--:|
+| 1 | 2004 | `Refused` | NA | NA |
+| 2 | 2006 | NA | Liberal Party of Canada | NA |
+| 3 | 2008 | NA | NA | NDP |
+| 4 | 2004 and 2006 | Other | Liberal Party of Canada | NA |
+| 5 | 2006 and 2008 | NA |  |  |
 
 Ultimately, each of these columns measure the same variable, the
 person’s vote cast, but at different time periods. As currently
@@ -418,11 +420,11 @@ As a result, we use the following naming conventions in this data-set
 for variables that have been recoded (e.g. small parties excluded,
 `Don't Know` responses set to `NA`, `Refused` set to `NA`, etc. )
 
-| Respondent ID |    Survey     | `ces04_PES_K5A` |     `ces06_PES_B4A`     | `ces08_PES_B4B` | `vote04` | `vote06` | `vote08` |
-|:-------------:|:-------------:|:---------------:|:-----------------------:|:---------------:|:--------:|:--------:|:--------:|
-|       1       |     2004      |    `Refused`    |           NA            |       NA        |    NA    |    NA    |    NA    |
-|       2       |     2006      |       NA        | Liberal Party of Canada |       NA        |    NA    | Liberal  |    NA    |
-|       4       | 2004 and 2006 |      Other      |         Liberal         |       NA        |    NA    | Liberal  |    NA    |
+| Respondent ID | Survey | `ces04_PES_K5A` | `ces06_PES_B4A` | `ces08_PES_B4B` | `vote04` | `vote06` | `vote08` |
+|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| 1 | 2004 | `Refused` | NA | NA | NA | NA | NA |
+| 2 | 2006 | NA | Liberal Party of Canada | NA | NA | Liberal | NA |
+| 4 | 2004 and 2006 | Other | Liberal | NA | NA | Liberal | NA |
 
 In order to combine these variables successfully into one tabular
 dataset, it is first necessary to: 1) split the 2004-2011 dataset into
@@ -673,9 +675,6 @@ ces04
 #One can compare the rows
 nrow(ces0411)
 #> [1] 13097
-```
-
-``` r
 nrow(ces04)
 #> [1] 2324
 ```
@@ -858,9 +857,6 @@ head(as_factor(ces))
 #> 4 <NA>               0.75  0.25     2000 Phone
 #> 5 Conservative       0.25  0.75     2000 Phone
 #> 6 <NA>               0     0.25     2000 Phone
-```
-
-``` r
 #Summarize
 summary(as_factor(ces))
 #>            vote        gay_rights         trad1           election   
@@ -921,6 +917,7 @@ You can open your Finder, or your PC equivalent and actually see it.
 
 <img src="man/figures/path.png" alt="Figure 1: Location of installed version of cesdata2" width="100%" />
 <p class="caption">
+
 Figure 1: Location of installed version of cesdata2
 </p>
 
@@ -1034,7 +1031,7 @@ Note: this script belongs in an *analysis* project, *not* in the
 
 library(tidyverse)
 #Install cesdata2
-#devtools::install_github("sjkiss/github")
+#devtools::install_github("sjkiss/cesdata2")
 library(cesdata2)
 
 #Seprate ces79 and ces80 to two separate files

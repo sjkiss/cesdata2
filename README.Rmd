@@ -134,6 +134,15 @@ This is an incomplete list of recoded and renamed variables.
 | Security   |`sector_security` | Binary variable distinguishing security (police, forces, security guards, corrections) from all other employees; only available from 2006 on | 
 |gender   |`male` | Binary variable distinguishing males from others | 
 |education|`degree` | Binary variable distinguishing BA holders from others | 
+|Employment Status | `employment` | Binary variable, 1=employed, 2=unemployed| 
+|Union Status | `union`|  Respondent is member of a union;1=R is a member of a union, 0 =not a member of a union; not available for all years| 
+|Union Status | `union_both`|  Binary variable, 1=one member of household is union, 0=neither, available in most datasets| 
+|Region | `region`|  Labelled variable, 1=Atlantic, 2=Ontario, 3=West, northerners excluded| 
+|Quebec | `quebec`|  Labelled variable, 1=Quebec, 0=Not; northerners excluded| 
+|Income | `income` | Household income, 5 category labelled variable, categories built on pre-existing income categories in provided datasets; 1=Lowest, 2=Lower Middle, 3=Middle, 4=Upper Middle, 5=Upper |
+|Income | `income2`| Same as `income` except attempts were made to map boundaries to nearest census quintiles|
+|Income | `income_tertile`| Same as `income2` except attempts were made to map boundaries to nearest census tertile| 
+|Age | `age` |Age in years at time of survey |
 | Political| |
 |Vote Choice | `vote` |respondent vote choice from PES: groups reform, PCs, CA and Conservatives, includes BQ, Green and Other|
 |Vote Choice | `vote3` |respondent vote choice separates out PPC|
@@ -142,6 +151,9 @@ This is an incomplete list of recoded and renamed variables.
 | Ideology | | |
 | These have normally been coded to run from 0 to 1, liberal to conservative| | |
 | Gay Rights | `gay_rights`| Gay couples should be allowed to marry, usually from MBS |  
+| Redistribution | `redistribution` | 
+
+
 # Establishing A Usable Time Series
 
 
@@ -516,7 +528,7 @@ Note: this script belongs in an *analysis* project, *not* in the `cesdata2` proj
 
 library(tidyverse)
 #Install cesdata2
-#devtools::install_github("sjkiss/github")
+#devtools::install_github("sjkiss/cesdata2")
 library(cesdata2)
 
 #Seprate ces79 and ces80 to two separate files

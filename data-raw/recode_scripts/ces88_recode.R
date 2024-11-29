@@ -348,7 +348,7 @@ ces88$death_penalty<-Recode(as.numeric(ces88$qf1), "1=0; 2=1; 8=0.5; else=NA")
 
 #recode Crime (qh11) (Left-Right)
 # look_for(ces88, "crime")
-#remotes::install_github('sjkiss/skpersonal')
+remotes::install_github('sjkiss/skpersonal')
 library(skpersonal)
 
 #ces88$crime<-skpersonal::revScale(as.numeric(ces88$qh11), reverse=T)
