@@ -283,10 +283,10 @@ ces0411$ces04_CPS_S4
 
 #recode Occupation3 as 6 class schema with self-employed (ces04_CPS_S4)
 # look_for(ces0411, "employ")
-ces0411$occupation04_3<-ifelse(ces0411$ces04_CPS_S4==1, 6, ces0411$occupation04)
-val_labels(ces0411$occupation04_3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+ces0411$occupation043<-ifelse(ces0411$ces04_CPS_S4==1, 6, ces0411$occupation04)
+val_labels(ces0411$occupation043)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
-val_labels(ces0411$occupation04_3)
+val_labels(ces0411$occupation043)
 # table(ces0411$occupation04_3)
 ####  #recode Income (ces04_CPS_S18)####
 # look_for(ces0411, "income")
@@ -1284,11 +1284,11 @@ val_labels(ces0411$occupation06)
 
 #recode Occupation3 as 6 class schema with self-employed (ces06_CPS_S4)
 # look_for(ces0411, "employ")
-ces0411$occupation06_3<-ifelse(ces0411$ces06_CPS_S4==1, 6, ces0411$occupation06)
-#ces0411$occupation06_3<-ifelse((ces0411$ces04_CPS_S4==1 & ces0411$ces06_RECALL==1), 6, ces0411$occupation06)
-val_labels(ces0411$occupation06_3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+ces0411$occupation063<-ifelse(ces0411$ces06_CPS_S4==1, 6, ces0411$occupation06)
+#ces0411$occupation063<-ifelse((ces0411$ces04_CPS_S4==1 & ces0411$ces06_RECALL==1), 6, ces0411$occupation06)
+val_labels(ces0411$occupation063)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
-val_labels(ces0411$occupation06_3)
+val_labels(ces0411$occupation063)
 # table(ces0411$occupation06_3)
 
 #### #recode Income (ces06_CPS_S18)####
@@ -2263,10 +2263,10 @@ ces0411 %>%
 
 #recode Occupation3 as 6 class schema with self-employed (ces08_CPS_S4)
 # look_for(ces0411, "employ")
-ces0411$occupation08_3<-ifelse(ces0411$ces08_CPS_S4==1, 6, ces0411$occupation08)
-val_labels(ces0411$occupation08_3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+ces0411$occupation083<-ifelse(ces0411$ces08_CPS_S4==1, 6, ces0411$occupation08)
+val_labels(ces0411$occupation083)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
-val_labels(ces0411$occupation08_3)
+val_labels(ces0411$occupation083)
 # table(ces0411$occupation08_3)
 
 #### #recode Income (ces08_CPS_S18A, ces08_CPS_S18B, ces08_PES_S9A, ces08_PES_S9B) ####
@@ -3316,11 +3316,11 @@ ces0411 %>%
 # table(ces0411$occupation11, useNA = "ifany")
 ces0411$CPS11_91
 
-ces0411$occupation11_3<-ifelse(ces0411$CPS11_91==1, 6, ces0411$occupation11)
-val_labels(ces0411$occupation11_3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+ces0411$occupation113<-ifelse(ces0411$CPS11_91==1, 6, ces0411$occupation11)
+val_labels(ces0411$occupation113)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 # table(ces0411$occupation11, ces0411$occupation11_3)
 #checks
-val_labels(ces0411$occupation11_3)
+val_labels(ces0411$occupation113)
 # table(ces0411$occupation11_3, useNA = "ifany" )
 
 #### #recode Income (CPS11_92 and CPS11_93) ####
