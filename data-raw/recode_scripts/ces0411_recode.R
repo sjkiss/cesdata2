@@ -3977,7 +3977,7 @@ table(ces0411$previous_vote11)
 
 #### Provincial Vote (PES11_68)
 look_for(ces0411, "vote")
-ces0411$prov_vote11<-Recode(ces0411$PES11_68, "1=1; 2=2; 3=3; 6=7; 5=8; 7=9; 0=0; 10=5; else=NA")
+ces0411$prov_vote11<-Recode(ces0411$PES11_68, "1=1; 2=2; 3=3; 4=4; 6=7; 5=8; 7=9; 0=0; 10=5; else=NA")
 val_labels(ces0411$prov_vote11)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7, ADQ=8, Wildrose=9)
 #checks
 val_labels(ces0411$prov_vote11)
