@@ -496,6 +496,14 @@ val_labels(ces7980$previous_vote80)<-c(Other=0, Liberal=1, Conservative=2, NDP=3
 #checks
 #val_labels(ces7980$previous_vote80)
 #table(ces7980$previous_vote80)
+
+#recode Provincial Vote (V1331)
+look_for(ces7980, "vote")
+ces7980$prov_vote<-car::Recode(as.numeric(ces7980$V1331), "1=1; 2=2; 3=3; 4:6=0; 7=4; else=NA")
+val_labels(ces7980$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5)
+#checks
+val_labels(ces7980$prov_vote)
+table(ces7980$prov_vote)
 #
 # #Empty variables that are not available pre-88
 # ces7980$redistribution<-rep(NA, nrow(ces7980))

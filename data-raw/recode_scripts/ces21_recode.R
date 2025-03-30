@@ -801,6 +801,15 @@ val_labels(ces21$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 val_labels(ces21$previous_vote)
 table(ces21$previous_vote)
 
+#recode Provincial Vote (pes21_provvote)
+# look_for(ces21, "vote")
+ces21$prov_vote<-car::Recode(as.numeric(ces21$pes21_provvote), "1=1; 7=2; 11=2; 2=3; 3=5; 4=10; 5=4; 6=11; 8:9=0; 10=7; 12:14=0; else=NA")
+val_labels(ces21$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7,
+                                  ADQ=8, Wildrose=9, CAQ=10, QS=11)
+#checks
+val_labels(ces21$prov_vote)
+table(ces21$prov_vote)
+
 #glimpse(ces21)
 table(ces21$occupation)
 nrow(ces21)

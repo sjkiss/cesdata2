@@ -1171,6 +1171,15 @@ val_labels(ces15phone$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=
 val_labels(ces15phone$previous_vote)
 table(ces15phone$previous_vote)
 
+#recode Provincial Vote (PES15_83)
+# look_for(ces15phone, "vote")
+ces15phone$prov_vote<-car::Recode(as.numeric(ces15phone$PES15_83), "1=1; 2=2; 3=3; 4=4; 0=0; 5=10; 6=7; 7=9; 11=11; 12=5; else=NA")
+val_labels(ces15phone$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7,
+                                    ADQ=8, Wildrose=9, CAQ=10, QS=11)
+#checks
+val_labels(ces15phone$prov_vote)
+table(ces15phone$prov_vote)
+
 #recode daycare (PES15_56)
 # look_for(ces15phone, "daycare")
 ces15phone$daycare<-Recode(as.numeric(ces15phone$PES15_56), "1=0; 5=1; 8=0.5; else=NA")

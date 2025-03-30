@@ -252,6 +252,14 @@ val_labels(ces65$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 val_labels(ces65$previous_vote)
 table(ces65$previous_vote)
 
+#recode Provincial Vote (v269)
+# look_for(ces65, "vote")
+ces65$prov_vote<-car::Recode(as.numeric(ces65$v269), "12=1; 11=2; 13=3; 14:16=0; else=NA")
+val_labels(ces65$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5)
+#checks
+val_labels(ces65$prov_vote)
+table(ces65$prov_vote)
+
 #Empty variables that are not available pre-88
 # ces65$redistribution<-rep(NA, nrow(ces65))
 # ces65$market_liberalism<-rep(NA, nrow(ces65))

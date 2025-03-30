@@ -556,7 +556,6 @@ ces0411$trad042<-ces0411$gay_rights04
 # table(ces0411$trad046)
 # table(ces0411$trad047)
 
-
 #Remove Value Labels
 ces0411 %>%
   mutate(across(.cols=num_range('trad04', 1:7), remove_val_labels)) ->ces0411
@@ -939,6 +938,25 @@ val_labels(ces0411$previous_vote043)<-c(Other=0, Liberal=1, Conservative=2, NDP=
 val_labels(ces0411$previous_vote043)
 table(ces0411$previous_vote043)
 
+#### Provincial Vote (ces04_PES_K8A & ces04_PES_K8B)
+look_for(ces0411, "province")
+  ces0411 %>%
+  mutate(prov_vote04=case_when(
+    ces04_PES_K8A==1 | ces04_PES_K8B==1 ~ 1,
+    ces04_PES_K8A==2 | ces04_PES_K8B==2 ~ 2,
+    ces04_PES_K8A==3 | ces04_PES_K8B==3 ~ 3,
+    ces04_PES_K8A==4 | ces04_PES_K8B==4 ~ 6,
+    ces04_PES_K8A==5 | ces04_PES_K8B==5 ~ 6,
+    ces04_PES_K8A==6 | ces04_PES_K8B==6 ~ 0,
+    ces04_PES_K8A==7 | ces04_PES_K8B==7 ~ 4,
+    ces04_PES_K8A==8 | ces04_PES_K8B==8 ~ 8,
+    ces04_PES_K8A==9 | ces04_PES_K8B==9 ~ 7,
+    ces04_PES_K8A==11 | ces04_PES_K8B==11 ~ 5,
+  ))->ces0411
+val_labels(ces0411$prov_vote04)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7, ADQ=8)
+#checks
+val_labels(ces0411$prov_vote04)
+table(ces0411$prov_vote04)
 
 # Add election04 variable
 ces0411 %>%
@@ -946,6 +964,7 @@ ces0411 %>%
     str_detect(survey, "04")~ 2004
   ))->ces0411
 table(ces0411$election04, useNA = "ifany")
+
 ###Recode 2006 2nd ####
 
 # Gender done at top
@@ -1917,6 +1936,14 @@ val_labels(ces0411$previous_vote06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3
 #checks
 val_labels(ces0411$previous_vote06)
 table(ces0411$previous_vote06)
+
+#### Provincial Vote (ces06_PES_SD6)
+look_for(ces0411, "province")
+ces0411$prov_vote06<-Recode(ces0411$ces06_PES_SD6, "1=1; 2=2; 3=3; 7=4; 9=7; 8=8; 0=0; 5=5; else=NA")
+val_labels(ces0411$prov_vote06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7, ADQ=8)
+#checks
+val_labels(ces0411$prov_vote06)
+table(ces0411$prov_vote06)
 
 ces0411 %>%
   mutate(election06=case_when(
@@ -3111,7 +3138,15 @@ ces0411 %>%
   select(survey, election08)
 table(ces0411$election08, useNA = "ifany")
 
-#### recode Environment Spend (ces04_PES_D1F)
+#### Provincial Vote (ces08_PES_PROV_VOTE1)
+look_for(ces0411, "vote")
+ces0411$prov_vote08<-Recode(ces0411$ces08_PES_PROV_VOTE1, "1=1; 2=2; 3=3; 7=4; 9=7; 8=8; 0=0; 10=5; else=NA")
+val_labels(ces0411$prov_vote08)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7, ADQ=8)
+#checks
+val_labels(ces0411$prov_vote08)
+table(ces0411$prov_vote08)
+
+#### recode Environment Spend (ces08_PES_D1F)
 # look_for(ces0411, "env")
 ces0411$enviro_spend08<-Recode(as.numeric(ces0411$ces08_PES_D1F), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
 #checks
@@ -3939,6 +3974,14 @@ val_labels(ces0411$previous_vote11)<-c(Other=0, Liberal=1, Conservative=2, NDP=3
 #checks
 val_labels(ces0411$previous_vote11)
 table(ces0411$previous_vote11)
+
+#### Provincial Vote (PES11_68)
+look_for(ces0411, "vote")
+ces0411$prov_vote11<-Recode(ces0411$PES11_68, "1=1; 2=2; 3=3; 6=7; 5=8; 7=9; 0=0; 10=5; else=NA")
+val_labels(ces0411$prov_vote11)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7, ADQ=8, Wildrose=9)
+#checks
+val_labels(ces0411$prov_vote11)
+table(ces0411$prov_vote11)
 
 #recode daycare (PES11_56)
 # look_for(ces0411, "daycare")

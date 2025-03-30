@@ -657,6 +657,14 @@ val_labels(ces88$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 #val_labels(ces88$previous_vote)
 #table(ces88$previous_vote)
 
+#recode Provincial Vote (b9)
+# look_for(ces88, "vote")
+ces88$prov_vote<-car::Recode(as.numeric(ces88$b9), "2=1; 1=2; 3=3; 4=0; 5=4; 6=0; else=NA")
+val_labels(ces88$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5)
+#checks
+val_labels(ces88$prov_vote)
+ table(ces88$prov_vote)
+
 glimpse(ces88)
 #Add mode
 ces88$mode<-rep("Phone", nrow(ces88))

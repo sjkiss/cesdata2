@@ -746,5 +746,14 @@ val_labels(ces19web$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3,
 val_labels(ces19web$previous_vote)
 table(ces19web$previous_vote)
 
+#recode Provincial Vote (pes19_provvote)
+# look_for(ces19web, "vote")
+ces19web$prov_vote<-car::Recode(as.numeric(ces19web$pes19_provvote), "281=1; 292=2; 290=2; 288=2; 282=3; 285=4; 293=0; 284=10; 291=7; 289=0; 286=11; 283=5; 298=0; 295=0; else=NA")
+val_labels(ces19web$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7,
+                                    ADQ=8, Wildrose=9, CAQ=10, QS=11)
+#checks
+val_labels(ces19web$prov_vote)
+table(ces19web$prov_vote)
+
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))
