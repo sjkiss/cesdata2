@@ -505,5 +505,4 @@ table(ces7980$election, ces7980$election80, useNA = "ifany")
 # THEY WILL SHOW UP IN THE CONSTRUCTION OF CES IN THE MASTER FILE
 #
 
-
 save(ces7980, file=here("data/ces7980.rda"))

@@ -649,6 +649,8 @@ val_labels(ces88$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 #val_labels(ces88$previous_vote)
 #table(ces88$previous_vote)
 
+#### Knowledge
+lookfor(ces88, "name")
 glimpse(ces88)
 #Add mode
 ces88$mode<-rep("Phone", nrow(ces88))
