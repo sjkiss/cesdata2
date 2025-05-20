@@ -109,6 +109,14 @@ val_labels(ces19phone$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces19phone$employment)
 # table(ces19phone$employment , ces19phone$q68 , useNA = "ifany" )
 
+#recode Unemployed (q68)
+# look_for(ces19phone, "employment")
+ces19phone$unemployed<-Recode(ces19phone$q68, "1:3=0; 9:11=0; 5=1; else=NA")
+val_labels(ces19phone$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces19phone$unemployed)
+table(ces19phone$unemployed)
+
 #recode Sector (p53 & q68)
 # look_for(ces19phone, "public")
 ces19phone %>%
@@ -187,6 +195,14 @@ val_labels(ces19phone$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, B
 #checks
 val_labels(ces19phone$party_id2)
 table(ces19phone$party_id2, ces19phone$p47 , useNA = "ifany" )
+
+#recode Party ID 3 *(not asked in campaign wave)
+
+#recode Party closeness (p48)
+look_for(ces19phone, "close")
+ces19phone$party_close<-Recode(ces19phone$p48, "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces19phone$p48 , ces19phone$party_close, useNA = "ifany" )
 
 #recode Vote (p3)
 # look_for(ces19phone, "party did you vote")

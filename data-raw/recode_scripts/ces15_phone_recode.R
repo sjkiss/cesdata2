@@ -117,6 +117,14 @@ val_labels(ces15phone$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces15phone$employment)
 # table(ces15phone$employment, useNA = "ifany" )
 
+#recode Unemployed (CPS15_91)
+# look_for(ces15phone, "employment")
+ces15phone$unemployed<-Recode(ces15phone$CPS15_91, "1:2=0; 9:11=0; 4=1; else=NA")
+val_labels(ces15phone$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces15phone$unemployed)
+table(ces15phone$unemployed)
+
 #recode Sector (PES15_92 & CPS15_91)
 # look_for(ces15phone, "company")
 # look_for(ces15phone, "private")
@@ -177,7 +185,7 @@ ces15phone %>%
 
 #recode Party ID (PES15_59a)
 look_for(ces15phone, "identify")
-ces15phone$party_id<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 6=10; 0=0; else=NA")
+ces15phone$party_id<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
 val_labels(ces15phone$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, None=10)
 #checks
 val_labels(ces15phone$party_id)
@@ -185,11 +193,25 @@ table(ces15phone$party_id)
 
 #recode Party ID 2 (PES15_59a)
 look_for(ces15phone, "identify")
-ces15phone$party_id2<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 6=10; 0=0; else=NA")
+ces15phone$party_id2<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
 val_labels(ces15phone$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, None=10)
 #checks
 val_labels(ces15phone$party_id2)
 table(ces15phone$party_id2)
+
+#recode Party ID 3 (CPS15_71)
+look_for(ces15phone, "identify")
+ces15phone$party_id3<-Recode(ces15phone$CPS15_71, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+val_labels(ces15phone$party_id3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, None=10)
+#checks
+val_labels(ces15phone$party_id3)
+table(ces15phone$party_id3)
+
+#recode Party closeness (CPS15_72)
+look_for(ces15phone, "close")
+ces15phone$party_close<-Recode(ces15phone$CPS15_72, "1=1; 3=0.5; 5=0; else=NA")
+#checks
+table(ces15phone$CPS15_72 , ces15phone$party_close, useNA = "ifany" )
 
 #recode Vote (PES15_6)
 # look_for(ces15phone, "party did you vote")

@@ -124,6 +124,8 @@ val_labels(ces72_nov$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces72_nov$party_id2)
 table(ces72_nov$party_id2, ces72_nov$qi)
 
+#recode Party closeness (not available)
+
 #recode Vote (qa13a1a)
 # look_for(ces72_nov, "vote")
 ces72_nov$vote<-Recode(ces72_nov$qa13a1a, "2=1; 1=2; 3=3; 4:8=0; else=NA")
