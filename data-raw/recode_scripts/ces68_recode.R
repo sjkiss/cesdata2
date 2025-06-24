@@ -140,6 +140,14 @@ val_labels(ces68$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces68$party_id)
 # table(ces68$party_id)
 
+#recode Party ID 2 (var122)
+# look_for(ces68, "affiliation")
+ces68$party_id2<-Recode(ces68$var122, "1=1; 2=2; 3=3; 4:11=0; else=NA")
+val_labels(ces68$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces68$party_id2)
+table(ces68$party_id2, ces68$var122)
+
 #recode Vote (var180)
 # look_for(ces68, "vote")
 ces68$vote<-Recode(ces68$var180, "2=1; 3=2; 4=3; 5:8=0; else=NA")
@@ -326,6 +334,15 @@ val_labels(ces68$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 #checks
 #val_labels(ces68$previous_vote)
 #table(ces68$previous_vote)
+
+#recode Provincial Vote (var178)
+# look_for(ces68, "vote")
+ces68$prov_vote<-car::Recode(as.numeric(ces68$var178), "2=1; 3=2; 4=3; 5:8=0; else=NA")
+val_labels(ces68$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5)
+#checks
+val_labels(ces68$prov_vote)
+table(ces68$prov_vote)
+
 
 #Empty variables that are not available pre-88
 # ces68$redistribution<-rep(NA, nrow(ces68))

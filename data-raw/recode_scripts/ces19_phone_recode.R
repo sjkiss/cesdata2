@@ -180,6 +180,14 @@ val_labels(ces19phone$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 val_labels(ces19phone$party_id)
 table(ces19phone$party_id, ces19phone$p47 , useNA = "ifany" )
 
+#recode Party ID 2 (p47)
+# look_for(ces19phone, "closest")
+ces19phone$party_id2<-Recode(ces19phone$p47, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=6; else=NA")
+val_labels(ces19phone$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4)
+#checks
+val_labels(ces19phone$party_id2)
+table(ces19phone$party_id2, ces19phone$p47 , useNA = "ifany" )
+
 #recode Vote (p3)
 # look_for(ces19phone, "party did you vote")
 ces19phone$vote<-Recode(ces19phone$p3, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=2; else=NA")

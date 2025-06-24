@@ -174,6 +174,7 @@ ces15phone %>%
     PES15_92==9 ~NA_real_ ,
     PES15_92==8 ~NA_real_ ,
   ))->ces15phone
+
 #recode Party ID (PES15_59a)
 look_for(ces15phone, "identify")
 ces15phone$party_id<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 6=10; 0=0; else=NA")
@@ -181,6 +182,14 @@ val_labels(ces15phone$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 #checks
 val_labels(ces15phone$party_id)
 table(ces15phone$party_id)
+
+#recode Party ID 2 (PES15_59a)
+look_for(ces15phone, "identify")
+ces15phone$party_id2<-Recode(ces15phone$PES15_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 6=10; 0=0; else=NA")
+val_labels(ces15phone$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, None=10)
+#checks
+val_labels(ces15phone$party_id2)
+table(ces15phone$party_id2)
 
 #recode Vote (PES15_6)
 # look_for(ces15phone, "party did you vote")
@@ -1161,6 +1170,21 @@ val_labels(ces15phone$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=
 #checks
 val_labels(ces15phone$previous_vote)
 table(ces15phone$previous_vote)
+
+#recode Provincial Vote (PES15_83)
+# look_for(ces15phone, "vote")
+ces15phone$prov_vote<-car::Recode(as.numeric(ces15phone$PES15_83), "1=1; 2=2; 3=3; 4=4; 0=0; 5=10; 6=7; 7=9; 11=11; 12=5; else=NA")
+val_labels(ces15phone$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7,
+                                    ADQ=8, Wildrose=9, CAQ=10, QS=11)
+#checks
+val_labels(ces15phone$prov_vote)
+table(ces15phone$prov_vote)
+
+#recode daycare (PES15_56)
+# look_for(ces15phone, "daycare")
+ces15phone$daycare<-Recode(as.numeric(ces15phone$PES15_56), "1=0; 5=1; 8=0.5; else=NA")
+#checks
+ table(ces15phone$daycare, ces15phone$PES15_56 , useNA = "ifany" )
 
 # add Election
 ces15phone$election<-rep(2015, nrow(ces15phone))

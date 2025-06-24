@@ -159,6 +159,23 @@ val_labels(ces97$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces97$party_id)
 table(ces97$party_id)
 
+# recode Party ID 2 (cpsk1 and cpsk4)
+look_for (ces97, "federal")
+ces97 %>%
+  mutate(party_id2=case_when(
+    cpsk1==1 | cpsk4==1 ~ 1,
+    cpsk1==2 | cpsk4==2 ~ 2,
+    cpsk1==3 | cpsk4==3 ~ 3,
+    cpsk1==4 | cpsk4==4 ~ 6,
+    cpsk1==5 | cpsk4==5 ~ 4,
+    cpsk1==6 | cpsk4==6 ~ 0,
+  ))->ces97
+
+val_labels(ces97$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces97$party_id2)
+table(ces97$party_id2)
+
 ####recode Vote (pesa4) ####
 # (ces97, "vote")
 ces97$vote<-Recode(ces97$pesa4, "1=1; 2=2; 3=3; 5=4; 4=2; 0=0; else=NA")
@@ -794,6 +811,14 @@ val_labels(ces97$previous_vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, B
 #checks
 val_labels(ces97$previous_vote3)
 table(ces97$previous_vote3)
+
+#recode Provincial Vote (pesh20)
+# look_for(ces97, "vote")
+ces97$prov_vote<-car::Recode(as.numeric(ces97$pesh20), "1=1; 2=2; 3=3; 4=0; 5=4; 6:7=0; 9=0; 8=6; else=NA")
+val_labels(ces97$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6)
+#checks
+val_labels(ces97$prov_vote)
+table(ces97$prov_vote)
 
 #Add mode
 ces97$mode<-rep("Phone", nrow(ces97))

@@ -154,6 +154,14 @@ val_labels(ces84$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces84$party_id)
 # table(ces84$party_id)
 
+#recode Party ID 2 (VAR081)
+# look_for(ces84, "fed. id")
+ces84$party_id2<-Recode(ces84$VAR081, "1=1; 2=2; 3=3; 0=0; 4:19=0; else=NA")
+val_labels(ces84$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces84$party_id2)
+ table(ces84$party_id2, ces84$VAR081)
+
 #recode Vote (VAR125)
 # look_for(ces84, "vote")
 ces84$vote<-Recode(ces84$VAR125, "1=1; 2=2; 3=3; 9=5; 15=2; 4:8=0; 10:12=0; 14=0; 16:20=0; else=NA")
@@ -373,6 +381,14 @@ val_labels(ces84$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 #checks
 #val_labels(ces84$previous_vote)
 #table(ces84$previous_vote)
+
+#recode Provincial Vote (VAR262)
+# look_for(ces84, "vote")
+ces84$prov_vote<-car::Recode(as.numeric(ces84$VAR262), "1=1; 2=2; 3=3; 4=0; 6=4; 7:14=0; else=NA")
+val_labels(ces84$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5)
+#checks
+val_labels(ces84$prov_vote)
+table(ces84$prov_vote)
 
 #Empty variables that are not available pre-88
 # ces84$redistribution<-rep(NA, nrow(ces84))

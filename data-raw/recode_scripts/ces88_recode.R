@@ -127,6 +127,14 @@ val_labels(ces88$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces88$party_id)
 # table(ces88$party_id)
 
+#recode Party ID 2 (i1)
+# look_for(ces88, "identification")
+ces88$party_id2<-Recode(ces88$i1, "1=1; 2=2; 3=3; else=NA")
+val_labels(ces88$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces88$party_id2)
+ table(ces88$party_id2, ces88$i1)
+
 #recode Vote (xb2)
 # look_for(ces88, "vote")
 ces88$vote<-car::Recode(as.numeric(ces88$xb2), "2=1; 1=2; 3=3; 4=2; 5=0; else=NA")
@@ -648,6 +656,14 @@ val_labels(ces88$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bl
 #checks
 #val_labels(ces88$previous_vote)
 #table(ces88$previous_vote)
+
+#recode Provincial Vote (b9)
+# look_for(ces88, "vote")
+ces88$prov_vote<-car::Recode(as.numeric(ces88$b9), "2=1; 1=2; 3=3; 4=0; 5=4; 6=0; else=NA")
+val_labels(ces88$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5)
+#checks
+val_labels(ces88$prov_vote)
+ table(ces88$prov_vote)
 
 glimpse(ces88)
 #Add mode

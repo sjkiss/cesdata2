@@ -223,6 +223,7 @@ ces19web %>%
   ))->ces19web
 with(ces19web, table(cps19_sector, sector_welfare, useNA = "ifany"))
 val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
+
 #### recode SectorSecurity ####
 ces19web %>%
   mutate(sector_security=case_when(
@@ -242,6 +243,7 @@ ces19web %>%
     cps19_sector==5~NA,
     cps19_employment>3&cps19_employment<13~ 0
   ))->ces19web
+
 #### recode Income ####
 lookfor(ces19web, "income")
 ces19web$cps19_income_number
@@ -313,6 +315,14 @@ val_labels(ces19web$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc
 #checks
 val_labels(ces19web$party_id)
 table(ces19web$party_id, ces19web$cps19_fed_id , useNA = "ifany" )
+
+#recode Party ID 2 (cps19_fed_id)
+look_for(ces19web, "fed_id")
+ces19web$party_id2<-Recode(ces19web$cps19_fed_id, "1=1; 2=2; 3=3; 4=4; 5=5; 6=6; 7=0; 8:9=NA")
+val_labels(ces19web$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19web$party_id2)
+table(ces19web$party_id2, ces19web$cps19_fed_id , useNA = "ifany" )
 
 #### recode Vote (pes21_votechoice2019) ####
 lookfor(ces19web, "vote")
@@ -737,6 +747,15 @@ val_labels(ces19web$previous_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3,
 #checks
 val_labels(ces19web$previous_vote)
 table(ces19web$previous_vote)
+
+#recode Provincial Vote (pes19_provvote)
+# look_for(ces19web, "vote")
+ces19web$prov_vote<-car::Recode(as.numeric(ces19web$pes19_provvote), "281=1; 292=2; 290=2; 288=2; 282=3; 285=4; 293=0; 284=10; 291=7; 289=0; 286=11; 283=5; 298=0; 295=0; else=NA")
+val_labels(ces19web$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7,
+                                    ADQ=8, Wildrose=9, CAQ=10, QS=11)
+#checks
+val_labels(ces19web$prov_vote)
+table(ces19web$prov_vote)
 
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))

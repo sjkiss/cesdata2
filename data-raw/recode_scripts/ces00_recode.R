@@ -153,6 +153,23 @@ val_labels(ces00$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces00$party_id)
 table(ces00$party_id)
 
+#recode Party ID 2 (pesk1a and pesk1ab)
+look_for(ces00, "yourself")
+ces00 %>%
+  mutate(party_id2=case_when(
+    pesk1a==1 | pesk1b==1 ~ 1,
+    pesk1a==2 | pesk1b==2 ~ 2,
+    pesk1a==3 | pesk1b==3 ~ 3,
+    pesk1a==4 | pesk1b==4 ~ 6,
+    pesk1a==0 | pesk1b==0 ~ 0,
+    pesk1a==5 | pesk1b==5 ~ 4,
+  ))->ces00
+
+val_labels(ces00$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces00$party_id2)
+table(ces00$party_id2)
+
 ####vote ####
 #recode Vote (pesa3a and pesa3b)
 # look_for(ces00, "vote")
@@ -791,6 +808,14 @@ val_labels(ces00$previous_vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, B
 #checks
 val_labels(ces00$previous_vote3)
 table(ces00$previous_vote3)
+
+#recode Provincial Vote (pesn5)
+# look_for(ces00, "vote")
+ces00$prov_vote<-car::Recode(as.numeric(ces00$pesn5), "1=1; 2=2; 3=3; 4:5=6; 6=0; 7=4; 8=8; 9=7; else=NA")
+val_labels(ces00$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7, ADQ=8)
+#checks
+val_labels(ces00$prov_vote)
+table(ces00$prov_vote)
 
 glimpse(ces00)
 #Add mode

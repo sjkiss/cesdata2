@@ -181,6 +181,14 @@ val_labels(ces93$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces93$party_id)
 table(ces93$party_id)
 
+#recode Party ID 2 (PESL1)
+look_for(ces93, "identification")
+ces93$party_id2<-Recode(ces93$PESL1, "1=1; 2=2; 3=3; 4=6; 5=4; 6=0; else=NA")
+val_labels(ces93$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces93$party_id2)
+table(ces93$party_id2, ces93$PESL1)
+
 #### vote####
 #recode Vote (PESA4)
 look_for(ces93, "vote")
@@ -859,6 +867,14 @@ val_labels(ces93$previous_vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, B
 #checks
 val_labels(ces93$previous_vote3)
 table(ces93$previous_vote3)
+
+#recode Provincial Vote (CPSM12)
+# look_for(ces93, "vote")
+ces93$prov_vote<-car::Recode(as.numeric(ces93$CPSM12), "1=1; 2=2; 3=3; 4=0; 5=4; 6=0; else=NA")
+val_labels(ces93$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5)
+#checks
+val_labels(ces93$prov_vote)
+table(ces93$prov_vote)
 
 glimpse(ces93)
 lookfor(ces93, "election")
