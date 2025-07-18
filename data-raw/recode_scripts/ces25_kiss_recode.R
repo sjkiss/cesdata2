@@ -41,6 +41,11 @@ ces25b %>%
     cps25_income2>3&cps25_income2<7~2,
     cps25_income2>6~3,
       ))->ces25b
-
+#reweight the ces25b file now that the income tertile has been assigned
 ces25b_des<-as_survey_design(subset(ces25b, !is.na(cps25_weight_kiss_module)), weights=cps25_weight_kiss_module)
+# check the income tertiles after weighting
 svytable(~income_tertile, design=ces25b_des)
+
+#Write out the dataset
+# #### Resave the file in the .rda file
+save(ces25b, file=here("data/ces25b.rda"))
