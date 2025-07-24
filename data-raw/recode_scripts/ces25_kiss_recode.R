@@ -1,8 +1,11 @@
 # This script loads and recodes CES25 Kiss module
 library(haven)
 library(here)
+library(tidyverse)
+library(srvyr)
+library(survey)
 #Load data
-ces25b<-read_dta(here("data-raw/CES 25 Kiss Module Final.dta"))
+ces25b<-read_dta(here("data-raw/CES 25 Kiss Module Final (with occupation Qs).dta"))
 library(labelled)
 library(car)
 look_for(ces25b, "class")
@@ -45,7 +48,8 @@ ces25b %>%
 ces25b_des<-as_survey_design(subset(ces25b, !is.na(cps25_weight_kiss_module)), weights=cps25_weight_kiss_module)
 # check the income tertiles after weighting
 svytable(~income_tertile, design=ces25b_des)
-
+?`srvyr-package`
 #Write out the dataset
 # #### Resave the file in the .rda file
 save(ces25b, file=here("data/ces25b.rda"))
+#write_sav(ces25b, path=here("data-raw/ces25b_with_occupation.sav"))

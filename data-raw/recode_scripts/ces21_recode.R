@@ -9,7 +9,7 @@ library(labelled)
 library(stringr)
 library(here)
 #Load data
-ces21<-read_dta(file=here("data-raw/ces21.dta"))
+ces21<-read_sav(file=here("data-raw/CES2021tab.sav"))
 n_on_import<-nrow(ces21)
 
 #recode Gender
@@ -312,8 +312,8 @@ ces21 %>%
     cps21_income_cat==8 | cps21_income_number> 150000 & cps21_income_number < 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 ~ 3,
   ))->ces21
 
-val_labels(ces19web$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
-table(ces19web$income_tertile)
+val_labels(ces21$income_tertile)<-c(Lowest=1,  Middle=2, Highest=3)
+#table(ces19web$income_tertile)
 
 #### recode Household size (cps21_household)####
 # look_for(ces21, "household")
