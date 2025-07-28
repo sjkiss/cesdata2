@@ -147,20 +147,22 @@ ces25b %>%
     #Major Group 95
     cps25_employment<3& NOC21_5>95000&NOC21_5<95999~5
   ))->ces25b
-ces21$occupation
+
 # ADd value labels
-val_labels(ces21$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+val_labels(ces25b$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 
 # Make occupation3 as self-employed and unskilled and skilleed groupi together
 library(labelled)
-lookfor(ces21, "employed")
+#lookfor(ces21, "employed")
 
-ces25b$occupation3<-ifelse(ces25b$cps25_employment==3, 6, ces21$occupation)
+ces25b$occupation3<-ifelse(ces25b$cps25_employment==3, 6, ces25b$occupation)
 
 # ADd value labels for occupation3
-val_labels(ces21$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
-
+val_labels(ces25b$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+ces25b$mode<-rep("Web", nrow(ces25b))
+ces25b$election<-rep(2025, nrow(ces25b))
 #Write out the dataset
 # #### Resave the file in the .rda file
 save(ces25b, file=here("data/ces25b.rda"))
+
 #write_sav(ces25b, path=here("data-raw/ces25b_with_occupation.sav"))
