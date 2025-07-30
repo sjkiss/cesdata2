@@ -1,4 +1,6 @@
 library(readxl)
+library(tidyverse)
+library(here)
 #Read in Kristin's NOC 2016 unique occupations file
 read_excel(path=here("data-raw/2016-unique-occupations-updated.xls")) %>%
   rename("title"=2) %>%

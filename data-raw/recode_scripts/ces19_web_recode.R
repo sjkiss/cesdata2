@@ -19,62 +19,121 @@ lookfor(ces19web, "occupation")
 #Add 2016 NOC and 2021 NOC
 source("data-raw/recode_scripts/ces19web_noc_recode.R")
 #Note this creates the occupation variable FROM THE 2016 NOC CODES
+# This code misses some responents
+# ces19web$occupation<-Recode(as.numeric(ces19web$NOC), "0:1099=2;
+# 1100:1199=1;
+# 2100:2199=1;
+#  3000:3199=1;
+#  4000:4099=1;
+#  4100:4199=1;
+#  5100:5199=1;
+#  1200:1599=3;
+#  2200:2299=3;
+#  3200:3299=3;
+#  3400:3500=3;
+#  4200:4499=3;
+#  5200:5299=3;
+#  6200:6399=3;
+#  6400:6799=3; 7200:7399=4;
+#                               7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+# val_labels(ces19web$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
+#var_label(ces19web$occupation)<-c("5 category class no self-employed from actual NOC codes")
 
-ces19web$occupation<-Recode(as.numeric(ces19web$NOC), "0:1099=2;
-1100:1199=1;
-2100:2199=1;
- 3000:3199=1;
- 4000:4099=1;
- 4100:4199=1;
- 5100:5199=1;
- 1200:1599=3;
- 2200:2299=3;
- 3200:3299=3;
- 3400:3500=3;
- 4200:4499=3;
- 5200:5299=3;
- 6200:6399=3;
- 6400:6799=3; 7200:7399=4;
-                              7400:7700=5; 8200:8399=4; 8400:8700=5; 9200:9599=4; 9600:9700=5; else=NA")
+# This code assigns respondents to a class category using the NOC21_4
+
+ces19web$occupation<-Recode(ces19web$NOC21_4, as.numeric=T,"9500:9599=5;
+       8500:8599=5;
+       7500:7599=5;
+       6500:6599=5;
+       5500:6599=5;
+       4500:4599=5;
+       9400:9499=4;
+       8400:8499=4;
+       7400:7499=4;
+       6400:6499=3;
+       5400:5499=3;
+       4400:4499=3;
+       1400:1499=3;
+       9300:9399=4;
+       8300:8399=4;
+       7300:7399=4;
+       6300:6399=3;
+       5300:5399=3;
+       4300:4399=3;
+       3300:3399=3;
+       1300:1399=3;
+       9200:9299=4;
+       8200:8299=4;
+       7200:7299=4;
+       6200:6299=3;
+       5200:5299=3;
+       4200:4299=3;
+       3200:3299=3;
+       2200:2999=3;
+       1200:1299=3;
+       9000:9099=2;
+       8000:8099=2;
+       7000:7099=2;
+       6000:6099=2;
+       5000:5099=2;
+       4000:4099=2;
+       3000:3099=2;
+       2000:2099=2;
+       1000:1099=2;
+       0000:0001=2;
+       1100:1199=1;
+       2100:2199=1;
+       3100:3199=1;
+       4100:4199=1;
+       5100:5199=1;
+       9999=NA;
+       else=NA")
+
+# ADd value labels
 val_labels(ces19web$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
-var_label(ces19web$occupation)<-c("5 category class no self-employed from actual NOC codes")
+
+# Add in self-employed
+library(labelled)
+lookfor(ces19web, "employed")
+
+ces19web$occupation3<-ifelse(ces19web$cps19_employment==3, 6, ces19web$occupation)
+
+# ADd value labels for occupation3
+val_labels(ces19web$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
+
 #This code checks if we missed anything
-ces19web %>%
-  filter(is.na(NOC)==F&is.na(occupation)==T) %>%
-  select(NOC, occupation)
+# ces19web %>%
+#   filter(is.na(NOC)==F&is.na(occupation)==T) %>%
+#   select(NOC, occupation)
+#
+# table(ces19web$occupation, useNA = "ifany")
+# ces19web %>%
+#   mutate(occupation2=case_when(
+#     #If occupation is not missing then return the value for occupation
+#     is.na(occupation)==F ~ occupation,
+#     #If occupoatuib is missing and categorical occupation is 2 then return managers
+#     is.na(occupation)==T & pes19_occ_cat==18 ~ 2,
+#     is.na(occupation)==T & pes19_occ_cat==19 ~ 1,
+#     #This is questionable; Here we assign technician or associate professional to routine non-manual; could revisit
+#     is.na(occupation)==T & pes19_occ_cat==20 ~ 3,
+#     #Clerical Support Worker
+#     is.na(occupation)==T & pes19_occ_cat==21 ~ 3,
+#     #Service or Sales Workers
+#     is.na(occupation)==T & pes19_occ_cat==22 ~ 3,
+#     #Skilled agricultural, forestry or fishery
+#     is.na(occupation)==T & pes19_occ_cat==23 ~ 4,
+#     #Craft or related trades worker
+#     is.na(occupation)==T & pes19_occ_cat==24 ~ 4,
+#     #Plant Machine Operator
+#     is.na(occupation)==T & pes19_occ_cat==25 ~ 5,
+#     #Cleaner Labourer
+#     is.na(occupation)==T & pes19_occ_cat==26 ~ 5,
+#     TRUE ~ NA_real_
+#   ))->ces19web
 
-table(ces19web$occupation, useNA = "ifany")
-ces19web %>%
-  mutate(occupation2=case_when(
-    #If occupation is not missing then return the value for occupation
-    is.na(occupation)==F ~ occupation,
-    #If occupoatuib is missing and categorical occupation is 2 then return managers
-    is.na(occupation)==T & pes19_occ_cat==18 ~ 2,
-    is.na(occupation)==T & pes19_occ_cat==19 ~ 1,
-    #This is questionable; Here we assign technician or associate professional to routine non-manual; could revisit
-    is.na(occupation)==T & pes19_occ_cat==20 ~ 3,
-    #Clerical Support Worker
-    is.na(occupation)==T & pes19_occ_cat==21 ~ 3,
-    #Service or Sales Workers
-    is.na(occupation)==T & pes19_occ_cat==22 ~ 3,
-    #Skilled agricultural, forestry or fishery
-    is.na(occupation)==T & pes19_occ_cat==23 ~ 4,
-    #Craft or related trades worker
-    is.na(occupation)==T & pes19_occ_cat==24 ~ 4,
-    #Plant Machine Operator
-    is.na(occupation)==T & pes19_occ_cat==25 ~ 5,
-    #Cleaner Labourer
-    is.na(occupation)==T & pes19_occ_cat==26 ~ 5,
-    TRUE ~ NA_real_
-  ))->ces19web
-table(is.na(ces19web$occupation))
-table(is.na(ces19web$occupation2))
-table(ces19web$occupation)
-table(ces19web$occupation2)
-table(is.na(ces19web$NOC))
 
-table(is.na(ces19web$NOC21_4))
-var_label(ces19web$occupation2)<-c("5 category class no self-employed from pre-existing categories provided to R")
+
+#var_label(ces19web$occupation2)<-c("5 category class no self-employed from pre-existing categories provided to R")
 
 #### recode visible minority ####
 look_for(ces19web, "ethnic")
@@ -649,7 +708,7 @@ ces19web$efficacy_external2<-Recode(as.numeric(ces19web$pes19_govtcare), "1=1; 2
 #val_labels(ces19web$efficacy_external2)<-c(low=0, high=1)
 #checks
 #val_labels(ces19web$efficacy_external2)
-#table(ces19web$efficacy_external2)
+#table(ces19web$efficacy_externxal2)
 #table(ces19web$efficacy_external2, ces19web$pes19_govtcare , useNA = "ifany" )
 
 ces19web %>%
