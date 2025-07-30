@@ -101,6 +101,14 @@ val_labels(ces65$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces65$employment)
 # table(ces65$employment)
 
+#recode Unemployed (v54)
+# look_for(ces65, "employ")
+ces65$unemployed<-Recode(ces65$v54, "1=1; 2=0; else=NA")
+val_labels(ces65$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces65$unemployed)
+# table(ces65$unemployed)
+
 #No Sector variable
 
 #recode Party ID (v221)
@@ -118,6 +126,12 @@ val_labels(ces65$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces65$party_id2)
 table(ces65$party_id2, ces65$v221)
+
+#recode Party closeness (v222)
+look_for(ces65, "strength")
+ces65$party_close<-Recode(ces65$v222  , "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces65$v222   , ces65$party_close, useNA = "ifany" )
 
 #recode Vote (v262)
 # look_for(ces65, "vote")

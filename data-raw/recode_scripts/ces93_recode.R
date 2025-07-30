@@ -136,6 +136,14 @@ val_labels(ces93$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces93$employment)
 table(ces93$employment)
 
+#recode Unemployed (CPSJOB1)
+# look_for(ces93, "employment")
+ces93$unemployed<-Recode(ces93$CPSJOB1, "1=0; 2:3=1; else=NA")
+val_labels(ces93$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces93$unemployed)
+table(ces93$unemployed)
+
 #### sector####
 #recode Sector (CPSJOB5 & CPSJOB1)
 look_for(ces93, "sector")
@@ -175,7 +183,16 @@ with(ces93, table(sector_welfare, useNA = "ifany"))
 ####party id ####
 #recode Party ID (PESL1)
 look_for(ces93, "identification")
-ces93$party_id<-Recode(ces93$PESL1, "1=1; 2=2; 3=3; 4=2; 5=4; 6=0; else=NA")
+#ces93$party_id<-Recode(ces93$PESL1, "1=1; 2=2; 3=3; 4=2; 5=4; 6=0; else=NA")
+ces93 %>%
+  mutate(party_id=case_when(
+    PESL1==1 | PESL4==1 ~ 1,
+    PESL1==2 | PESL4==2 ~ 2,
+    PESL1==3 | PESL4==3 ~ 3,
+    PESL1==4 | PESL4==4 ~ 2,
+    PESL1==5 | PESL4==5 ~ 4,
+    PESL1==6 | PESL4==6 ~ 0,
+  ))->ces93
 val_labels(ces93$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces93$party_id)
@@ -183,11 +200,43 @@ table(ces93$party_id)
 
 #recode Party ID 2 (PESL1)
 look_for(ces93, "identification")
-ces93$party_id2<-Recode(ces93$PESL1, "1=1; 2=2; 3=3; 4=6; 5=4; 6=0; else=NA")
+#ces93$party_id2<-Recode(ces93$PESL1, "1=1; 2=2; 3=3; 4=6; 5=4; 6=0; else=NA")
+ces93 %>%
+  mutate(party_id2=case_when(
+    PESL1==1 | PESL4==1 ~ 1,
+    PESL1==2 | PESL4==2 ~ 2,
+    PESL1==3 | PESL4==3 ~ 3,
+    PESL1==4 | PESL4==4 ~ 6,
+    PESL1==5 | PESL4==5 ~ 4,
+    PESL1==6 | PESL4==6 ~ 0,
+  ))->ces93
 val_labels(ces93$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces93$party_id2)
 table(ces93$party_id2, ces93$PESL1)
+
+#recode Party ID 3 (CPSM1 & CPSM4)
+look_for(ces93, "identification")
+#ces93$party_id3<-Recode(ces93$CPSM1, "1=1; 2=2; 3=3; 4=6; 5=4; 6=0; else=NA")
+ces93 %>%
+  mutate(party_id3=case_when(
+    CPSM1==1 | CPSM4==1 ~ 1,
+    CPSM1==2 | CPSM4==2 ~ 2,
+    CPSM1==3 | CPSM4==3 ~ 3,
+    CPSM1==4 | CPSM4==4 ~ 6,
+    CPSM1==5 | CPSM4==5 ~ 4,
+    CPSM1==6 | CPSM4==6 ~ 0,
+  ))->ces93
+val_labels(ces93$party_id3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces93$party_id3)
+table(ces93$party_id3, ces93$CPSM1)
+
+#recode Party closeness (PESL2 )
+look_for(ces93, "strongly")
+ces93$party_close<-Recode(ces93$PESL2 , "1=1; 3=0.5; 5=0; else=NA")
+#checks
+table(ces93$PESL2  , ces93$party_close, useNA = "ifany" )
 
 #### vote####
 #recode Vote (PESA4)

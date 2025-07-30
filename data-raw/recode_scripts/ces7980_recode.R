@@ -148,19 +148,25 @@ val_labels(ces7980$sector)
 
 #recode Party ID (V1192)
 # look_for(ces7980, "federal")
-ces7980$party_id<-Recode(ces7980$V1192, "1=1; 2=2; 3=3; 0=0; 4:7=0; else=NA")
+ces7980$party_id<-Recode(ces7980$V1192, "1=1; 2=2; 3=3; 4:7=0; else=NA")
 val_labels(ces7980$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces7980$party_id)
-# table(ces7980$party_id)
+ table(ces7980$party_id)
 
 #recode Party ID 2 (V1192)
 # look_for(ces7980, "federal")
-ces7980$party_id2<-Recode(ces7980$V1192, "1=1; 2=2; 3=3; 0=0; 4:7=0; else=NA")
+ces7980$party_id2<-Recode(ces7980$V1192, "1=1; 2=2; 3=3; 4:7=0; else=NA")
 val_labels(ces7980$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces7980$party_id2)
  table(ces7980$party_id2, ces7980$V1192)
+
+ #recode Party closeness (V1193)
+ look_for(ces7980, "intensity")
+ ces7980$party_close<-Recode(ces7980$V1193  , "1=1; 2=0.5; 3=0; else=NA")
+ #checks
+ table(ces7980$V1193, ces7980$party_close, useNA = "ifany" )
 
 #recode Vote (V1234)
 # look_for(ces7980, "vote")
