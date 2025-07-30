@@ -148,10 +148,14 @@ This is an incomplete list of recoded and renamed variables.
 |Vote Choice | `vote3` |respondent vote choice separates out PPC|
 |Previous vote | `previous_vote` | respondent previous recalled vote, no split conservatives|
 |Previous vote | `previous_vote3` | respondent previous recalled vote, splitting PPC|
+|Party ID | `party_id`| CPS Party ID, BQ, Greens, NDP, Liberal Conservative|
+|Party ID | `party_id2`| CPS+PES Party ID , BQ, Greens, NDP, Liberal Conservative|
 | Ideology | | |
-| These have normally been coded to run from 0 to 1, liberal to conservative| | |
+| These have no.rmally been coded to run from 0 to 1, liberal to conservative| | |
 | Gay Rights | `gay_rights`| Gay couples should be allowed to marry, usually from MBS |  
-| Redistribution | `redistribution` | 
+| Redistribution | `redistribution` |  |
+|Satisfaction with democracy | `satdem`| CPS, Recoded 0 to 1, 1 is satisfied with democracy|
+| | `satdem2`|PES, Recoded 0 to 1, 1 is satisfied with democracy|
 
 
 # Establishing A Usable Time Series
