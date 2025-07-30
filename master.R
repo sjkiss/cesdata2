@@ -66,36 +66,15 @@ names(ces08)<-str_remove_all(names(ces08), "08")
 names(ces11)<-str_remove_all(names(ces11), "11")
 
 # List data frames
-ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone,  ces19phone, ces19web, ces21)
+ces.list<-list(ces65, ces68, ces72_nov, ces74, ces79, ces80, ces84, ces88, ces93, ces97, ces00, ces04, ces06, ces08, ces11, ces15phone, ces15web, ces19phone, ces19web, ces21)
 ces.list %>%
   map(., nrow)
 #Provide names for list
-names(ces.list)<-c(1965, 1968, 1972, 1974, 1979, 1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, "2015 Phone","2019 Phone", "2019 Web", 2021)
+names(ces.list)<-c(1965, 1968, 1972, 1974, 1979, 1980, 1984, 1988, 1993, 1997, 2000, 2004, 2006, 2008, 2011, "2015 Phone", "2015 Web", "2019 Phone", "2019 Web", 2021)
 #Common variables to be selected
 #common_vars<-c('male')
 common_vars<-c('male',
-               'sector',
-               'occupation',
-               'employment',
-               'union_both',
-               'region', 'union',
-               'degree',
-               'quebec',
-               'age',
-               'religion',
-               'vote',
-               'income',
-               'redistribution',
-               'market_liberalism',
-               'immigration_rates',
-               'traditionalism',
-               'traditionalism2',
-               'trad1', 'trad2', 'immigration_rates',
-               'market1','market2',
-               'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3',
-               'efficacy_external', 'efficacy_external2', 'efficacy_internal', 'political_efficacy', 'inequality', 'efficacy_rich', 'promise', 'trust', 'pol_interest', 'foreign',
-               'non_charter_language', 'language', 'employment', 'satdem', 'satdem2', 'turnout', 'party_id', 'postgrad', 'income_tertile', 'income2', 'household', 'enviro', 'ideology', 'income_house', 'enviro_spend', 'mode', 'election',
-               'race', 'women', 'previous_vote', 'previous_vote3', 'duty', 'welfare', 'quebec_sov', 'quebec_accom', 'size', 'prov', 'party_id2', 'prov_vote' )
+               'turnout', 'mip', 'occupation', 'occupation3', 'education', 'personal_retrospective', 'national_retrospective', 'vote3', 'mode', 'election' )
 
 ces.list %>%
   map(., select, any_of(common_vars))%>%

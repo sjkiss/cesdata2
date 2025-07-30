@@ -192,7 +192,8 @@ val_labels(ces0411$sector04)<-c(Private=0, Public=1)
 #checks
 val_labels(ces0411$sector04)
 # table(ces0411$sector04)
-<<<<<<< HEAD
+
+#### #recode Occupation ####
 lookfor(ces0411, "occupation")
 ces0411 %>%
   mutate(sector_welfare04=case_when(
@@ -210,12 +211,8 @@ ces0411 %>%
 TRUE~ NA
   ))->ces0411
 with(ces0411, table(ces0411$sector_welfare04, useNA = "ifany"))
-#### #recode Party ID (ces04_CPS_Q1A@3 and  ces04_CPS_Q1B@3`) ***note needs `...` to recognize the variable***####
-=======
-
 
 #### #recode Party ID (ces04_CPS_Q1A@3 and  ces04_CPS_Q1B@3` ces04_CPS_Q4) ***note needs `...` to recognize the variable***####
->>>>>>> e26b2f4233cabe849aeb281b50f6ae423327ad18
 look_for(ces0411, "yourself")
 ces0411 %>%
   mutate(party_id04=case_when(
