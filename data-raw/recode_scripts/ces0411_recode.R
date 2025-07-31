@@ -2060,8 +2060,8 @@ ces0411 %>%
 #ces0411$religion08<-Recode(ces0411$ces08_CPS_S9, "0=0; 1:2=2; 4:5=1; 7=2; 9:10=2; 12:14=2; 16:20=2; 98:99=NA; 3=3; 6=3; 8=3; 11=3; 15=3; 97=3;")
 
 
-ces0411 %>%
-  filter(str_detect(survey,"PES08"))->ces08
+# ces0411 %>%
+#   filter(str_detect(survey,"PES08"))->ces08
 
 ces0411 %>%
   mutate(religion08=case_when(
@@ -2343,12 +2343,28 @@ ces0411 %>%
   summarise(total=sum(occupation08), missing=sum(is.na(occupation08)))
 
 #recode Occupation3 as 6 class schema with self-employed (ces08_CPS_S4)
-# look_for(ces0411, "employ")
-ces0411$occupation083<-ifelse(ces0411$ces08_CPS_S4==1, 6, ces0411$occupation08)
+look_for(ces0411, "occupation")
+table(ces0411$ces08_CPS_S4)
+val_labels(ces0411$ces08_CPS_S4)
+ces0411 %>%
+  select(contains("idnum"))
+ces0411 %>%
+  select(starts_with("election"), starts_with("occupation"), contains("IDNUM"), survey, ces08_CPS_S4) %>%
+  pivot_longer(starts_with("election"),  names_to=c("election"), values_to=c("year"))  %>%
+  pivot_longer(starts_with("occupation")) %>%
+  filter(name=="occupation08"&!is.na(value)|(name=="occupation083"&is.na(value))&year<2011) %>% view()
+
+ces0411 %>%
+  mutate(occupation083=case_when(
+    ces08_CPS_S4==1~6,
+    ces08_PES_S2==1~6,
+    TRUE~occupation08
+  ))->ces0411
+
+#ces0411$occupation083<-ifelse(as.numeric(ces0411$ces08_PES_S2)==1|as.numeric(ces0411$ces08_CPS_S4==1), 6, ces0411$occupation08)
 val_labels(ces0411$occupation083)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
-val_labels(ces0411$occupation083)
-# table(ces0411$occupation08_3)
+
 
 #### #recode Income (ces08_CPS_S18A, ces08_CPS_S18B, ces08_PES_S9A, ces08_PES_S9B) ####
 # look_for(ces0411, "income")
@@ -4026,3 +4042,5 @@ table(ces0411$election11, useNA = "ifany")
 ces0411$mode<-rep("Phone", nrow(ces0411))
 
 save(ces0411, file=here("data/ces0411.rda"))
+
+
