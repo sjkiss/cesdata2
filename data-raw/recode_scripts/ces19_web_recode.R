@@ -417,42 +417,40 @@ val_labels(ces19web$native)<-c(Foreign=0, Native=1)
 val_labels(ces19web$native)
 table(ces19web$native, ces19web$cps19_bornin_canada , useNA = "ifany" )
 
-
-
 #recode Liberal leader
-ces19web$liberal_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_23), "-99=NA")
+ces19web$liberal_leader<-Recode(as.numeric(ces19web$cps19_lead_rating_23), "-99=NA")
 #checks
-ces19web$liberal_leader<-(ces19web$liberal_leader2 /100)
+#ces19web$liberal_leader<-(ces19web$liberal_leader2 /100)
 table(ces19web$liberal_leader)
 
 #recode Conservative leader
-ces19web$conservative_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_24), "-99=NA")
+ces19web$conservative_leader<-Recode(as.numeric(ces19web$cps19_lead_rating_24), "-99=NA")
 #checks
-ces19web$conservative_leader<-(ces19web$conservative_leader2 /100)
+#ces19web$conservative_leader<-(ces19web$conservative_leader2 /100)
 table(ces19web$conservative_leader)
 
 #recode NDP leader
-ces19web$ndp_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_25), "-99=NA")
+ces19web$ndp_leader<-Recode(as.numeric(ces19web$cps19_lead_rating_25), "-99=NA")
 #checks
-ces19web$ndp_leader<-(ces19web$ndp_leader2 /100)
+#ces19web$ndp_leader<-(ces19web$ndp_leader2 /100)
 table(ces19web$ndp_leader)
 
 #recode Bloc leader
-ces19web$bloc_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_26), "-99=NA")
+ces19web$bloc_leader<-Recode(as.numeric(ces19web$cps19_lead_rating_26), "-99=NA")
 #checks
-ces19web$bloc_leader<-(ces19web$bloc_leader2 /100)
+#ces19web$bloc_leader<-(ces19web$bloc_leader2 /100)
 table(ces19web$bloc_leader)
 
 #recode Green leader
-ces19web$green_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_27), "-99=NA")
+ces19web$green_leader<-Recode(as.numeric(ces19web$cps19_lead_rating_27), "-99=NA")
 #checks
-ces19web$green_leader<-(ces19web$green_leader2 /100)
+#ces19web$green_leader<-(ces19web$green_leader2 /100)
 table(ces19web$green_leader)
 
 #recode PPC leader
-ces19web$ppc_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_28), "-99=NA")
+ces19web$ppc_leader<-Recode(as.numeric(ces19web$cps19_lead_rating_28), "-99=NA")
 #checks
-ces19web$ppc_leader<-(ces19web$ppc_leader2 /100)
+#ces19web$ppc_leader<-(ces19web$ppc_leader2 /100)
 table(ces19web$ppc_leader)
 
 #recode Manage economy (cps19_issue_handle_8)
@@ -497,7 +495,7 @@ table(ces19web$immigration_rates, ces19web$cps19_imm , useNA = "ifany" )
 
 # recode Immigration sentiment (pes19_immigjobs)
 look_for(ces19web, "immigr")
-ces19web$immigration_job<-Recode(as.numeric(ces19web$pes19_immigjobs), "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+ces19web$immigration_job<-Recode(as.numeric(ces19web$pes19_immigjobs), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 6=0.5; else=NA", as.numeric=T)
 #checks
 table(ces19web$immigration_job, ces19web$pes19_immigjobs, useNA = "ifany" )
 

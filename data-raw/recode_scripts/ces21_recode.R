@@ -353,39 +353,39 @@ val_labels(ces21$past_vote)
 table(ces21$past_vote, ces21$cps21_vote_2019 , useNA = "ifany" )
 
 #recode Liberal leader
-ces21$liberal_leader2<-Recode(as.numeric(ces21$cps21_lead_rating_23), "-99=NA")
+ces21$liberal_leader<-Recode(as.numeric(ces21$cps21_lead_rating_23), "-99=NA")
 #checks
-ces21$liberal_leader<-(ces21$liberal_leader2 /100)
+#ces21$liberal_leader<-(ces21$liberal_leader2 /100)
 table(ces21$liberal_leader)
 
 #recode Conservative leader
-ces21$conservative_leader2<-Recode(as.numeric(ces21$cps21_lead_rating_24), "-99=NA")
+ces21$conservative_leader<-Recode(as.numeric(ces21$cps21_lead_rating_24), "-99=NA")
 #checks
-ces21$conservative_leader<-(ces21$conservative_leader2 /100)
+#ces21$conservative_leader<-(ces21$conservative_leader2 /100)
 table(ces21$conservative_leader)
 
 #recode NDP leader
-ces21$ndp_leader2<-Recode(as.numeric(ces21$cps21_lead_rating_25), "-99=NA")
+ces21$ndp_leader<-Recode(as.numeric(ces21$cps21_lead_rating_25), "-99=NA")
 #checks
-ces21$ndp_leader<-(ces21$ndp_leader2 /100)
+#ces21$ndp_leader<-(ces21$ndp_leader2 /100)
 table(ces21$ndp_leader)
 
 #recode Bloc leader
-ces21$bloc_leader2<-Recode(as.numeric(ces21$cps21_lead_rating_26), "-99=NA")
+ces21$bloc_leader<-Recode(as.numeric(ces21$cps21_lead_rating_26), "-99=NA")
 #checks
-ces21$bloc_leader<-(ces21$bloc_leader2 /100)
+#ces21$bloc_leader<-(ces21$bloc_leader2 /100)
 table(ces21$bloc_leader)
 
 #recode Green leader
-ces21$green_leader2<-Recode(as.numeric(ces21$cps21_lead_rating_27), "-99=NA")
+ces21$green_leader<-Recode(as.numeric(ces21$cps21_lead_rating_27), "-99=NA")
 #checks
-ces21$green_leader<-(ces21$green_leader2 /100)
+#ces21$green_leader<-(ces21$green_leader2 /100)
 table(ces21$green_leader)
 
 #recode PPC leader
-ces21$ppc_leader2<-Recode(as.numeric(ces21$cps21_lead_rating_29), "-99=NA")
+ces21$ppc_leader<-Recode(as.numeric(ces21$cps21_lead_rating_29), "-99=NA")
 #checks
-ces21$ppc_leader<-(ces21$ppc_leader2 /100)
+#ces21$ppc_leader<-(ces21$ppc_leader2 /100)
 table(ces21$ppc_leader)
 
 #recode Manage economy (cps21_issue_handle_9)
@@ -400,7 +400,7 @@ table(ces21$manage_economy)
 #recode Manage environment (cps19_issue_handle_3)
 # look_for(ces21, "environment")
 ces21$cps21_issue_handle_3
-ces21$manage_environment<-Recode(ces21$cps121_issue_handle_3, "1=1; 2=2; 3=3; 4=4; 5=5; 6:7=NA; else=NA")
+ces21$manage_environment<-Recode(ces21$cps21_issue_handle_3, "1=1; 2=2; 3=3; 4=4; 5=5; 6:7=NA; else=NA")
 val_labels(ces21$manage_environment)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 #checks
 val_labels(ces21$manage_environment)
@@ -679,7 +679,7 @@ table(ces21$ideology, ces21$cps21_lr_scale_bef_1 , useNA = "ifany" )
 
 # recode Immigration sentiment (pes21_immigjobs)
 look_for(ces21, "immigr")
-ces21$immigration_job<-Recode(as.numeric(ces21$pes21_immigjobs), "1=0; 2=0.25; 3=0.75; 4=1; else=NA", as.numeric=T)
+ces21$immigration_job<-Recode(as.numeric(ces21$pes21_immigjobs), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; 6=0.5; else=NA", as.numeric=T)
 #checks
 table(ces21$immigration_job, ces21$pes21_immigjobs, useNA = "ifany" )
 
