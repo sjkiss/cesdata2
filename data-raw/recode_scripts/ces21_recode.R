@@ -388,6 +388,41 @@ ces21$ppc_leader2<-Recode(as.numeric(ces21$cps21_lead_rating_29), "-99=NA")
 ces21$ppc_leader<-(ces21$ppc_leader2 /100)
 table(ces21$ppc_leader)
 
+#recode Manage economy (cps21_issue_handle_9)
+# look_for(ces21, "economy")
+ces21$cps21_issue_handle_9
+ces21$manage_economy<-Recode(ces21$cps21_issue_handle_9, "1=1; 2=2; 3=3; 4=4; 5=5; 6:7=NA; else=NA")
+val_labels(ces21$manage_economy)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces21$manage_economy)
+table(ces21$manage_economy)
+
+#recode Manage environment (cps19_issue_handle_3)
+# look_for(ces21, "environment")
+ces21$cps21_issue_handle_3
+ces21$manage_environment<-Recode(ces21$cps121_issue_handle_3, "1=1; 2=2; 3=3; 4=4; 5=5; 6:7=NA; else=NA")
+val_labels(ces21$manage_environment)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces21$manage_environment)
+table(ces21$manage_environment)
+
+#recode Manage immigration (cps21_issue_handle_7)
+# look_for(ces21, "immigration")
+ces21$cps21_issue_handle_7
+ces21$manage_immigration<-Recode(ces21$cps21_issue_handle_7, "1=1; 2=2; 3=3; 4=4; 5=5; 6:7=NA; else=NA")
+val_labels(ces21$manage_immigration)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces21$manage_immigration)
+table(ces21$manage_immigration)
+
+#recode Addressing Main Issue (cps21_imp_iss_party)
+# look_for(ces21, "issue")
+ces21$address_issue<-Recode(ces21$cps21_imp_iss_party, "1=1; 2=2; 3=3; 4=4; 5=5; 6:7=NA; else=NA")
+val_labels(ces21$address_issue)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces21$address_issue)
+table(ces21$address_issue)
+
 #recode Environment (cps21_spend_env)
 look_for(ces21, "enviro")
 ces21$environment<-Recode(as.numeric(ces21$cps21_spend_env), "3=0.5; 1=1; 2=0; else=NA")
