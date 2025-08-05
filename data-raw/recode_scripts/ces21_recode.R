@@ -572,7 +572,7 @@ table(ces21$trad3)
 ces21 %>%
   mutate(traditionalism=rowMeans(select(., num_range("trad", 1:3)), na.rm=T))->ces21
 #Check distribution of traditionalism
-qplot(ces21$traditionalism, geom="histogram")
+#qplot(ces21$traditionalism, geom="histogram")
 table(ces21$traditionalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -758,9 +758,17 @@ table(ces21$foreign, ces21$cps21_bornin_canada, useNA="ifany")
 
 #recode Environment Spend (cps21_spend_env)
 look_for(ces21, "env")
+ces21$cps21_pos_jobs
 ces21$enviro_spend<-Recode(as.numeric(ces21$cps21_spend_env), "1=0; 2=0.5; 3=1; else=NA")
 #checks
 table(ces21$enviro_spend , ces21$cps21_spend_env , useNA = "ifany" )
+
+#### recode Environment vs Jobs
+look_for(ces21, "env")
+ces21$enviro<-Recode(as.numeric(ces21$cps21_pos_jobs), "5=1; 4=0.75; 3=0.5; 2=0.25; 1=0; 6=0.5; else=NA")
+table(ces21$cps21_pos_jobs, ces21$enviro)
+#checks
+#table(ces19web$enviro , ces19web$cps19_pos_jobs , useNA = "ifany")
 
 #recode duty (cps21_duty_choice )
 look_for(ces21, "duty")

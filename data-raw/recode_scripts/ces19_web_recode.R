@@ -471,7 +471,7 @@ ces19web %>%
   select(starts_with("market")) %>%
   summary()
 #Check distribution of market_liberalism
-qplot(ces19web$market_liberalism, geom="histogram")
+#qplot(ces19web$market_liberalism, geom="histogram")
 table(ces19web$market_liberalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -480,9 +480,9 @@ ces19web %>%
   alpha(.)
 #For some reason the cronbach's alpha doesn't work here.
 #Check correlation
-ces19web %>%
-  select(market1, market2) %>%
-  cor(., use="complete.obs")
+# ces19web %>%
+#   select(market1, market2) %>%
+#   cor(., use="complete.obs")
 
 #recode Capital Punishment (Missing)
 
@@ -526,7 +526,7 @@ table(ces19web$trad3)
 ces19web %>%
   mutate(traditionalism=rowMeans(select(., num_range("trad", 1:3)), na.rm=T))->ces19web
 #Check distribution of traditionalism
-qplot(ces19web$traditionalism, geom="histogram")
+#qplot(ces19web$traditionalism, geom="histogram")
 table(ces19web$traditionalism, useNA="ifany")
 
 #Calculate Cronbach's alpha
@@ -543,17 +543,17 @@ ces19web %>%
   mutate(traditionalism2=rowMeans(select(., num_range("trad", 1:2)), na.rm=T))->ces19web
 
 #Check distribution of traditionalism2
-qplot(ces19web$traditionalism2, geom="histogram")
+#qplot(ces19web$traditionalism2, geom="histogram")
 table(ces19web$traditionalism2, useNA="ifany")
 
 #Calculate Cronbach's alpha
-ces19web %>%
-  select(trad1, trad2) %>%
-  psych::alpha(.)
-#Check correlation
-ces19web %>%
-  select(trad1, trad2) %>%
-  cor(., use="complete.obs")
+# ces19web %>%
+#   select(trad1, trad2) %>%
+#   psych::alpha(.)
+# #Check correlation
+# ces19web %>%
+#   select(trad1, trad2) %>%
+#   cor(., use="complete.obs")
 
 #recode 2nd Dimension (lifestyles, immigration, gay rights, crime)
 ces19web$author1<-ces19web$lifestyles
@@ -573,7 +573,7 @@ ces19web %>%
   summary()
 tail(names(ces19web))
 #Check distribution of traditionalism
-qplot(ces19web$authoritarianism, geom="histogram")
+#qplot(ces19web$authoritarianism, geom="histogram")
 
 #Calculate Cronbach's alpha
 ces19web %>%
