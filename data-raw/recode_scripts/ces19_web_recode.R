@@ -417,6 +417,78 @@ val_labels(ces19web$native)<-c(Foreign=0, Native=1)
 val_labels(ces19web$native)
 table(ces19web$native, ces19web$cps19_bornin_canada , useNA = "ifany" )
 
+
+
+#recode Liberal leader
+ces19web$liberal_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_23), "-99=NA")
+#checks
+ces19web$liberal_leader<-(ces19web$liberal_leader2 /100)
+table(ces19web$liberal_leader)
+
+#recode Conservative leader
+ces19web$conservative_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_24), "-99=NA")
+#checks
+ces19web$conservative_leader<-(ces19web$conservative_leader2 /100)
+table(ces19web$conservative_leader)
+
+#recode NDP leader
+ces19web$ndp_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_25), "-99=NA")
+#checks
+ces19web$ndp_leader<-(ces19web$ndp_leader2 /100)
+table(ces19web$ndp_leader)
+
+#recode Bloc leader
+ces19web$bloc_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_26), "-99=NA")
+#checks
+ces19web$bloc_leader<-(ces19web$bloc_leader2 /100)
+table(ces19web$bloc_leader)
+
+#recode Green leader
+ces19web$green_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_27), "-99=NA")
+#checks
+ces19web$green_leader<-(ces19web$green_leader2 /100)
+table(ces19web$green_leader)
+
+#recode PPC leader
+ces19web$ppc_leader2<-Recode(as.numeric(ces19web$cps19_lead_rating_28), "-99=NA")
+#checks
+ces19web$ppc_leader<-(ces19web$ppc_leader2 /100)
+table(ces19web$ppc_leader)
+
+#recode Manage economy (cps19_issue_handle_8)
+# look_for(ces19web, "economy")
+ces19web$cps19_issue_handle_8
+ces19web$manage_economy<-Recode(ces19web$cps19_issue_handle_8, "1=1; 2=2; 3=3; 4=4; 5=5; 7=NA; 6=2; else=NA")
+val_labels(ces19web$manage_economy)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19web$manage_economy)
+table(ces19web$manage_economy)
+
+#recode Manage environment (cps19_issue_handle_3)
+# look_for(ces19web, "environment")
+ces19web$manage_environment<-Recode(ces19web$cps19_issue_handle_3, "1=1; 2=2; 3=3; 4=4; 5=5; 7=NA; 6=2; else=NA")
+val_labels(ces19web$manage_environment)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19web$manage_environment)
+table(ces19web$manage_environment)
+
+#recode Manage immigration (cps19_issue_handle_7)
+# look_for(ces19web, "immigration")
+ces19web$cps19_issue_handle_7
+ces19web$manage_immigration<-Recode(ces19web$cps19_issue_handle_7, "1=1; 2=2; 3=3; 4=4; 5=5; 7=NA; 6=2; else=NA")
+val_labels(ces19web$manage_immigration)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19web$manage_immigration)
+table(ces19web$manage_immigration)
+
+#recode Addressing Main Issue (cps19_imp_iss_party)
+# look_for(ces19web, "issue")
+ces19web$address_issue<-Recode(ces19web$cps19_imp_iss_party, "1=1; 2=2; 3=3; 4=4; 5=5; 7=NA; 6=2; else=NA")
+val_labels(ces19web$address_issue)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces19web$address_issue)
+table(ces19web$address_issue)
+
 #recode Immigration (cps19_imm)
 look_for(ces19web, "admit")
 ces19web$immigration_rates<-Recode(as.numeric(ces19web$cps19_imm), "1=0; 2=1; 3=0.5; 4=0.5; else=NA", as.numeric=T)
