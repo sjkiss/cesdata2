@@ -5,7 +5,7 @@ library(tidyverse)
 library(srvyr)
 library(survey)
 #Load data
-ces25b<-read_dta(here("data-raw/CES 25 Kiss Module Final (with occupation Qs).dta"))
+ces25b<-read_dta(here("data-raw/CES 25 Kiss Module Final (with occupation & Additional Qs).dta"))
 library(labelled)
 library(car)
 look_for(ces25b, "class")
@@ -160,6 +160,7 @@ ces25b$occupation3<-ifelse(ces25b$cps25_employment==3, 6, ces25b$occupation)
 # ADd value labels for occupation3
 val_labels(ces25b$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 
+# Create Oesch variabl e
 
 #Check, did I get everyone?
 
@@ -167,6 +168,60 @@ ces25b %>%
   filter(is.na(occupation3)) %>%
   select(cps25_employment, occupation_name, occupation3) %>%
   as_factor()
+ces25b$NOC21_5
+
+#code logic of authority
+
+#First extract the first two digits of eac NOC
+
+ces25b$sector_teer<-str_extract_all(ces25b$NOC21_5, "^\\d{2}") %>% unlist()
+#Now separate
+ces25b %>%
+  separate_wider_position(., cols=sector_teer, widths=c("sector"=1, "teer"=1))->ces25b
+# Check employment status
+lookfor(ces25b, "status")
+ces25b %>%
+  mutate(logic=case_when(
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==0~"Organizational",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==1~"Organizational",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==2~"Technical",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==3~"Interpersonal",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==4~"Interpersonal",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==5~"Interpersonal",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==6~"Interpersonal",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==7~"Technical",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==8~"Technical",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==8~"Technical",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&sector==8~"Technical"
+  ))->ces25b
+
+# Introduce level of authority for the 8-class schema
+#Note that Rehm and Kitchelt have four gradations here; Oesch has only two.
+ces25b %>%
+  mutate(authority=case_when(
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&teer>3~"Higher",
+    cps25_employment<4|(cps25_employment>9&cps25_employment<12)&teer>2~"Lower"
+  ))->ces25b
+
+#Check most frequent self-employed
+ces25b %>%
+  filter(cps25_employment==3) %>%
+  select(NOC21_5) %>%
+  count(NOC21_5)
+#Note, most doctores are not self-employed
+ces25b %>%
+  filter(NOC21_5==31102) %>%
+  count(cps25_employment)
+
+ces25b %>%
+  mutate(occupation_oesch=case_when(
+    logic=="Technical"& authority=="Higher"~'Technical Professionals',
+    logic=="Organizational"&authority=="Higher"~'(Associate) Managers',
+    logic=="Interpersonal"&authority=="Higher"~'Socio-cultural (semi) Professionals',
+    logic=="Technical"&authority=="Lower"~'Production workers',
+    logic=="Organizational"&authority=="Lower"~'Office clerks',
+    logic=="Interpersonal"&authority=="Lower"~'Service workers'
+  ))->ces25b
 
 
 ces25b$mode<-rep("Web", nrow(ces25b))
