@@ -180,29 +180,33 @@ ces25b %>%
   separate_wider_position(., cols=sector_teer, widths=c("sector"=1, "teer"=1))->ces25b
 # Check employment status
 lookfor(ces25b, "status")
-table(ces25b$sector)
-table(ces25b$teer)
+#Create working variable
+ces25b %>%
+  mutate(working=case_when(
+    cps25_employment<4|(cps25_employment>8&cps25_employment<12)~1,
+    TRUE~0)
+  )->ces25b
 ces25b %>%
   mutate(logic=case_when(
-    cps25_employment<4 &sector==0~"Organizational",
-    cps25_employment<4&sector==1~"Organizational",
-    cps25_employment<4&sector==2~"Technical",
-    cps25_employment<4&sector==3~"Interpersonal",
-    cps25_employment<4&sector==4~"Interpersonal",
-    cps25_employment<4&sector==5~"Interpersonal",
-    cps25_employment<4&sector==6~"Interpersonal",
-    cps25_employment<4&sector==7~"Technical",
-    cps25_employment<4&sector==8~"Technical",
-    cps25_employment<4&sector==8~"Technical",
-    cps25_employment<4&sector==8~"Technical"
+   working==1 &sector==0~"Organizational",
+   working==1&sector==1~"Organizational",
+   working==1&sector==2~"Technical",
+   working==1&sector==3~"Interpersonal",
+   working==1&sector==4~"Interpersonal",
+   working==1&sector==5~"Interpersonal",
+   working==1&sector==6~"Interpersonal",
+   working==1&sector==7~"Technical",
+   working==1&sector==8~"Technical",
+   working==1&sector==8~"Technical",
+   working==1&sector==8~"Technical"
   ))->ces25b
 table(ces25b$logic)
 # Introduce level of authority for the 8-class schema
 #Note that Rehm and Kitchelt have four gradations here; Oesch has only two.
 ces25b %>%
   mutate(authority=case_when(
-    cps25_employment<4&teer<3~"Higher",
-    cps25_employment<4&teer>2~"Lower"
+    working==1&teer<3~"Higher",
+    working==1&teer>2~"Lower"
   ))->ces25b
 table(ces25b$authority)
 ces25b %>%
