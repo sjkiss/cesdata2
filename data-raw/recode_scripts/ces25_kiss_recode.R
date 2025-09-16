@@ -236,5 +236,5 @@ ces25b$election<-rep(2025, nrow(ces25b))
 #Write out the dataset
 # #### Resave the file in the .rda file
 save(ces25b, file=here("data/ces25b.rda"))
-
+table(ces25b$cps25_employment)
 #write_sav(ces25b, path=here("data-raw/ces25b_with_occupation.sav"))
