@@ -186,6 +186,24 @@ val_labels(ces84$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3
 val_labels(ces84$occupation3)
 # table(ces84$occupation3)
 
+
+#Add occupation Oesch 6
+ces84$VAR525
+ces84 %>%
+  mutate(occupation_oesch_6=case_when(
+#Managers
+    VAR533==1~"Self-employed",
+    VAR525==2~"Managers",
+    VAR525==1~"Professionals",
+    VAR525==5~"Skilled Workers",
+    VAR525==6~"Unskilled Workers",
+    VAR525==4~"Unskilled Workers",
+    VAR525==3~"Semi-Professionals Associate Managers",
+    VAR525==7~"Skilled Workers"
+  ))->ces84
+ces84$occupation_oesch_6<-factor(ces84$occupation_oesch_6, levels=c("Unskilled Workers", "Skilled Workers",
+                                          "Semi-Professionals Associate Managers",
+                                          "Self-employed","Professionals", "Managers"))
 #recode Income (VAR442 and VAR443)
 #recode Income (VAR442 and VAR443)
 # look_for(ces84, "income")

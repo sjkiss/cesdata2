@@ -179,7 +179,7 @@ table(ces21$prov)
 
 #recode Quebec (cps21_province)
 look_for(ces21, "province")
-ces21$quebec<-Recode(ces21$cps21_province, "1:5=0; 7=0; 9:10; 11=1; 12=0; else=NA")
+ces21$quebec<-Recode(ces21$cps21_province, "1:10=0; 11=1; 12=0; else=NA")
 val_labels(ces21$quebec)<-c(Other=0, Quebec=1)
 #checks
 val_labels(ces21$quebec)

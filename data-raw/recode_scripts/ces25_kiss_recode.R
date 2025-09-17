@@ -16,9 +16,11 @@ look_for(ces25b, "vote")
 ces25b$cps25_province
 ces25b$prov<-Recode(ces25b$cps25_province, "5=1; 10=2; 7=3; 4=4; 11=5; 9=6; 3=7; 12=8; 1=9; 2=10; else=NA")
 val_labels(ces25b$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
-
-ces25b$quebec<-Recode(ces25b$cps25_province, "1:5=0; 7=0; 9:10; 11=1; 12=0; else=NA")
+table(ces25b$cps25_province)
+val_labels(ces25b$cps25_province)
+ces25b$quebec<-Recode(ces25b$cps25_province, "1:5=0; 11=1; 7=0;9:10=0;12=0; else=NA")
 val_labels(ces25b$quebec)<-c(Other=0, Quebec=1)
+
 ces25b$vote<-Recode(ces25b$cps25_votechoice , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 8=2; else=NA")
 val_labels(ces25b$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 table(as_factor(ces25b$vote))
@@ -268,11 +270,26 @@ ces25b %>%
 # check self-employed
 table(as_factor(ces25b$cps25_employment))
 with(ces25b, table(cps25_employment, occupation_oesch))
+
+# Calculate Oesch-5
+ces25b %>%
+  mutate(occupation_oesch_6=case_when(
+    teer==0~"Managers",
+    teer==1~"Professionals",
+    teer==2~"Semi-Professionals Associate Managers",
+    teer==3~"Skilled Workers",
+    teer>3~"Unskilled Workers",
+    cps25_employment==3~"Self-employed"
+  ))->ces25b
+table(ces25b$occupation_oesch_6)
+ces25b$occupation_oesch_6<-factor(ces25b$occupation_oesch_6, levels=c("Unskilled Workers", "Skilled Workers",
+                                           "Semi-Professionals Associate Managers",
+                                           "Self-employed","Professionals", "Managers"))
 #Add mode and election
 ces25b$mode<-rep("Web", nrow(ces25b))
 ces25b$election<-rep(2025, nrow(ces25b))
 #Write out the dataset
 # #### Resave the file in the .rda file
 save(ces25b, file=here("data/ces25b.rda"))
-table(ces25b$cps25_employment)
+
 #write_sav(ces25b, path=here("data-raw/ces25b_with_occupation.sav"))
