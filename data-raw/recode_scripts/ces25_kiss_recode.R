@@ -188,25 +188,25 @@ ces25b %>%
   )->ces25b
 ces25b %>%
   mutate(logic=case_when(
-   working==1 &sector==0~"Organizational",
-   working==1&sector==1~"Organizational",
-   working==1&sector==2~"Technical",
-   working==1&sector==3~"Interpersonal",
-   working==1&sector==4~"Interpersonal",
-   working==1&sector==5~"Interpersonal",
-   working==1&sector==6~"Interpersonal",
-   working==1&sector==7~"Technical",
-   working==1&sector==8~"Technical",
-   working==1&sector==8~"Technical",
-   working==1&sector==8~"Technical"
+   working==1&cps25_employment!=3 &sector==0~"Organizational",
+   working==1&cps25_employment!=3&sector==1~"Organizational",
+   working==1&cps25_employment!=3&sector==2~"Technical",
+   working==1&cps25_employment!=3&sector==3~"Interpersonal",
+   working==1&cps25_employment!=3&sector==4~"Interpersonal",
+   working==1&cps25_employment!=3&sector==5~"Interpersonal",
+   working==1&cps25_employment!=3&sector==6~"Interpersonal",
+   working==1&cps25_employment!=3&sector==7~"Technical",
+   working==1&cps25_employment!=3&sector==8~"Technical",
+   working==1&cps25_employment!=3&sector==8~"Technical",
+   working==1&cps25_employment!=3&sector==9~"Technical"
   ))->ces25b
 table(ces25b$logic)
 # Introduce level of authority for the 8-class schema
 #Note that Rehm and Kitchelt have four gradations here; Oesch has only two.
 ces25b %>%
   mutate(authority=case_when(
-    working==1&teer<3~"Higher",
-    working==1&teer>2~"Lower"
+    working==1&cps25_employment!=3&teer<3~"Higher",
+    working==1&cps25_employment!=3&teer>2~"Lower"
   ))->ces25b
 table(ces25b$authority)
 ces25b %>%
@@ -231,10 +231,36 @@ ces25b %>%
     logic=="Organizational"&authority=="Lower"~'Office clerks',
     logic=="Interpersonal"&authority=="Lower"~'Service workers'
   ))->ces25b
+
+ces25b %>%
+  mutate(occupation_oesch=case_when(
+    cps25_employment==3~"Self-employed",
+    TRUE~ occupation_oesch
+  ))->ces25b
 table(ces25b$logic)
 table(ces25b$authority)
-table(ces25b$occupation_oesch)
+table(ces25b$occupation_oesch, useNA = "ifany")
 
+#This code checks to see that everyone with an NOC21_5 has also been given an oesch
+ces25b %>%
+  filter(working==1) %>%
+  select(NOC21_5, occupation_oesch) %>% filter(!is.na(!NOC21_5)&is.na(occupation_oesch))
+table(ces25b$occupation_oesch)
+#How many non-missing oesch do we hvave
+table(is.na(ces25b$occupation_oesch)) #1999
+
+#How many more will we get from the open-ended
+ces25b %>%
+  filter(working==1) %>%
+  filter(occupation_code=="") %>%
+  select(occupation_code, NOC21_5, pes25_occ_select_2) %>%
+  filter(pes25_occ_select_2!="-99"&pes25_occ_select_2!="") %>%
+  nrow()
+
+# check self-employed
+table(as_factor(ces25b$cps25_employment))
+with(ces25b, table(cps25_employment, occupation_oesch))
+#Add mode and election
 ces25b$mode<-rep("Web", nrow(ces25b))
 ces25b$election<-rep(2025, nrow(ces25b))
 #Write out the dataset
