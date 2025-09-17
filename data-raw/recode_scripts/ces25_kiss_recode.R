@@ -11,6 +11,14 @@ library(car)
 look_for(ces25b, "class")
 look_for(ces25b, "vote")
 look_for(ces25b, "vote")
+
+# Create province and quebec variable
+ces25b$cps25_province
+ces25b$prov<-Recode(ces25b$cps25_province, "5=1; 10=2; 7=3; 4=4; 11=5; 9=6; 3=7; 12=8; 1=9; 2=10; else=NA")
+val_labels(ces25b$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
+
+ces25b$quebec<-Recode(ces25b$cps25_province, "1:5=0; 7=0; 9:10; 11=1; 12=0; else=NA")
+val_labels(ces25b$quebec)<-c(Other=0, Quebec=1)
 ces25b$vote<-Recode(ces25b$cps25_votechoice , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 8=2; else=NA")
 val_labels(ces25b$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 table(as_factor(ces25b$vote))
