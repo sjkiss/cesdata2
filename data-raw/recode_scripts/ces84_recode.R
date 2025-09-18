@@ -414,8 +414,31 @@ table(ces84$prov_vote)
 # ces84$traditionalism2<-rep(NA, nrow(ces84))
 # ces84$immigration_rates<-rep(NA, nrow(ces84))
 glimpse(ces84)
+lookfor(ces84, "home")
 
-#Add mode
+#Add sub_class
+lookfor(ces84, "belong")
+table(as_factor(ces84$VAR377), useNA = "ifany")
+ces84 %>%
+  mutate(sub_class=case_when(
+    VAR307==1~"Upper Class",
+    VAR307==2~"Upper-Middle Class",
+    VAR307==3~"Middle Class",
+    VAR307==4~"Working Class",
+    VAR307==5~"Lower Class",
+    TRUE~NA_character_
+  ))->ces84
+ces84$sub_class<-factor(ces84$sub_class, levels=c("Lower Class", "Working Class", "Middle Class", "Upper-Middle Class", "Upper Class"))
+table(ces84$sub_class)
+#Add own rent
+ces84 %>%
+  mutate(own_rent=case_when(
+    VAR418==1~'Own',
+    VAR418==2~'Rent',
+    VAR418==8~'Other'
+  ))->ces84
+ces84$own_rent<-factor(ces84$own_rent, levels=c("Own", "Rent", "Other"))
+  #Add mode
 ces84$mode<-rep("Phone", nrow(ces84))
 #Add Election
 ces84$election<-rep(1984, nrow(ces84))

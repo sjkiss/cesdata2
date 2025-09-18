@@ -184,10 +184,10 @@ ces25b$NOC21_5
 
 #First extract the first two digits of eac NOC
 
-ces25b$sector_teer<-str_extract_all(ces25b$NOC21_5, "^\\d{2}") %>% unlist()
+ces25b$occupational_category_teer<-str_extract_all(ces25b$NOC21_5, "^\\d{2}") %>% unlist()
 #Now separate
 ces25b %>%
-  separate_wider_position(., cols=sector_teer, widths=c("sector"=1, "teer"=1))->ces25b
+  separate_wider_position(., cols=occupational_category_teer, widths=c("occupational_category"=1, "teer"=1))->ces25b
 # Check employment status
 lookfor(ces25b, "status")
 #Create working variable
@@ -198,17 +198,17 @@ ces25b %>%
   )->ces25b
 ces25b %>%
   mutate(logic=case_when(
-   working==1&cps25_employment!=3 &sector==0~"Organizational",
-   working==1&cps25_employment!=3&sector==1~"Organizational",
-   working==1&cps25_employment!=3&sector==2~"Technical",
-   working==1&cps25_employment!=3&sector==3~"Interpersonal",
-   working==1&cps25_employment!=3&sector==4~"Interpersonal",
-   working==1&cps25_employment!=3&sector==5~"Interpersonal",
-   working==1&cps25_employment!=3&sector==6~"Interpersonal",
-   working==1&cps25_employment!=3&sector==7~"Technical",
-   working==1&cps25_employment!=3&sector==8~"Technical",
-   working==1&cps25_employment!=3&sector==8~"Technical",
-   working==1&cps25_employment!=3&sector==9~"Technical"
+   working==1&cps25_employment!=3 &occupational_category==0~"Organizational",
+   working==1&cps25_employment!=3&occupational_category==1~"Organizational",
+   working==1&cps25_employment!=3&occupational_category==2~"Technical",
+   working==1&cps25_employment!=3&occupational_category==3~"Interpersonal",
+   working==1&cps25_employment!=3&occupational_category==4~"Interpersonal",
+   working==1&cps25_employment!=3&occupational_category==5~"Interpersonal",
+   working==1&cps25_employment!=3&occupational_category==6~"Interpersonal",
+   working==1&cps25_employment!=3&occupational_category==7~"Technical",
+   working==1&cps25_employment!=3&occupational_category==8~"Technical",
+   working==1&cps25_employment!=3&occupational_category==8~"Technical",
+   working==1&cps25_employment!=3&occupational_category==9~"Technical"
   ))->ces25b
 table(ces25b$logic)
 # Introduce level of authority for the 8-class schema
@@ -285,6 +285,29 @@ table(ces25b$occupation_oesch_6)
 ces25b$occupation_oesch_6<-factor(ces25b$occupation_oesch_6, levels=c("Unskilled Workers", "Skilled Workers",
                                            "Semi-Professionals Associate Managers",
                                            "Self-employed","Professionals", "Managers"))
+
+# Add Subjective social class
+ces25b %>%
+  mutate(sub_class=case_when(
+    kiss_module_Q2==1~"Upper Class",
+    kiss_module_Q2==2~"Upper-Middle Class",
+    kiss_module_Q2==3~"Middle Class",
+    kiss_module_Q2==4~"Working Class",
+    kiss_module_Q2==5~"Lower Class",
+    TRUE~NA_character_
+  ))->ces25b
+#lookfor(ces25b, "class")
+ces25b$sub_class<-factor(ces25b$sub_class, levels=c("Lower Class", "Working Class", "Middle Class", "Upper-Middle Class", "Upper Class"))
+
+ces25b %>%
+  mutate(own_rent=case_when(
+    cps25_property_1==1~"Own",
+    cps25_rent==1 ~"Rent",
+    cps25_rent==4~"Other"
+  ))->ces25b
+ces25b$own_rent<-factor(ces25b$own_rent, levels=c("Own", "Rent", "Other"))
+
+#Use property1 and cps25_rent to cobble together
 #Add mode and election
 ces25b$mode<-rep("Web", nrow(ces25b))
 ces25b$election<-rep(2025, nrow(ces25b))
