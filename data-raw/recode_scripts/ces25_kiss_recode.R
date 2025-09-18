@@ -4,6 +4,7 @@ library(here)
 library(tidyverse)
 library(srvyr)
 library(survey)
+
 #Load data
 ces25b<-read_dta(here("data-raw/CES 25 Kiss Module Final (with occupation & Additional Qs).dta"))
 library(labelled)
@@ -12,7 +13,7 @@ look_for(ces25b, "class")
 look_for(ces25b, "vote")
 look_for(ces25b, "vote")
 
-# Create province and quebec variable
+#### Create province and quebec variable ####
 ces25b$cps25_province
 ces25b$prov<-Recode(ces25b$cps25_province, "5=1; 10=2; 7=3; 4=4; 11=5; 9=6; 3=7; 12=8; 1=9; 2=10; else=NA")
 val_labels(ces25b$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
@@ -21,10 +22,12 @@ val_labels(ces25b$cps25_province)
 ces25b$quebec<-Recode(ces25b$cps25_province, "1:5=0; 11=1; 7=0;9:10=0;12=0; else=NA")
 val_labels(ces25b$quebec)<-c(Other=0, Quebec=1)
 
+#### Create party vote ####
 ces25b$vote<-Recode(ces25b$cps25_votechoice , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 8=2; else=NA")
 val_labels(ces25b$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 table(as_factor(ces25b$vote))
 
+#### Create income ####
 lookfor(ces25b, "income")
 # This is a hacky way to assign respondents to income tertiles
 # convert original income to numeric
@@ -32,7 +35,7 @@ ces25b$cps25_income2<-as.numeric(ces25b$cps25_income)
 
 # Set don't knows to missing
 # We could set these to the median 4 if we want to rescue missing data
-# talk to matt
+# talk to matt (Matt believes it best to leave the NA's out for income as its not that many people)
 ces25b %>%
   mutate(cps25_income2=case_when(
     cps25_income==9~ NA_integer_,
@@ -58,7 +61,8 @@ ces25b %>%
 ces25b_des<-as_survey_design(subset(ces25b, !is.na(cps25_weight_kiss_module)), weights=cps25_weight_kiss_module)
 # check the income tertiles after weighting
 svytable(~income_tertile, design=ces25b_des)
-# Class
+
+#### Create Class ####
 #Convert the 5 digit NOC code provided by CDEM to a number
 ces25b$NOC21_5<-as.numeric(ces25b$occupation_code)
 #Note, that this will turn some 5 digit codes that start with 0000 into 2-digit codes
@@ -286,6 +290,7 @@ ces25b$occupation_oesch_6<-factor(ces25b$occupation_oesch_6, levels=c("Unskilled
                                            "Semi-Professionals Associate Managers",
                                            "Self-employed","Professionals", "Managers"))
 
+
 # Add Subjective social class
 ces25b %>%
   mutate(sub_class=case_when(
@@ -308,9 +313,24 @@ ces25b %>%
 ces25b$own_rent<-factor(ces25b$own_rent, levels=c("Own", "Rent", "Other"))
 
 #Use property1 and cps25_rent to cobble together
+
+#### recode Age (cps25_age_in_years) ####
+look_for(ces25b, "age")
+ces25b$age<-ces25b$cps25_age_in_years
+#checks
+table(ces25b$age)
+
+#### recode Gender ####
+ces25b$male<-Recode(ces25b$cps25_genderid, "1=1; 2=0; else=NA")
+val_labels(ces25b$male)<-c(Female=0, Male=1)
+#checks
+val_labels(ces25b$male)
+table(ces25b$male)
+
 #Add mode and election
 ces25b$mode<-rep("Web", nrow(ces25b))
 ces25b$election<-rep(2025, nrow(ces25b))
+
 #Write out the dataset
 # #### Resave the file in the .rda file
 save(ces25b, file=here("data/ces25b.rda"))
