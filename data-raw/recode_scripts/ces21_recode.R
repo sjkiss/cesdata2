@@ -853,6 +853,20 @@ val_labels(ces21$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, 
 val_labels(ces21$prov_vote)
 table(ces21$prov_vote)
 
+#### recode Homeowner(cps21_property_1) ####
+look_for(ces21, "home")
+ces21 %>%
+  mutate(homeowner=case_when(
+    cps21_property_1==1 ~1,
+    cps21_property_5==1 ~0,
+    cps21_property_6==1 ~NA_real_ ,
+    cps21_property_2==1 ~0,
+    cps21_property_3==1 ~0,
+    cps21_property_4==1 ~0,
+  ))->ces21
+#checks
+table(ces21$homeowner, ces21$cps21_property_1, useNA = "ifany")
+
 #glimpse(ces21)
 table(ces21$occupation)
 nrow(ces21)

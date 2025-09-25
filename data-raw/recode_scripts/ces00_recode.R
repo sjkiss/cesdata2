@@ -817,6 +817,20 @@ val_labels(ces00$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, 
 val_labels(ces00$prov_vote)
 table(ces00$prov_vote)
 
+#### Inequality - increased (cpsj5) ####
+look_for(ces00, "gap")
+table(ces00$cpsj5)
+ces00$inequality_increase<-Recode(as.numeric(ces00$cpsj5), "1=1; 3=0; 5=0.5; else=NA")
+#checks
+table(ces00$inequality_increase,  ces00$cpsj5, useNA = "ifany")
+
+#### Business - trickle down (pesg16) ####
+look_for(ces00, "business")
+table(ces00$pesg16)
+ces00$business<-Recode(as.numeric(ces00$pesg16), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces00$business,  ces00$pesg16, useNA = "ifany")
+
 glimpse(ces00)
 #Add mode
 ces00$mode<-rep("Phone", nrow(ces00))

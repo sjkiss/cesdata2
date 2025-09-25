@@ -303,6 +303,20 @@ val_labels(ces25b$male)<-c(Female=0, Male=1)
 val_labels(ces25b$male)
 table(ces25b$male)
 
+#### recode Homeowner(cps25_property_1) ####
+look_for(ces25b, "home")
+ces25b %>%
+  mutate(homeowner=case_when(
+    cps25_property_1==1 ~1,
+    cps25_property_5==1 ~0,
+    cps25_property_6==1 ~NA_real_ ,
+    cps25_property_2==1 ~0,
+    cps25_property_3==1 ~0,
+    cps25_property_4==1 ~0,
+  ))->ces25b
+#checks
+table(ces25b$homeowner, ces25b$cps25_property_1, useNA = "ifany")
+
 #Add mode and election
 ces25b$mode<-rep("Web", nrow(ces25b))
 ces25b$election<-rep(2025, nrow(ces25b))
