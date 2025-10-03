@@ -111,7 +111,7 @@ val_labels(ces15phone$non_charter_language)
 
 #recode Employment (CPS15_91)
 # look_for(ces15phone, "employment")
-ces15phone$employment<-Recode(ces15phone$CPS15_91, "3:7=0; 1:2=1; 8:11=1; else=NA")
+ces15phone$employment<-Recode(ces15phone$CPS15_91, "4:7=0; 1:3=1; 8:11=1; else=NA")
 val_labels(ces15phone$employment)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces15phone$employment)

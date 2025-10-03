@@ -13,19 +13,118 @@ look_for(ces25b, "class")
 look_for(ces25b, "vote")
 look_for(ces25b, "vote")
 
+#### recode Gender ####
+ces25b$male<-Recode(ces25b$cps25_genderid, "1=1; 2=0; else=NA")
+val_labels(ces25b$male)<-c(Female=0, Male=1)
+#checks
+val_labels(ces25b$male)
+table(ces25b$male)
+
+# recode Union Household (cps25_union)
+ces25b$union<-Recode(ces25b$cps25_union, "1=1; 2=0; else=NA")
+val_labels(ces25b$union)<-c(None=0, Union=1)
+# Checks
+val_labels(ces25b$union)
+table(ces25b$union , useNA = "ifany" )
+
+#Union Combined variable (identical copy of union) ### Respondent only
+ces25b$union_both<-ces25b$union
+#checks
+val_labels(ces25b$union_both)
+table(ces25b$union_both , useNA = "ifany" )
+
+#recode Education (cps25_education)
+ces25b$degree<-Recode(ces25b$cps25_education, "9:11=1; 1:8=0; else=NA")
+val_labels(ces25b$degree)<-c(nodegree=0, degree=1)
+#checks
+val_labels(ces25b$degree)
+table(ces25b$degree, ces25b$cps25_education , useNA = "ifany" )
+
+#recode Region (cps25_province)
+look_for(ces25b, "province")
+ces25b$region<-Recode(ces25b$cps25_province, "1:3=3; 4:5=1; 7=1; 9=2; 10=1; 12=3; else=NA")
+val_labels(ces25b$region)<-c(Atlantic=1, Ontario=2, West=3)
+#checks
+val_labels(ces25b$region)
+table(ces25b$region , ces25b$cps25_province , useNA = "ifany" )
+
 #### Create province and quebec variable ####
 ces25b$cps25_province
 ces25b$prov<-Recode(ces25b$cps25_province, "5=1; 10=2; 7=3; 4=4; 11=5; 9=6; 3=7; 12=8; 1=9; 2=10; else=NA")
 val_labels(ces25b$prov)<-c(NL=1, PE=2, NS=3, NB=4, QC=5, ON=6, MB=7, SK=8, AB=9, BC=10)
 table(ces25b$cps25_province)
+table(ces25b$prov)
 val_labels(ces25b$cps25_province)
 ces25b$quebec<-Recode(ces25b$cps25_province, "1:5=0; 11=1; 7=0;9:10=0;12=0; else=NA")
 val_labels(ces25b$quebec)<-c(Other=0, Quebec=1)
+table(ces25b$quebec)
+
+#### recode Age (cps25_age_in_years) ####
+look_for(ces25b, "age")
+ces25b$age<-ces25b$cps25_age_in_years
+#checks
+table(ces25b$age)
+
+#recode Religion (cps25_religion)
+look_for(ces25b, "relig")
+ces25b$religion<-Recode(ces25b$cps25_religion, "1:2=0; 3:7=3; 8:9=2; 10:11=1; 12:21=2; 22=3; else=NA")
+val_labels(ces25b$religion)<-c(None=0, Catholic=1, Protestant=2, Other=3)
+#checks
+val_labels(ces25b$religion)
+table(ces25b$religion , ces25b$cps25_religion , useNA = "ifany" )
+
+#recode Language (cps25_UserLanguage)
+look_for(ces25b, "language")
+ces25b$language<-Recode(ces25b$cps25_UserLanguage, "'FR-CA'=0; 'EN'=1; else=NA")
+val_labels(ces25b$language)<-c(French=0, English=1)
+#checks
+val_labels(ces25b$language)
+table(ces25b$language)
+
+# #recode Non-charter Language (pes21_lang)
+# look_for(ces21, "language")
+# ces21$non_charter_language<-Recode(ces21$pes21_lang, "1:2=1; 3:18=0; else=NA")
+# val_labels(ces21$non_charter_language)<-c(Charter=0, Non_Charter=1)
+# table(as_factor(ces21$pes21_lang),ces21$non_charter_language , useNA = "ifany" )
+# #checks
+# val_labels(ces21$non_charter_language)
+# table(ces21$non_charter_language)
+
+#recode Employment (cps25_employment)
+look_for(ces25b, "employment")
+ces25b$employment<-Recode(ces25b$cps25_employment, "4:8=0; 1:3=1; 9:11=1; else=NA")
+val_labels(ces25b$employment)<-c(Unemployed=0, Employed=1)
+#checks
+val_labels(ces25b$employment)
+table(ces25b$employment , ces25b$cps25_employment , useNA = "ifany" )
+
+# #recode Sector (cps25_sector)
+# lookfor(ces25b, "sector")
+# ces25b$sector<-Recode(ces25b$cps25_sector, "1=0; 3=0; 2=1; else=NA")
+# val_labels(ces25b$sector)<-c(`Public`=1, `Private`=0)
+# #checks
+# val_labels(ces25b$sector)
+# table(ces25b$sector , ces25b$cps25_sector , useNA = "ifany" )
 
 #### Create party vote ####
 ces25b$vote<-Recode(ces25b$cps25_votechoice , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 8=2; else=NA")
 val_labels(ces25b$vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
 table(as_factor(ces25b$vote))
+
+#### Create party vote - splitting out PPC from Cons ####
+ces25b$vote3<-Recode(ces25b$cps25_votechoice , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 8=6; else=NA")
+val_labels(ces25b$vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, PPC=6)
+table(as_factor(ces25b$vote3))
+
+#### Create party ID####
+ces25b$partyid<-Recode(ces25b$cps25_fed_id , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 9=2; else=NA")
+val_labels(ces25b$partyid)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+table(as_factor(ces25b$partyid))
+
+#### Create party ID - splitting out PPC from Cons ####
+ces25b$partyid2<-Recode(ces25b$cps25_fed_id , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 9=6; else=NA")
+val_labels(ces25b$partyid2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, PPC=6)
+table(as_factor(ces25b$partyid2))
 
 #### Create income ####
 lookfor(ces25b, "income")
@@ -61,6 +160,24 @@ ces25b %>%
 ces25b_des<-as_survey_design(subset(ces25b, !is.na(cps25_weight_kiss_module)), weights=cps25_weight_kiss_module)
 # check the income tertiles after weighting
 svytable(~income_tertile, design=ces25b_des)
+
+#recode Income Quintile (cps21_income_cat & cps21_income_number)
+look_for(ces25b, "income")
+ces25b %>%
+  mutate(income=case_when(
+    cps25_income==1 ~ 1,
+    cps25_income==2 ~ 1,
+    cps25_income==3 ~ 2,
+    cps25_income==4 ~ 3,
+    cps25_income==5 ~ 4,
+    cps25_income==6 ~ 4,
+    cps25_income==7 ~ 5,
+    cps25_income==8 ~ 5,
+  ))->ces25b
+val_labels(ces25b$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
+#checks
+val_labels(ces25b$income)
+table(ces25b$income)
 
 #### Create Class ####
 #Convert the 5 digit NOC code provided by CDEM to a number
@@ -165,19 +282,18 @@ ces25b %>%
 # ADd value labels
 val_labels(ces25b$occupation)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5)
 
-# Make occupation3 as self-employed and unskilled and skilleed groupi together
+# Make occupation3 as self-employed and unskilled and skilled grouped together
 library(labelled)
-#lookfor(ces21, "employed")
 
+#lookfor(ces21, "employed")
 ces25b$occupation3<-ifelse(ces25b$cps25_employment==3, 6, ces25b$occupation)
 
-# ADd value labels for occupation3
+# Add value labels for occupation3
 val_labels(ces25b$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 
-# Create Oesch variabl e
+# Create Oesch variable
 
 #Check, did I get everyone?
-
 ces25b %>%
   filter(is.na(occupation3)) %>%
   select(cps25_employment, occupation_name, occupation3) %>%
@@ -186,7 +302,7 @@ ces25b$NOC21_5
 
 #code logic of authority
 
-#First extract the first two digits of eac NOC
+#First extract the first two digits of each NOC
 
 ces25b$sector_teer<-str_extract_all(ces25b$NOC21_5, "^\\d{2}") %>% unlist()
 #Now separate
@@ -215,6 +331,7 @@ ces25b %>%
    working==1&cps25_employment!=3&sector==9~"Technical"
   ))->ces25b
 table(ces25b$logic)
+
 # Introduce level of authority for the 8-class schema
 #Note that Rehm and Kitchelt have four gradations here; Oesch has only two.
 ces25b %>%
@@ -226,12 +343,14 @@ table(ces25b$authority)
 ces25b %>%
   select(cps25_employment, teer, authority) %>%
   count(cps25_employment, teer, authority)
+
 #Check most frequent self-employed
 ces25b %>%
   filter(cps25_employment==3) %>%
   select(NOC21_5) %>%
   count(NOC21_5)
-#Note, most doctores are not self-employed
+
+#Note, most doctors are not self-employed
 ces25b %>%
   filter(NOC21_5==31102) %>%
   count(cps25_employment)
@@ -290,18 +409,215 @@ ces25b$occupation_oesch_6<-factor(ces25b$occupation_oesch_6, levels=c("Unskilled
                                            "Semi-Professionals Associate Managers",
                                            "Self-employed","Professionals", "Managers"))
 
-#### recode Age (cps25_age_in_years) ####
-look_for(ces25b, "age")
-ces25b$age<-ces25b$cps25_age_in_years
+#recode Religiosity (ces25_rel_imp)
+look_for(ces25b, "relig")
+ces25b$religiosity<-Recode(ces25b$cps25_rel_imp, "1=5; 2=4; 5=3; 3=2; 4=1; else=NA")
+val_labels(ces25b$religiosity)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4, Highest=5)
 #checks
-table(ces25b$age)
+val_labels(ces25b$religiosity)
+table(ces25b$religiosity, ces25b$cps25_rel_imp , useNA = "ifany")
 
-#### recode Gender ####
-ces25b$male<-Recode(ces25b$cps25_genderid, "1=1; 2=0; else=NA")
-val_labels(ces25b$male)<-c(Female=0, Male=1)
+# #recode Community Size (ces25_rural_urban)
+# look_for(ces25b, "urban")
+# ces25b$size<-Recode(ces25b$pes21_rural_urban, "1=1; 2=2; 3=3; 4=4; 5=5; else=NA")
+# val_labels(ces25b$size)<-c(Rural=1, Under_10K=2, Under_100K=3, Under_500K=4, City=5)
+# #checks
+# val_labels(ces25b$size)
+# table(ces25b$size, ces25b$pes21_rural_urban , useNA = "ifany" )
+
+#recode Native-born (cps25_bornin_canada)
+ces25b$native<-Recode(ces25b$cps25_bornin_canada, "1=1; 2=0; else=NA")
+val_labels(ces25b$native)<-c(Foreign=0, Native=1)
 #checks
-val_labels(ces25b$male)
-table(ces25b$male)
+val_labels(ces25b$native)
+table(ces25b$native, ces25b$cps25_bornin_canada , useNA = "ifany" )
+
+#recode Liberal leader
+ces25b$liberal_leader<-Recode(as.numeric(ces25b$cps25_lead_rating_23), "-99=NA")
+#checks
+#ces25b$liberal_leader<-(ces25b$liberal_leader2 /100)
+table(ces25b$liberal_leader)
+
+#recode Conservative leader
+ces25b$conservative_leader<-Recode(as.numeric(ces25b$cps25_lead_rating_24), "-99=NA")
+#checks
+#ces25b$conservative_leader<-(ces25b$conservative_leader2 /100)
+table(ces25b$conservative_leader)
+
+#recode NDP leader
+ces25b$ndp_leader<-Recode(as.numeric(ces25b$cps25_lead_rating_25), "-99=NA")
+#checks
+#ces25b$ndp_leader<-(ces25b$ndp_leader2 /100)
+table(ces25b$ndp_leader)
+
+#recode Bloc leader
+ces25b$bloc_leader<-Recode(as.numeric(ces25b$cps25_lead_rating_26), "-99=NA")
+#checks
+#ces25b$bloc_leader<-(ces25b$bloc_leader2 /100)
+table(ces25b$bloc_leader)
+
+#recode Green leader
+ces25b$green_leader<-Recode(as.numeric(ces25b$cps25_lead_rating_27), "-99=NA")
+#checks
+#ces25b$green_leader<-(ces25b$green_leader2 /100)
+table(ces25b$green_leader)
+
+#recode PPC leader
+ces25b$ppc_leader<-Recode(as.numeric(ces25b$cps25_lead_rating_29), "-99=NA")
+#checks
+#ces25b$ppc_leader<-(ces25b$ppc_leader2 /100)
+table(ces25b$ppc_leader)
+
+#recode Liberal rating
+look_for(ces25b, "parties")
+ces25b$liberal_rating<-Recode(as.numeric(ces25b$cps25_party_rating_23), "-99=NA")
+table(ces25b$liberal_rating)
+
+#recode Conservative rating
+ces25b$conservative_rating<-Recode(as.numeric(ces25b$cps25_party_rating_24), "-99=NA")
+table(ces25b$conservative_rating)
+
+#recode NDP rating
+ces25b$NDP_rating<-Recode(as.numeric(ces25b$cps25_party_rating_25), "-99=NA")
+table(ces25b$NDP_rating)
+
+#recode Bloc rating
+ces25b$bloc_rating<-Recode(as.numeric(ces25b$cps25_party_rating_26), "-99=NA")
+table(ces25b$bloc_rating)
+
+#recode Green rating
+ces25b$green_rating<-Recode(as.numeric(ces25b$cps25_party_rating_27), "-99=NA")
+table(ces25b$green_rating)
+
+#recode PPC rating
+ces25b$ppc_rating<-Recode(as.numeric(ces25b$cps25_party_rating_29), "-99=NA")
+table(ces25b$ppc_rating)
+
+#### recode Redistribution (kiss_module_Q8 )####
+look_for(ces25b, "rich")
+ces25b$redistribution_mod<-Recode(as.numeric(ces25b$kiss_module_Q8), "; 1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+#val_labels(ces25b$redistribution_mod)<-c(Much_more=0, Somewhat_more=0.25, Same_amount=0.5, Somewhat_less=0.75, Much_less=1) #LEFT TO RIGHT#
+#checks
+#val_labels(ces25b$redistribution_mod)
+table(ces25b$redistribution_mod)
+
+#recode Pro-Redistribution (p44)
+ces25b$pro_redistribution_mod<-Recode(ces25b$kiss_module_Q7, "1:2=1; 3:5=0; else=NA", as.numeric=T)
+val_labels(ces25b$pro_redistribution_mod)<-c(Non_Pro=0, Pro=1)
+#checks
+val_labels(ces25b$pro_redistribution_mod)
+table(ces25b$pro_redistribution_mod)
+
+#### Inequality - problem (kiss_module_Q7) ####
+look_for(ces25b, "poor")
+ces25b$inequality_mod<-Recode(as.numeric(ces25b$kiss_module_Q7), "1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA")
+#checks
+table(ces25b$inequality_mod, ces25b$kiss_module_Q7, useNA = "ifany")
+
+#recode Personal Retrospective (cps25_own_fin_retro)
+look_for(ces25b, "situation")
+ces25b$personal_retrospective<-Recode(as.numeric(ces25b$cps25_own_fin_retro), "1=1; 2=0.5; 3=0; 4=0.5; else=NA", as.numeric=T)
+#val_labels(ces25b$personal_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces25b$personal_retrospective)
+table(ces25b$personal_retrospective , ces25b$cps25_own_fin_retro, useNA = "ifany" )
+
+#recode National Retrospective (cps25_econ_retro)
+look_for(ces25b, "economy")
+ces25b$national_retrospective<-Recode(as.numeric(ces25b$cps25_econ_retro), "1=1; 2=0.5; 3=0; 4=0.5; else=NA", as.numeric=T)
+#val_labels(ces25b$national_retrospective)<-c(Worse=0, Same=0.5, Better=1)
+#checks
+val_labels(ces25b$national_retrospective)
+table(ces25b$national_retrospective, ces25b$cps25_econ_retro, useNA = "ifany" )
+
+#recode Ideology (cps25_lr_scale_bef_1)
+look_for(ces25b, "scale")
+ces25b$ideology<-Recode(as.numeric(ces25b$cps25_lr_scale_bef_1), "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; -99=NA; else=NA")
+#val_labels(ces25b$ideology)<-c(Left=0, Right=1)
+#checks
+#val_labels(ces25b$ideology)
+table(ces25b$ideology, ces25b$cps25_lr_scale_bef_1 , useNA = "ifany" )
+
+# # recode turnout (pes21_turnout2021)
+# look_for(ces21, "vote")
+# ces21$turnout<-Recode(ces21$pes21_turnout2021, "1=1; 2:5=0; 6:8=NA; else=NA")
+# val_labels(ces21$turnout)<-c(No=0, Yes=1)
+# #checks
+# val_labels(ces21$turnout)
+# table(ces21$turnout)
+# table(ces21$turnout, ces21$vote)
+
+#### recode political efficacy ####
+#recode No Say (kiss_module_Q10_3)
+#look_for(ces25b, "have any say")
+ces25b$efficacy_internal<-Recode(as.numeric(ces25b$kiss_module_Q10_3), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+#val_labels(ces25b$efficacy_internal)<-c(low=0, high=1)
+#checks
+#val_labels(ces25b$efficacy_internal)
+table(ces25b$efficacy_internal, ces25b$kiss_module_Q10_3 , useNA = "ifany" )
+
+#recode MPs lose touch (kiss_module_Q10_1)
+#look_for(ces25b, "touch")
+ces25b$efficacy_external<-Recode(as.numeric(ces25b$kiss_module_Q10_1), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+#val_labels(ces25b$efficacy_external)<-c(low=0, high=1)
+#checks
+#val_labels(ces25b$efficacy_external)
+table(ces25b$efficacy_external, ces25b$kiss_module_Q10_1 , useNA = "ifany" )
+
+#recode Official Don't Care (kiss_module_Q10_2)
+#look_for(ces25b, "doesn't care")
+ces25b$efficacy_external2<-Recode(as.numeric(ces25b$kiss_module_Q10_2), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+#val_labels(ces25b$efficacy_external2)<-c(low=0, high=1)
+#checks
+#val_labels(ces25b$efficacy_external2)
+table(ces25b$efficacy_external2, ces25b$kiss_module_Q10_2 , useNA = "ifany" )
+
+ces25b %>%
+  mutate(political_efficacy=rowMeans(select(., c("efficacy_external", "efficacy_external2", "efficacy_internal")), na.rm=T))->ces25b
+
+ces25b %>%
+  select(starts_with("efficacy")) %>%
+  summary()
+
+# recode satisfaction with democracy (cps25_demsat & pes25_dem_sat)
+# look_for(ces21, "dem")
+# ces21$satdem<-Recode(as.numeric(ces21$pes21_dem_sat), "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+# #checks
+# table(ces21$satdem, ces21$pes21_dem_sat, useNA = "ifany" )
+
+ces25b$satdem2<-Recode(as.numeric(ces25b$cps25_demsat), "1=1; 2=0.75; 3=0.25; 4=0; 5=0.5; else=NA", as.numeric=T)
+#checks
+table(ces25b$satdem2, ces25b$cps25_demsat, useNA = "ifany" )
+
+# recode political interest (cps25_interest_gen_1)
+look_for(ces25b, "interest")
+ces25b$pol_interest<-Recode(as.numeric(ces25b$cps25_interest_gen_1), "0=0; 1=0.1; 2=0.2; 3=0.3; 4=0.4; 5=0.5; 6=0.6; 7=0.7; 8=0.8; 9=0.9; 10=1; else=NA", as.numeric=T)
+#checks
+table(ces25b$pol_interest, ces25b$cps25_interest_gen_1, useNA = "ifany" )
+
+#recode Foreign-born (cps25_bornin_canada)
+ces25b$foreign<-Recode(ces25b$cps25_bornin_canada, "1=0; 2=1; else=NA")
+val_labels(ces25b$foreign)<-c(No=0, Yes=1)
+#checks
+val_labels(ces25b$foreign)
+table(ces25b$foreign, ces25b$cps25_bornin_canada , useNA = "ifany" )
+
+#recode Previous Vote (cps25_vote_2021)
+look_for(ces25b, "party did you vote")
+ces25b$past_vote<-Recode(ces25b$cps25_vote_2021, "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; else=NA")
+val_labels(ces25b$past_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+#checks
+val_labels(ces25b$past_vote)
+table(ces25b$past_vote, ces25b$cps25_vote_2021 , useNA = "ifany" )
+
+# #recode Provincial Vote (pes21_provvote)
+# # look_for(ces21, "vote")
+# ces21$prov_vote<-car::Recode(as.numeric(ces21$pes21_provvote), "1=1; 7=2; 11=2; 2=3; 3=5; 4=10; 5=4; 6=11; 8:9=0; 10=7; 12:14=0; else=NA")
+# val_labels(ces21$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, Green=5, Reform=6, Sask=7,
+#                                ADQ=8, Wildrose=9, CAQ=10, QS=11)
+# #checks
+# val_labels(ces21$prov_vote)
+# table(ces21$prov_vote)
 
 #### recode Homeowner(cps25_property_1) ####
 look_for(ces25b, "home")
@@ -316,6 +632,130 @@ ces25b %>%
   ))->ces25b
 #checks
 table(ces25b$homeowner, ces25b$cps25_property_1, useNA = "ifany")
+
+#### Add Subjective social class ####
+ces25b %>%
+  mutate(sub_class=case_when(
+    kiss_module_Q2==1~"Upper Class",
+    kiss_module_Q2==2~"Upper-Middle Class",
+    kiss_module_Q2==3~"Middle Class",
+    kiss_module_Q2==4~"Working Class",
+    kiss_module_Q2==5~"Lower Class",
+    TRUE~NA_character_
+  ))->ces25b
+#lookfor(ces25b, "class")
+ces25b$sub_class<-factor(ces25b$sub_class, levels=c("Lower Class", "Working Class", "Middle Class", "Upper-Middle Class", "Upper Class"))
+table(ces25b$sub_class)
+
+# recode Subjective class - belong to class (kiss_module_Q1)
+look_for(ces25b, "class")
+ces25b$class_belong<-Recode(ces25b$kiss_module_Q1, "2=0; 1=1; else=NA")
+val_labels(ces25b$class_belong)<-c(No=0, Yes=1)
+#checks
+val_labels(ces25b$class_belong)
+table(ces25b$class_belong)
+
+# recode Subjective class - closeness to others in class (kiss_module_Q3)
+look_for(ces25b, "class")
+ces25b$class_close<-Recode(ces25b$kiss_module_Q3, "3=0; 1=1; 2=0.5; else=NA")
+val_labels(ces25b$class_close)<-c(Not_close=0, Fairly_close=0.5, Very_close=1)
+#checks
+val_labels(ces25b$class_close)
+table(ces25b$class_close)
+
+# recode Class conflict (kiss_module_Q4)
+look_for(ces25b, "class")
+ces25b$class_conflict<-Recode(ces25b$kiss_module_Q4, "2=0; 1=1; else=NA")
+val_labels(ces25b$class_conflict)<-c(No=0, Yes=1)
+#checks
+val_labels(ces25b$class_conflict)
+table(ces25b$class_conflict)
+
+# recode Liberal class favouritism (kiss_module_Q9_1)
+look_for(ces25b, "class")
+ces25b$liberal_class<-Recode(as.numeric(ces25b$kiss_module_Q9_1) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces25b$liberal_class<-c(Working_class=0, Middle_class=1)
+#checks
+#val_labels(ces25b4$liberal_class)
+table(ces25b$liberal_class, ces25b$kiss_module_Q9_1  , useNA = "ifany")
+
+# recode Conservative class favouritism (kiss_module_Q9_2)
+ces25b$conservative_class<-Recode(as.numeric(ces25b$kiss_module_Q9_2) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces25b$conservative_class<-c(Working_class=0, Middle_class=1)
+#checks
+#val_labels(ces25b$conservative_class)
+table(ces25b$conservative_class, ces25b$kiss_module_Q9_2  , useNA = "ifany")
+
+# recode NDP class favouritism (kiss_module_Q9_3)
+ces25b$ndp_class<-Recode(as.numeric(ces25b$kiss_module_Q9_3) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces25b$ndp_class<-c(Working_class=0, Middle_class=1)
+#checks
+#val_labels(ces25b$ndp_class)
+table(ces25b$ndp_class, ces25b$kiss_module_Q9_3  , useNA = "ifany")
+
+# recode Green class favouritism (kiss_module_Q9_4)
+ces25b$green_class<-Recode(as.numeric(ces25b$kiss_module_Q9_4) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces25b$green_class<-c(Working_class=0, Middle_class=1)
+#checks
+#val_labels(ces25b$green_class)
+table(ces25b$green_class, ces25b$kiss_module_Q9_4  , useNA = "ifany")
+
+# recode PPC class favouritism (kiss_module_Q9_5)
+ces25b$ppc_class<-Recode(as.numeric(ces25b$kiss_module_Q9_5) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces25b$ppc_class<-c(Working_class=0, Middle_class=1)
+#checks
+#val_labels(ces25b$ppc_class)
+table(ces25b$ppc_class, ces25b$kiss_module_Q9_5  , useNA = "ifany")
+
+# recode Bloc class favouritism (kiss_module_Q9_6)
+ces25b$bloc_class<-Recode(as.numeric(ces25b$kiss_module_Q9_6) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces25b$bloc_class<-c(Working_class=0, Middle_class=1)
+#checks
+#val_labels(ces25b$bloc_class)
+table(ces25b$bloc_class, ces25b$kiss_module_Q9_6  , useNA = "ifany")
+
+#### Add Own vs Rent ####
+look_for(ces25b, "rent")
+ces25b %>%
+  mutate(own_rent=case_when(
+    cps25_property_1==1~"Own",
+    cps25_rent==1 ~"Rent"
+  ))->ces25b
+ces25b$own_rent<-factor(ces25b$own_rent, levels=c("Own", "Rent", "Other"))
+table(ces25b$own_rent)
+
+# recode Future home (kiss_module_Q5)
+look_for(ces25b, "purchase")
+ces25b$home_future<-Recode(ces25b$kiss_module_Q5, "1=3; 2=2; 3=1; else=NA")
+val_labels(ces25b$home_future)<-c(New_rental=1, Stay=2, Purchase=3)
+#checks
+val_labels(ces25b$home_future)
+table(ces25b$home_future)
+
+# recode Housing - gov't provide adequate (kiss_module_Q6)
+look_for(ces25b, "housing")
+ces25b$housing<-Recode(as.numeric(ces25b$kiss_module_Q6) , "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
+#val_labels(ces25b$home_future)<-c(Agree=0, Disagree=1) # LEFT TO rIGHT #
+#checks
+#val_labels(ces25b$housing)
+table(ces25b$housing)
+
+#recode Racial minority thermometer
+look_for(ces25b, "therm")
+ces25b$racial_rating<-Recode(as.numeric(ces25b$cps25_groups_therm_1 /100), "-0.99=NA")
+table(ces25b$racial_rating)
+
+#recode Racial minority thermometer
+ces25b$immigrant_rating<-Recode(as.numeric(ces25b$cps25_groups_therm_2 /100), "-0.99=NA")
+table(ces25b$immigrant_rating)
+
+#recode Francophones thermometer
+ces25b$francophone_rating<-Recode(as.numeric(ces25b$cps25_groups_therm_3 /100), "-0.99=NA")
+table(ces25b$francophone_rating)
+
+#recode Indigenous thermometer
+ces25b$indigenous_rating<-Recode(as.numeric(ces25b$cps25_groups_therm_4 /100), "-0.99=NA")
+table(ces25b$indigenous_rating)
 
 #Add mode and election
 ces25b$mode<-rep("Web", nrow(ces25b))

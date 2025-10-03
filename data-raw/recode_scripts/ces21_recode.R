@@ -218,7 +218,7 @@ table(ces21$non_charter_language)
 
 #recode Employment (cps21_employment)
 look_for(ces21, "employment")
-ces21$employment<-Recode(ces21$cps21_employment, "3:8=0; 1:2=1; 9:11=1; else=NA")
+ces21$employment<-Recode(ces21$cps21_employment, "4:8=0; 1:3=1; 9:11=1; else=NA")
 val_labels(ces21$employment)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces21$employment)
