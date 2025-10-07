@@ -233,7 +233,7 @@ table(ces19web$non_charter_language)
 
 #recode Employment (cps19_employment)
 look_for(ces19web, "employment")
-ces19web$employment<-Recode(ces19web$cps19_employment, "3:8=0; 1:2=1; 9:11=1; else=NA")
+ces19web$employment<-Recode(ces19web$cps19_employment, "4:8=0; 1:3=1; 9:11=1; else=NA")
 val_labels(ces19web$employment)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces19web$employment)
@@ -885,6 +885,27 @@ val_labels(ces19web$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=
 #checks
 val_labels(ces19web$prov_vote)
 table(ces19web$prov_vote)
+
+#### recode Homeowner(cps19_property_1) ####
+look_for(ces19web, "home")
+ces19web %>%
+  mutate(homeowner=case_when(
+    cps19_property_1==1 ~1,
+    cps19_property_5==1 ~0,
+    cps19_property_6==1 ~NA_real_ ,
+    cps19_property_2==1 ~0,
+    cps19_property_3==1 ~0,
+    cps19_property_4==1 ~0,
+  ))->ces19web
+#checks
+table(ces19web$homeowner, ces19web$cps19_property_1, useNA = "ifany")
+
+#### Business tax (pes19_taxes_2) ####
+look_for(ces19web, "tax")
+table(ces19web$pes19_taxes_2)
+ces19web$business_tax<-Recode(as.numeric(ces19web$pes19_taxes_2), "1:2:=0; 4:5=1; 3=0.5; 6=0.5; else=NA")
+#checks
+table(ces19web$business_tax,  ces19web$pes19_taxes_2, useNA = "ifany")
 
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))

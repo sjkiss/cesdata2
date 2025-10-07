@@ -111,7 +111,7 @@ val_labels(ces15phone$non_charter_language)
 
 #recode Employment (CPS15_91)
 # look_for(ces15phone, "employment")
-ces15phone$employment<-Recode(ces15phone$CPS15_91, "3:7=0; 1:2=1; 8:11=1; else=NA")
+ces15phone$employment<-Recode(ces15phone$CPS15_91, "4:7=0; 1:3=1; 8:11=1; else=NA")
 val_labels(ces15phone$employment)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces15phone$employment)
@@ -1185,6 +1185,26 @@ table(ces15phone$prov_vote)
 ces15phone$daycare<-Recode(as.numeric(ces15phone$PES15_56), "1=0; 5=1; 8=0.5; else=NA")
 #checks
  table(ces15phone$daycare, ces15phone$PES15_56 , useNA = "ifany" )
+
+#### recode Homeowner(PES15_95) ####
+look_for(ces15phone, "home")
+ces15phone$homeowner<-Recode(ces15phone$PES15_95, "1=1; 5=0; else=NA")
+#checks
+table(ces15phone$homeowner, ces15phone$PES15_95, useNA = "ifany")
+
+#### Business - trickle down (PES15_47) ####
+look_for(ces15phone, "business")
+table(ces15phone$PES15_47)
+ces15phone$business<-Recode(as.numeric(ces15phone$PES15_47), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces15phone$business,  ces15phone$PES15_47, useNA = "ifany")
+
+#### Business tax (CPS15_31) ####
+look_for(ces15phone, "tax")
+table(ces15phone$CPS15_31)
+ces15phone$business_tax<-Recode(as.numeric(ces15phone$CPS15_31), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
+#checks
+table(ces15phone$business_tax,  ces15phone$CPS15_31, useNA = "ifany")
 
 # add Election
 ces15phone$election<-rep(2015, nrow(ces15phone))

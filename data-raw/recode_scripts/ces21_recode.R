@@ -218,7 +218,7 @@ table(ces21$non_charter_language)
 
 #recode Employment (cps21_employment)
 look_for(ces21, "employment")
-ces21$employment<-Recode(ces21$cps21_employment, "3:8=0; 1:2=1; 9:11=1; else=NA")
+ces21$employment<-Recode(ces21$cps21_employment, "4:8=0; 1:3=1; 9:11=1; else=NA")
 val_labels(ces21$employment)<-c(Unemployed=0, Employed=1)
 #checks
 val_labels(ces21$employment)
@@ -852,6 +852,20 @@ val_labels(ces21$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, 
 #checks
 val_labels(ces21$prov_vote)
 table(ces21$prov_vote)
+
+#### recode Homeowner(cps21_property_1) ####
+look_for(ces21, "home")
+ces21 %>%
+  mutate(homeowner=case_when(
+    cps21_property_1==1 ~1,
+    cps21_property_5==1 ~0,
+    cps21_property_6==1 ~NA_real_ ,
+    cps21_property_2==1 ~0,
+    cps21_property_3==1 ~0,
+    cps21_property_4==1 ~0,
+  ))->ces21
+#checks
+table(ces21$homeowner, ces21$cps21_property_1, useNA = "ifany")
 
 #glimpse(ces21)
 table(ces21$occupation)

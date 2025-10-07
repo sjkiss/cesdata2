@@ -416,7 +416,20 @@ table(ces84$prov_vote)
 glimpse(ces84)
 lookfor(ces84, "home")
 
-#Add sub_class
+
+#### Inequality - problem (VAR324) ####
+look_for(ces84, "poor")
+ces84$inequality<-Recode(as.numeric(ces84$VAR324), "1=1; 2=0.75; 7=0.5; 3=0.25; 4=0; else=NA")
+#checks
+table(ces84$inequality,ces84$VAR324, useNA = "ifany")
+
+#recode Homeowner (VAR418)
+ces84$homeowner<-Recode(as.numeric(ces84$VAR418), "1=1; 2=0; else=NA")
+#checks
+table(ces84$homeowner,ces84$VAR418, useNA = "ifany")
+
+#### Add Subjective social class ####
+
 lookfor(ces84, "belong")
 table(as_factor(ces84$VAR377), useNA = "ifany")
 ces84 %>%
@@ -430,15 +443,76 @@ ces84 %>%
   ))->ces84
 ces84$sub_class<-factor(ces84$sub_class, levels=c("Lower Class", "Working Class", "Middle Class", "Upper-Middle Class", "Upper Class"))
 table(ces84$sub_class)
-#Add own rent
+
+
+# recode Subjective class - belong to class (VAR306)
+look_for(ces84, "class")
+ces84$class_belong<-Recode(ces84$VAR306, "2=0; 1=1; else=NA")
+val_labels(ces84$class_belong)<-c(No=0, Yes=1)
+#checks
+val_labels(ces84$class_belong)
+table(ces84$class_belong)
+
+# recode Subjective class - closeness to others in class (VAR309)
+look_for(ces84, "class")
+ces84$class_close<-Recode(ces84$VAR309, "3=0; 1=1; 2=0.5; else=NA")
+val_labels(ces84$class_close)<-c(Not_close=0, Fairly_close=0.5, Very_close=1)
+#checks
+val_labels(ces84$class_close)
+table(ces84$class_close)
+
+# recode Class conflict (VAR310)
+look_for(ces84, "class")
+ces84$class_conflict<-Recode(ces84$VAR310, "2=0; 1=1; else=NA")
+val_labels(ces84$class_conflict)<-c(No=0, Yes=1)
+#checks
+val_labels(ces84$class_conflict)
+table(ces84$class_conflict)
+
+# recode Liberal class favouritism (VAR062)
+look_for(ces84, "class")
+ces84$liberal_class<-Recode(as.numeric(ces84$VAR062) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces84$liberal_class<-c(Working_class=0, Middle_class=1)
+#checks
+#val_labels(ces84$liberal_class)
+table(ces84$liberal_class, ces84$VAR062  , useNA = "ifany")
+
+# recode Conservative class favouritism (VAR063)
+ces84$conservative_class<-Recode(as.numeric(ces84$VAR063) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces84$conservative_class<-c(Working_class=0, Middle_class=1)
+#checks
+#val_labels(ces84$conservative_class)
+table(ces84$conservative_class, ces84$VAR063  , useNA = "ifany")
+
+# recode NDP class favouritism (VAR064)
+ces84$ndp_class<-Recode(as.numeric(ces84$VAR064) , "1=0; 2=0.17; 3=0.33; 4=0.5; 5=0.67; 6=0.83; 7=1; else=NA")
+#val_labels(ces84$ndp_class<-c(Working_class=0, Middle_class=1)
+#checks
+#val_labels(ces84$ndp_class)
+table(ces84$ndp_class, ces84$VAR064  , useNA = "ifany")
+
+#### Add Own vs Rent ####
 ces84 %>%
   mutate(own_rent=case_when(
     VAR418==1~'Own',
     VAR418==2~'Rent',
     VAR418==8~'Other'
   ))->ces84
+
 ces84$own_rent<-factor(ces84$own_rent, levels=c("Own", "Rent", "Other"))
-  #Add mode
+
+table(ces84$own_rent)
+
+# recode Housing - gov't provide adequate (VAR322)
+look_for(ces84, "housing")
+ces84$housing<-Recode(as.numeric(ces84$VAR322) , "1=0; 2=0.25; 7=0.5; 3=0.75; 4=1; else=NA")
+#val_labels(ces84$home_future)<-c(Agree=0, Disagree=1) # LEFT TO rIGHT #
+#checks
+#val_labels(ces84b$housing)
+table(ces84$housing)
+
+#Add mode
+
 ces84$mode<-rep("Phone", nrow(ces84))
 #Add Election
 ces84$election<-rep(1984, nrow(ces84))

@@ -973,6 +973,33 @@ val_labels(ces0411$prov_vote04)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ
 val_labels(ces0411$prov_vote04)
 table(ces0411$prov_vote04)
 
+#### recode Homeowner(ces04_CPS_S7) ####
+look_for(ces0411, "home")
+ces0411$homeowner04<-Recode(ces0411$ces04_CPS_S7, "1=1; 5=0; else=NA")
+#checks
+table(ces0411$homeowner04, ces0411$ces04_CPS_S7, useNA = "ifany")
+
+#### Inequality - increased (ces04_PES_D4) ####
+look_for(ces0411, "gap")
+table(ces0411$ces04_PES_D4)
+ces0411$inequality_increase04<-Recode(as.numeric(ces0411$ces04_PES_D4), "1=1; 3=0; 5=0.5; else=NA")
+#checks
+table(ces0411$inequality_increase04,  ces0411$ces04_PES_D4, useNA = "ifany")
+
+#### Business - trickle down (ces04_PES_G2) ####
+look_for(ces0411, "business")
+table(ces0411$ces04_PES_G2)
+ces0411$business04<-Recode(as.numeric(ces0411$ces04_PES_G2), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces0411$business04,  ces0411$ces04_PES_G2, useNA = "ifany")
+
+#### Business tax (ces04_PES_D1L) ####
+look_for(ces0411, "tax")
+table(ces0411$ces04_PES_D1L)
+ces0411$business_tax04<-Recode(as.numeric(ces0411$ces04_PES_D1L), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
+#checks
+table(ces0411$business_tax04,  ces0411$ces04_PES_D1L, useNA = "ifany")
+
 # Add election04 variable
 ces0411 %>%
   mutate(election04=case_when(
@@ -1960,11 +1987,31 @@ val_labels(ces0411$prov_vote06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ
 val_labels(ces0411$prov_vote06)
 table(ces0411$prov_vote06)
 
+#### recode Homeowner(ces06_CPS_S7) ####
+look_for(ces0411, "home")
+ces0411$homeowner06<-Recode(ces0411$ces06_CPS_S7, "1=1; 5=0; else=NA")
+#checks
+table(ces0411$homeowner06, ces0411$ces06_CPS_S7, useNA = "ifany")
+
 ces0411 %>%
   mutate(election06=case_when(
     str_detect(survey, "06")~ 2006
   ))->ces0411
 table(ces0411$election06, useNA = "ifany")
+
+#### Business - trickle down (ces06_PES_G1) ####
+look_for(ces0411, "business")
+table(ces0411$ces06_PES_G1)
+ces0411$business06<-Recode(as.numeric(ces0411$ces06_PES_G1), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces0411$business06,  ces0411$ces06_PES_G1, useNA = "ifany")
+
+#### Business tax (ces06_PES_D1L) ####
+look_for(ces0411, "tax")
+table(ces0411$ces06_PES_D1L)
+ces0411$business_tax06<-Recode(as.numeric(ces0411$ces06_PES_D1L), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
+#checks
+table(ces0411$business_tax06,  ces0411$ces06_PES_D1L, useNA = "ifany")
 
 ####Recode 2008 3rd ####
 
@@ -3190,6 +3237,26 @@ ces0411$enviro_spend08<-Recode(as.numeric(ces0411$ces08_PES_D1F), "1=1; 3=0; 5=0
 #checks
 # table(ces0411$enviro_spend08, useNA = "ifany" )
 
+#### recode Homeowner(ces08_PES_S7) ####
+look_for(ces0411, "home")
+ces0411$homeowner08<-Recode(ces0411$ces08_PES_S7, "1=1; 5=0; else=NA")
+#checks
+table(ces0411$homeowner08, ces0411$ces08_PES_S7, useNA = "ifany")
+
+#### Business - trickle down (ces08_PES_G1) ####
+look_for(ces0411, "business")
+table(ces0411$ces08_PES_G1)
+ces0411$business08<-Recode(as.numeric(ces0411$ces08_PES_G1), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces0411$business08,  ces0411$ces08_PES_G1, useNA = "ifany")
+
+#### Business tax (ces08_PES_D1L) ####
+look_for(ces0411, "tax")
+table(ces0411$ces08_PES_D1L)
+ces0411$business_tax08<-Recode(as.numeric(ces0411$ces08_PES_D1L), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
+#checks
+table(ces0411$business_tax08,  ces0411$ces08_PES_D1L, useNA = "ifany")
+
 
 ####Recode 2011 4th ####
 
@@ -4026,6 +4093,26 @@ table(ces0411$prov_vote11)
 ces0411$daycare11<-Recode(ces0411$PES11_56, "1=0; 5=1; 8=0.5; else=NA")
 #checks
 table(ces0411$daycare11, ces0411$PES11_56, useNA = "ifany" )
+
+#### recode Homeowner(PES11_95) ####
+look_for(ces0411, "home")
+ces0411$homeowner11<-Recode(ces0411$PES11_95, "1=1; 5=0; else=NA")
+#checks
+table(ces0411$homeowner11, ces0411$PES11_95, useNA = "ifany")
+
+#### Business - trickle down (PES11_47) ####
+look_for(ces0411, "business")
+table(ces0411$PES11_47)
+ces0411$business11<-Recode(as.numeric(ces0411$PES11_47), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
+#checks
+table(ces0411$business11,  ces0411$PES11_47, useNA = "ifany")
+
+#### Business tax (CPS11_31) ####
+look_for(ces0411, "tax")
+table(ces0411$CPS11_31)
+ces0411$business_tax11<-Recode(as.numeric(ces0411$CPS11_31), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
+#checks
+table(ces0411$business_tax11,  ces0411$CPS11_31, useNA = "ifany")
 
 # Add 2011 Election Variable
 table(ces0411$survey)
