@@ -431,18 +431,21 @@ table(ces84$homeowner,ces84$VAR418, useNA = "ifany")
 #### Add Subjective social class ####
 
 lookfor(ces84, "belong")
-table(as_factor(ces84$VAR377), useNA = "ifany")
+
+table(ces84$VAR307, useNA = "ifany")
 ces84 %>%
   mutate(sub_class=case_when(
-    VAR307==1~"Upper Class",
-    VAR307==2~"Upper-Middle Class",
-    VAR307==3~"Middle Class",
-    VAR307==4~"Working Class",
-    VAR307==5~"Lower Class",
+    VAR307==1|VAR308==1~"Upper Class",
+    VAR307==2|VAR308==2~"Upper-Middle Class",
+    VAR307==3|VAR308==3~"Middle Class",
+    VAR307==4|VAR308==4~"Working Class",
+    VAR307==5|VAR308==5~"Lower Class",
     TRUE~NA_character_
   ))->ces84
+#table(ces84$VAR307, ces84$sub_class, useNA = "ifany")
+#table(ces84$VAR307, ces84$VAR308, useNA = "ifany")
 ces84$sub_class<-factor(ces84$sub_class, levels=c("Lower Class", "Working Class", "Middle Class", "Upper-Middle Class", "Upper Class"))
-table(ces84$sub_class)
+#table(ces84$sub_class)
 
 
 # recode Subjective class - belong to class (VAR306)
