@@ -40,6 +40,13 @@ val_labels(ces25b$degree)<-c(nodegree=0, degree=1)
 val_labels(ces25b$degree)
 table(ces25b$degree, ces25b$cps25_education , useNA = "ifany" )
 
+#recode Education 2 (cps25_education)
+ces25b$education<-Recode(ces25b$cps25_education, "1:4=1; 5=2; 6:7=3; 8=4; 9:11=5; else=NA")
+val_labels(ces25b$education)<-c(Less_than_HS=1, HS=2, College=3, Some_uni=4, Bachelor=5)
+#checks
+val_labels(ces25b$education)
+table(ces25b$education)
+
 #recode Region (cps25_province)
 look_for(ces25b, "province")
 ces25b$region<-Recode(ces25b$cps25_province, "1:3=3; 4:5=1; 7=1; 9=2; 10=1; 12=3; else=NA")
@@ -774,7 +781,7 @@ look_for(ces25b, "therm")
 ces25b$racial_rating<-Recode(as.numeric(ces25b$cps25_groups_therm_1 /100), "-0.99=NA")
 table(ces25b$racial_rating)
 
-#recode Racial minority thermometer
+#recode Immigrant minority thermometer
 ces25b$immigrant_rating<-Recode(as.numeric(ces25b$cps25_groups_therm_2 /100), "-0.99=NA")
 table(ces25b$immigrant_rating)
 

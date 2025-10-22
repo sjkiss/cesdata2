@@ -7,7 +7,6 @@ library(haven)
 #load data
 ces84<-read_sav(file=here("data-raw/1984.sav"))
 
-
 #recode Gender (VAR456)
 # look_for(ces84, "sex")
 ces84$male<-Recode(ces84$VAR456, "1=1; 2=0")
@@ -47,7 +46,15 @@ ces84$degree<-Recode(ces84$VAR362, "8=1; 1:7=0; 9=0; else=NA")
 val_labels(ces84$degree)<-c(nodegree=0, degree=1)
 #checks
 val_labels(ces84$degree)
-# table(ces84$degree)
+table(ces84$degree)
+
+#recode Education 2 (VAR262)
+# look_for(ces84, "education")
+ces84$education<-Recode(ces84$VAR362, "1:3=1; 4=2; 5:6=3; 7=4; 8=5; 9=1; else=NA")
+val_labels(ces84$education)<-c(Less_than_HS=1, HS=2, College=3, Some_uni=4, Bachelor=5)
+#checks
+val_labels(ces84$education)
+table(ces84$education)
 
 #recode Region (VAR003)
 # look_for(ces84, "region")
@@ -418,10 +425,14 @@ lookfor(ces84, "home")
 
 
 #### Inequality - problem (VAR324) ####
-look_for(ces84, "poor")
 ces84$inequality<-Recode(as.numeric(ces84$VAR324), "1=1; 2=0.75; 7=0.5; 3=0.25; 4=0; else=NA")
 #checks
 table(ces84$inequality,ces84$VAR324, useNA = "ifany")
+
+#### Redistribution - high taxes for rich (VAR329) #### (Left-Right)
+ces84$redistribtion_tax<-Recode(as.numeric(ces84$VAR329), "1=0; 2=0.25; 7=0.5; 3=0.75; 4=1; else=NA")
+#checks
+table(ces84$redistribtion_tax,ces84$VAR329, useNA = "ifany")
 
 #recode Homeowner (VAR418)
 ces84$homeowner<-Recode(as.numeric(ces84$VAR418), "1=1; 2=0; else=NA")
@@ -513,6 +524,39 @@ ces84$housing<-Recode(as.numeric(ces84$VAR322) , "1=0; 2=0.25; 7=0.5; 3=0.75; 4=
 #checks
 #val_labels(ces84b$housing)
 table(ces84$housing)
+
+# Gay rights - homosexual teachers (VAR336)
+look_for(ces84, "homo")
+ces84$trad2<-Recode(as.numeric(ces84$VAR336) , "1=0; 2=0.25; 7=0.5; 3=0.75; 4=1; else=NA")
+#checks
+table(ces84$trad2)
+
+# Abortion (VAR335)
+look_for(ces84, "abortion")
+ces84$abortion<-Recode(as.numeric(ces84$VAR335) , "1=0; 2=0.25; 7=0.5; 3=0.75; 4=1; else=NA")
+#checks
+table(ces84$abortion)
+
+#recode Women's movement thermometer (VAR291)
+ces84$feminism_rating<-Recode(as.numeric(ces84$VAR291 /100), "9.97:9.99=NA")
+table(ces84$feminism_rating)
+
+#recode non-whites thermometer (VAR290)
+ces84$racial_rating<-Recode(as.numeric(ces84$VAR290 /100), "9.97:9.99=NA")
+table(ces84$racial_rating)
+
+#recode whites thermometer (VAR289)
+ces84$whites_rating<-Recode(as.numeric(ces84$VAR289 /100), "9.97:9.99=NA")
+table(ces84$whites_rating)
+
+#recode francophone thermometer (VAR286)
+ces84$francophone_rating<-Recode(as.numeric(ces84$VAR286 /100), "9.97:9.99=NA")
+table(ces84$francophone_rating)
+
+#recode CEOs thermometer (VAR296)
+ces84$CEOs_rating<-Recode(as.numeric(ces84$VAR296 /100), "9.97:9.99=NA")
+table(ces84$CEOs_rating)
+
 
 #Add mode
 
