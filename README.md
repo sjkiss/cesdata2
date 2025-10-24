@@ -113,36 +113,37 @@ Election Study.
 
 ``` r
 list.files(path="data-raw")
-#>  [1] "1974_1979_1980.sav"                                  
-#>  [2] "1984.sav"                                            
-#>  [3] "2016-unique-occupations-updated.xls"                 
-#>  [4] "2019 Canadian Election Study - Phone Survey v1.0.dta"
-#>  [5] "2021_mip_unique.csv"                                 
-#>  [6] "2021_occupations_coded_government.xlsx"              
-#>  [7] "2021_occupations_coded.xlsx"                         
-#>  [8] "CES 25 Kiss Module Final (with occupation Qs).dta"   
-#>  [9] "CES 25 Kiss Module Final.dta"                        
-#> [10] "CES_04060811_ISR_revised.sav"                        
-#> [11] "CES-E-1972-jun-july_F1.sav"                          
-#> [12] "CES-E-1972-nov_F1.sav"                               
-#> [13] "CES-E-1972-sept_F1.sav"                              
-#> [14] "CES-E-1974_F1.sav"                                   
-#> [15] "CES-E-1993_F1.sav"                                   
-#> [16] "CES-E-1997_F1.sav"                                   
-#> [17] "CES-E-2000_F1.sav"                                   
-#> [18] "CES-E-2019-online_F1.sav"                            
-#> [19] "CES15_CPS+PES_Web_SSI Full.dta"                      
-#> [20] "ces1965.dta"                                         
-#> [21] "ces1968.dta"                                         
-#> [22] "CES1988.sav"                                         
-#> [23] "CES2015_CPS-PES-MBS_complete.sav"                    
-#> [24] "CES2021tab.sav"                                      
-#> [25] "ces21.dta"                                           
-#> [26] "ces25b_with_occupation.sav"                          
-#> [27] "mip_2019.xlsx"                                       
-#> [28] "NOC_2021_4_job_titles.xlsx"                          
-#> [29] "NOC_2021_5_job_titles.xlsx"                          
-#> [30] "recode_scripts"
+#>  [1] "1974_1979_1980.sav"                                            
+#>  [2] "1984.sav"                                                      
+#>  [3] "2016-unique-occupations-updated.xls"                           
+#>  [4] "2019 Canadian Election Study - Phone Survey v1.0.dta"          
+#>  [5] "2021_mip_unique.csv"                                           
+#>  [6] "2021_occupations_coded_government.xlsx"                        
+#>  [7] "2021_occupations_coded.xlsx"                                   
+#>  [8] "CES 25 Kiss Module Final (with occupation & Additional Qs).dta"
+#>  [9] "CES 25 Kiss Module Final (with occupation Qs).dta"             
+#> [10] "CES 25 Kiss Module Final.dta"                                  
+#> [11] "CES_04060811_ISR_revised.sav"                                  
+#> [12] "CES-E-1972-jun-july_F1.sav"                                    
+#> [13] "CES-E-1972-nov_F1.sav"                                         
+#> [14] "CES-E-1972-sept_F1.sav"                                        
+#> [15] "CES-E-1974_F1.sav"                                             
+#> [16] "CES-E-1993_F1.sav"                                             
+#> [17] "CES-E-1997_F1.sav"                                             
+#> [18] "CES-E-2000_F1.sav"                                             
+#> [19] "CES-E-2019-online_F1.sav"                                      
+#> [20] "CES15_CPS+PES_Web_SSI Full.dta"                                
+#> [21] "ces1965.dta"                                                   
+#> [22] "ces1968.dta"                                                   
+#> [23] "CES1988.sav"                                                   
+#> [24] "CES2015_CPS-PES-MBS_complete.sav"                              
+#> [25] "CES2021tab.sav"                                                
+#> [26] "ces21.dta"                                                     
+#> [27] "ces25b_with_occupation.sav"                                    
+#> [28] "mip_2019.xlsx"                                                 
+#> [29] "NOC_2021_4_job_titles.xlsx"                                    
+#> [30] "NOC_2021_5_job_titles.xlsx"                                    
+#> [31] "recode_scripts"
 ```
 
 2.  An `.rda` file for each that contains the results of our recode
@@ -1167,6 +1168,7 @@ glimpse(ces)
 #> $ sector                 <dbl+lbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ occupation3            <dbl+lbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ ideology               <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+#> $ inequality             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ redistribution         <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ market_liberalism      <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ immigration_rates      <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
@@ -1189,7 +1191,6 @@ glimpse(ces)
 #> $ promise                <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ trust                  <dbl+lbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ enviro_spend           <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
-#> $ inequality             <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ efficacy_rich          <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 ```
 
