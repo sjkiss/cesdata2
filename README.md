@@ -1147,9 +1147,9 @@ ces.list %>%
 glimpse(ces)
 
 #Export to Stata
-write_dta(ces_master, here("ces_master.dta"))
+write_dta(ces, here("ces_master.dta"))
 #Export to CSV
-write_csv(ces_master,here("ces_master.csv"))
+write_csv(ces,here("ces_master.csv"))
 ```
 
 # Credit
