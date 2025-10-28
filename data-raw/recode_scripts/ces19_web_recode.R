@@ -674,11 +674,11 @@ table(ces19web$national_retrospective, ces19web$cps19_econ_retro, useNA = "ifany
 
 #recode Education (cps19_spend_educ)
 look_for(ces19web, "education")
-ces19web$education<-Recode(as.numeric(ces19web$cps19_spend_educ), "3:4=0.5; 1=1; 2=0; else=NA")
+ces19web$education_spend<-Recode(as.numeric(ces19web$cps19_spend_educ), "3=0; 3=1; 2=0.5; 4=0.5; else=NA")
 #val_labels(ces19web$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 #val_labels(ces19web$education)
-table(ces19web$education, ces19web$cps19_spend_educ , useNA = "ifany" )
+table(ces19web$education_spend, ces19web$cps19_spend_educ , useNA = "ifany" )
 
 #recode Ideology (cps19_lr_scale_bef_1)
 look_for(ces19web, "scale")
@@ -906,6 +906,10 @@ table(ces19web$pes19_taxes_2)
 ces19web$business_tax<-Recode(as.numeric(ces19web$pes19_taxes_2), "1:2:=0; 4:5=1; 3=0.5; 6=0.5; else=NA")
 #checks
 table(ces19web$business_tax,  ces19web$pes19_taxes_2, useNA = "ifany")
+
+#### recode feminism (cps19_groups_therm_4)
+ces19web$feminism_rating<-Recode(as.numeric(ces19web$cps19_groups_therm_4 /100), "-99=NA")
+table(ces19web$feminism_rating)
 
 # Save the file
 save(ces19web, file=here("data/ces19web.rda"))

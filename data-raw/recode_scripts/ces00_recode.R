@@ -604,7 +604,7 @@ ces00$bloc_rating<-Recode(as.numeric(ces00$pesc1e), "0=1; 996:999=NA")
 
 #recode Education (pesd1f)
 # look_for(ces00, "edu")
-ces00$education<-Recode(as.numeric(ces00$pesd1f), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+ces00$education_spend<-Recode(as.numeric(ces00$pesd1f), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
 #checks
 # table(ces00$education, ces00$pesd1f , useNA = "ifany" )
 

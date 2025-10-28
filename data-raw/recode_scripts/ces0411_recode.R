@@ -733,7 +733,7 @@ ces0411$green_rating04<-Recode(as.numeric(ces0411$ces04_CPS_G11), "0=1; 996:999=
 
 #### recode Education (ces04_PES_D1D)####
 # look_for(ces0411, "edu")
-ces0411$education04<-Recode(as.numeric(ces0411$ces04_PES_D1D), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+ces0411$education_spend04<-Recode(as.numeric(ces0411$ces04_PES_D1D), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
 #checks
 #table(ces0411$education04, ces0411$ces04_PES_D1D , useNA = "ifany" )
 #val_labels(ces0411$education04)<-NULL
@@ -999,6 +999,10 @@ table(ces0411$ces04_PES_D1L)
 ces0411$business_tax04<-Recode(as.numeric(ces0411$ces04_PES_D1L), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
 #checks
 table(ces0411$business_tax04,  ces0411$ces04_PES_D1L, useNA = "ifany")
+
+#### recode feminism (ces04_PES_C7)
+ces0411$feminism_rating04<-Recode(as.numeric(ces0411$ces04_PES_C7 /100), "9.97:9.99=NA")
+table(ces0411$feminism_rating04)
 
 # Add election04 variable
 ces0411 %>%
@@ -1810,7 +1814,7 @@ ces0411$green_rating06<-Recode(as.numeric(ces0411$ces06_CPS_G11), "0=1; 996:999=
 
 #### recode Education (ces06_PES_D1D)####
 # look_for(ces0411, "edu")
-ces0411$education06<-Recode(as.numeric(ces0411$ces06_PES_D1D), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+ces0411$education_spend06<-Recode(as.numeric(ces0411$ces06_PES_D1D), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
 #checks
 # table(ces0411$education06, ces0411$ces06_PES_D1D , useNA = "ifany" )
 
@@ -2012,6 +2016,10 @@ table(ces0411$ces06_PES_D1L)
 ces0411$business_tax06<-Recode(as.numeric(ces0411$ces06_PES_D1L), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
 #checks
 table(ces0411$business_tax06,  ces0411$ces06_PES_D1L, useNA = "ifany")
+
+#### recode feminism (ces06_PES_C4)
+ces0411$feminism_rating06<-Recode(as.numeric(ces0411$ces06_PES_C4 /100), "9.97:9.99=NA")
+table(ces0411$feminism_rating06)
 
 ####Recode 2008 3rd ####
 
@@ -2983,7 +2991,7 @@ ces0411$green_rating08<-Recode(as.numeric(ces0411$ces08_CPS_G11), "0=1; 996:999=
 
 #### recode Education (ces08_PES_D1D)####
 # look_for(ces0411, "edu")
-ces0411$education08<-Recode(as.numeric(ces0411$ces08_PES_D1D), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+ces0411$education_spend08<-Recode(as.numeric(ces0411$ces08_PES_D1D), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
 #checks
 # table(ces0411$education08, ces0411$ces08_PES_D1D , useNA = "ifany" )
 
@@ -3193,7 +3201,7 @@ ces0411$women08<-Recode(as.numeric(ces0411$ces08_PES_I4), "1=0; 2=0.25; 3=0.5; 4
 #checks
 table(ces0411$women08,  useNA = "ifany")
 
-#### recode Women - how much should be done (ces08_PES_I3) ####
+#### recode Race - how much should be done (ces08_PES_I3) ####
 look_for(ces0411, "racial")
 table(ces0411$ces08_PES_I3)
 ces0411$race08<-Recode(as.numeric(ces0411$ces08_PES_I3), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
@@ -3256,6 +3264,10 @@ table(ces0411$ces08_PES_D1L)
 ces0411$business_tax08<-Recode(as.numeric(ces0411$ces08_PES_D1L), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
 #checks
 table(ces0411$business_tax08,  ces0411$ces08_PES_D1L, useNA = "ifany")
+
+#### recode feminism (ces08_PES_C4)
+ces0411$feminism_rating08<-Recode(as.numeric(ces0411$ces08_PES_C4 /100), "9.97:9.99=NA")
+table(ces0411$feminism_rating08)
 
 
 ####Recode 2011 4th ####
@@ -3871,7 +3883,7 @@ ces0411$green_rating11<-Recode(as.numeric(ces0411$CPS11_22), "0=1; 996:999=NA")
 
 #### recode Education (CPS11_35)####
 # look_for(ces0411, "edu")
-ces0411$education11<-Recode(as.numeric(ces0411$CPS11_35), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
+ces0411$education_spend11<-Recode(as.numeric(ces0411$CPS11_35), "3=0; 5=0.5; 1=1; 8=0.5; else=NA")
 #checks
 # table(ces0411$education11, ces0411$CPS11_35 , useNA = "ifany" )
 
@@ -4113,6 +4125,10 @@ table(ces0411$CPS11_31)
 ces0411$business_tax11<-Recode(as.numeric(ces0411$CPS11_31), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
 #checks
 table(ces0411$business_tax11,  ces0411$CPS11_31, useNA = "ifany")
+
+#### recode feminism (PES11_17)
+ces0411$feminism_rating11<-Recode(as.numeric(ces0411$PES11_17 /100), "9.97:9.99=NA")
+table(ces0411$feminism_rating11)
 
 # Add 2011 Election Variable
 table(ces0411$survey)

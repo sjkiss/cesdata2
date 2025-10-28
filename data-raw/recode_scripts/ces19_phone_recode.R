@@ -675,7 +675,7 @@ val_labels(ces19phone$justice)
 
 #recode Education (q27_a)
 # look_for(ces19phone, "education")
-ces19phone$education<-Recode(as.numeric(ces19phone$q27_a), "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
+ces19phone$education_spend<-Recode(as.numeric(ces19phone$q27_a), "3=0.5; 1=1; 2=0; -9=0.5; else=NA")
 #val_labels(ces19phone$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 #val_labels(ces19phone$education)
