@@ -613,7 +613,7 @@ ces97$bloc_rating<-Recode(as.numeric(ces97$cpsd1k), "0=1; 997:999=NA")
 
 #recode Education (pese6f)
 # (ces97, "edu")
-ces97$education<-Recode(as.numeric(ces97$pese6f), "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
+ces97$education_spend<-Recode(as.numeric(ces97$pese6f), "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
 #checks
 # (ces97$education, ces97$pese6f , useNA = "ifany" )
 
@@ -833,6 +833,10 @@ table(ces97$pese20)
 ces97$business<-Recode(as.numeric(ces97$pese20), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.5; else=NA")
 #checks
 table(ces97$business,  ces97$pese20, useNA = "ifany")
+
+#### recode feminism (pesf3)
+ces97$feminism_rating<-Recode(as.numeric(ces97$pesf3 /100), "9.97:9.99=NA")
+table(ces97$feminism_rating)
 
 #Add mode
 ces97$mode<-rep("Phone", nrow(ces97))

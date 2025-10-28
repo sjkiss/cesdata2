@@ -704,7 +704,7 @@ ces15phone$justice<-Recode(as.numeric(ces15phone$CPS15_36), "1=1; 3=0; 5=0.5; 8=
 
 #recode Education (CPS15_34)
 # look_for(ces15phone, "education")
-ces15phone$education<-Recode(as.numeric(ces15phone$CPS15_34), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
+ces15phone$education_spend<-Recode(as.numeric(ces15phone$CPS15_34), "1=1; 3=0; 5=0.5; 8=0.5; else=NA")
 #val_labels(ces15phone$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #val_labels(ces15phone$education)<-NULL
 
@@ -1205,6 +1205,10 @@ table(ces15phone$CPS15_31)
 ces15phone$business_tax<-Recode(as.numeric(ces15phone$CPS15_31), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
 #checks
 table(ces15phone$business_tax,  ces15phone$CPS15_31, useNA = "ifany")
+
+#### recode feminism (PES15_17)
+ces15phone$feminism_rating<-Recode(as.numeric(ces15phone$PES15_17 /100), "9.97:9.99=NA")
+table(ces15phone$feminism_rating)
 
 # add Election
 ces15phone$election<-rep(2015, nrow(ces15phone))

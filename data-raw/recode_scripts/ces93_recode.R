@@ -671,9 +671,9 @@ table(ces93$bloc_rating)
 
 #recode Education (CPSL7F)
 look_for(ces93, "edu")
-ces93$education<-Recode(as.numeric(ces93$CPSL7F), "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
+ces93$education_spend<-Recode(as.numeric(ces93$CPSL7F), "1=0; 3=0.5; 5=1; 8=0.5; else=NA")
 #checks
-table(ces93$education, ces93$CPSL7F , useNA = "ifany" )
+table(ces93$education_spend, ces93$CPSL7F , useNA = "ifany" )
 
 #recode Personal Retrospective (CPSC1)
 look_for(ces93, "financ")
@@ -875,6 +875,10 @@ val_labels(ces93$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, 
 #checks
 val_labels(ces93$prov_vote)
 table(ces93$prov_vote)
+
+# recode feminism (PESH7)
+ces93$feminism_rating<-Recode(as.numeric(ces93$PESH7 /100), "9.97:9.99=NA")
+table(ces93$feminism_rating)
 
 glimpse(ces93)
 lookfor(ces93, "election")

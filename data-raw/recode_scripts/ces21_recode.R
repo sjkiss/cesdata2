@@ -397,7 +397,7 @@ val_labels(ces21$manage_economy)<-c(Liberal=1, Conservative=2, NDP=3, Bloc=4, Gr
 val_labels(ces21$manage_economy)
 table(ces21$manage_economy)
 
-#recode Manage environment (cps19_issue_handle_3)
+#recode Manage environment (cps21_issue_handle_3)
 # look_for(ces21, "environment")
 ces21$cps21_issue_handle_3
 ces21$manage_environment<-Recode(ces21$cps21_issue_handle_3, "1=1; 2=2; 3=3; 4=4; 5=5; 6:7=NA; else=NA")
@@ -527,7 +527,7 @@ table(ces21$national_retrospective, ces21$cps21_econ_retro, useNA = "ifany" )
 
 #recode Education (cps21_spend_educ)
 look_for(ces21, "education")
-ces21$education<-Recode(as.numeric(ces21$cps21_spend_educ), "3:4=0.5; 1=1; 2=0; else=NA")
+ces21$education<-Recode(as.numeric(ces21$cps21_spend_educ), "2=0.5; 1=0; 3=1; 4=0.5; else=NA")
 #val_labels(ces21$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 #val_labels(ces21$education)
@@ -783,7 +783,6 @@ ces21$pol_interest<-Recode(as.numeric(ces21$cps21_interest_gen_1), "0=0; 1=0.1; 
 table(ces21$pol_interest, ces21$cps21_interest_gen_1, useNA = "ifany" )
 
 #recode foreign born (cps21_bornin_canada)
-
 look_for(ces21, "born")
 ces21$foreign<-Recode(ces21$cps21_bornin_canada, "1=0; 2=1; else=NA")
 val_labels(ces21$foreign)<-c(No=0, Yes=1)
@@ -866,6 +865,10 @@ ces21 %>%
   ))->ces21
 #checks
 table(ces21$homeowner, ces21$cps21_property_1, useNA = "ifany")
+
+#### recode feminism (cps21_groups_therm_6)
+ces21$feminism_rating<-Recode(as.numeric(ces21$cps21_groups_therm_6 /100), "-99=NA")
+table(ces21$feminism_rating)
 
 #glimpse(ces21)
 table(ces21$occupation)
