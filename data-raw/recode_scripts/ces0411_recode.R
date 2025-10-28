@@ -975,7 +975,7 @@ table(ces0411$prov_vote04)
 
 #### recode Homeowner(ces04_CPS_S7) ####
 look_for(ces0411, "home")
-ces0411$homeowner04<-Recode(ces0411$ces04_CPS_S7, "1=1; 5=0; else=NA")
+ces0411$homeowner04<-Recode(as.numeric(ces0411$ces04_CPS_S7), "1=1; 5=0; else=NA")
 #checks
 table(ces0411$homeowner04, ces0411$ces04_CPS_S7, useNA = "ifany")
 
@@ -1993,7 +1993,7 @@ table(ces0411$prov_vote06)
 
 #### recode Homeowner(ces06_CPS_S7) ####
 look_for(ces0411, "home")
-ces0411$homeowner06<-Recode(ces0411$ces06_CPS_S7, "1=1; 5=0; else=NA")
+ces0411$homeowner06<-Recode(as.numeric(ces0411$ces06_CPS_S7), "1=1; 5=0; else=NA")
 #checks
 table(ces0411$homeowner06, ces0411$ces06_CPS_S7, useNA = "ifany")
 
@@ -3247,7 +3247,7 @@ ces0411$enviro_spend08<-Recode(as.numeric(ces0411$ces08_PES_D1F), "1=1; 3=0; 5=0
 
 #### recode Homeowner(ces08_PES_S7) ####
 look_for(ces0411, "home")
-ces0411$homeowner08<-Recode(ces0411$ces08_PES_S7, "1=1; 5=0; else=NA")
+ces0411$homeowner08<-Recode(as.numeric(ces0411$ces08_PES_S7), "1=1; 5=0; else=NA")
 #checks
 table(ces0411$homeowner08, ces0411$ces08_PES_S7, useNA = "ifany")
 
@@ -4108,7 +4108,7 @@ table(ces0411$daycare11, ces0411$PES11_56, useNA = "ifany" )
 
 #### recode Homeowner(PES11_95) ####
 look_for(ces0411, "home")
-ces0411$homeowner11<-Recode(ces0411$PES11_95, "1=1; 5=0; else=NA")
+ces0411$homeowner11<-Recode(as.numeric(ces0411$PES11_95), "1=1; 5=0; else=NA")
 #checks
 table(ces0411$homeowner11, ces0411$PES11_95, useNA = "ifany")
 
