@@ -526,10 +526,14 @@ We provide here a template R code that will get the user up and running quickly.
 
 Note: this script belongs in an *analysis* project, *not* in the `cesdata2` project.
 
-```{r template}
-
-library(tidyverse)
-#Install cesdata2
+```{r template, eval=F}
+#load libraries
+#install if necessary
+library(dplyr)
+library(here)
+library(labelled)
+library(haven)
+#Install cesdata2 if you think there may be changes on cesdata2
 #devtools::install_github("sjkiss/cesdata2")
 library(cesdata2)
 
@@ -622,7 +626,9 @@ ces.list %>%
 #show what we have.
 glimpse(ces)
 
-
+#Export to Stata
+write_dta(here("ces_master.dta"))
+write_csv(here("ces_master.csv"))
 
 ```
 

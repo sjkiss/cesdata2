@@ -139,11 +139,13 @@ list.files(path="data-raw")
 #> [24] "CES2015_CPS-PES-MBS_complete.sav"                              
 #> [25] "CES2021tab.sav"                                                
 #> [26] "ces21.dta"                                                     
-#> [27] "ces25b_with_occupation.sav"                                    
-#> [28] "mip_2019.xlsx"                                                 
-#> [29] "NOC_2021_4_job_titles.xlsx"                                    
-#> [30] "NOC_2021_5_job_titles.xlsx"                                    
-#> [31] "recode_scripts"
+#> [27] "ces25.dta"                                                     
+#> [28] "ces25b_with_occupation.sav"                                    
+#> [29] "mip_2019.xlsx"                                                 
+#> [30] "NOC_2021_4_job_titles.xlsx"                                    
+#> [31] "NOC_2021_5_job_titles.xlsx"                                    
+#> [32] "recode_scripts"
+
 ```
 
 2.  An `.rda` file for each that contains the results of our recode
@@ -154,10 +156,10 @@ list.files(path="data-raw")
 ``` r
 list.files(path="data")
 #>  [1] "ces00.rda"      "ces0411.rda"    "ces15phone.rda" "ces15web.rda"  
-#>  [5] "ces19phone.rda" "ces19web.rda"   "ces21.rda"      "ces25b.rda"    
-#>  [9] "ces65.rda"      "ces68.rda"      "ces72_nov.rda"  "ces74.rda"     
-#> [13] "ces7980.rda"    "ces84.rda"      "ces88.rda"      "ces93.rda"     
-#> [17] "ces97.rda"
+#>  [5] "ces19phone.rda" "ces19web.rda"   "ces21.rda"      "ces25.rda"     
+#>  [9] "ces25b.rda"     "ces65.rda"      "ces68.rda"      "ces72_nov.rda" 
+#> [13] "ces74.rda"      "ces7980.rda"    "ces84.rda"      "ces88.rda"     
+#> [17] "ces93.rda"      "ces97.rda"
 ```
 
 The recode scripts themselves are stored in the package subfolder
@@ -1042,9 +1044,13 @@ Note: this script belongs in an *analysis* project, *not* in the
 `cesdata2` project.
 
 ``` r
-
-library(tidyverse)
-#Install cesdata2
+#load libraries
+#install if necessary
+library(dplyr)
+library(here)
+library(labelled)
+library(haven)
+#Install cesdata2 if you think there may be changes on cesdata2
 #devtools::install_github("sjkiss/cesdata2")
 library(cesdata2)
 
@@ -1136,6 +1142,7 @@ ces.list %>%
   bind_rows()->ces
 #show what we have.
 glimpse(ces)
+
 #> Rows: 120,719
 #> Columns: 54
 #> $ male                   <dbl+lbl> 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0…
@@ -1192,6 +1199,12 @@ glimpse(ces)
 #> $ trust                  <dbl+lbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ enviro_spend           <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
 #> $ efficacy_rich          <dbl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+
+
+#Export to Stata
+write_dta(here("ces_master.dta"))
+write_csv(here("ces_master.csv"))
+
 ```
 
 # Credit
