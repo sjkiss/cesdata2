@@ -1045,7 +1045,7 @@ Note: this script belongs in an *analysis* project, *not* in the
 ``` r
 #load libraries
 #install if necessary
-library(dplyr)
+library(tidyverse)
 library(here)
 library(labelled)
 library(haven)
