@@ -1000,6 +1000,12 @@ ces0411$business_tax04<-Recode(as.numeric(ces0411$ces04_PES_D1L), "1=0; 3=1; 5=0
 #checks
 table(ces0411$business_tax04,  ces0411$ces04_PES_D1L, useNA = "ifany")
 
+#### recode Housing - gov't spend (L-R) ####
+look_for(ces0411, "spend")
+ces0411$housing04<-Recode(as.numeric(ces0411$ces04_PES_D1G) , "1=0; 5=0.5; 3=1; else=NA")
+#checks
+table(ces0411$housing04)
+
 #### recode feminism (ces04_PES_C7)
 ces0411$feminism_rating04<-Recode(as.numeric(ces0411$ces04_PES_C7 /100), "9.97:9.99=NA")
 table(ces0411$feminism_rating04)
@@ -2016,6 +2022,12 @@ table(ces0411$ces06_PES_D1L)
 ces0411$business_tax06<-Recode(as.numeric(ces0411$ces06_PES_D1L), "1=0; 3=1; 5=0.5; 8=0.5; else=NA")
 #checks
 table(ces0411$business_tax06,  ces0411$ces06_PES_D1L, useNA = "ifany")
+
+#### recode Housing - gov't spend (L-R) ####
+look_for(ces0411, "spend")
+ces0411$housing06<-Recode(as.numeric(ces0411$ces06_PES_D1G) , "1=0; 5=0.5; 3=1; else=NA")
+#checks
+table(ces0411$housing06)
 
 #### recode feminism (ces06_PES_C4)
 ces0411$feminism_rating06<-Recode(as.numeric(ces0411$ces06_PES_C4 /100), "9.97:9.99=NA")

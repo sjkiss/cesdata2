@@ -852,6 +852,12 @@ val_labels(ces21$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, 
 val_labels(ces21$prov_vote)
 table(ces21$prov_vote)
 
+#recode daycare (PES15_56)
+# look_for(ces21, "childcare")
+ces21$daycare<-Recode(as.numeric(ces21$cps21_spend_nation_c), "1=1; 3=0; 2=0.5; else=NA")
+#checks
+table(ces21$daycare, ces21$cps21_spend_nation_c , useNA = "ifany" )
+
 #### recode Homeowner(cps21_property_1) ####
 look_for(ces21, "home")
 ces21 %>%
@@ -865,6 +871,12 @@ ces21 %>%
   ))->ces21
 #checks
 table(ces21$homeowner, ces21$cps21_property_1, useNA = "ifany")
+
+# recode Housing - gov't spend (L-R)
+look_for(ces21, "housing")
+ces21$housing<-Recode(as.numeric(ces21$cps21_spend_afford_h) , "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces21$housing)
 
 #### recode feminism (cps21_groups_therm_6)
 ces21$feminism_rating<-Recode(as.numeric(ces21$cps21_groups_therm_6 /100), "-99=NA")
