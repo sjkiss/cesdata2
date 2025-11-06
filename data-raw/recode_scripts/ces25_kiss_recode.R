@@ -514,8 +514,8 @@ ces25b$conservative_rating<-Recode(as.numeric(ces25b$cps25_party_rating_24), "-9
 table(ces25b$conservative_rating)
 
 #recode NDP rating
-ces25b$NDP_rating<-Recode(as.numeric(ces25b$cps25_party_rating_25), "-99=NA")
-table(ces25b$NDP_rating)
+ces25b$ndp_rating<-Recode(as.numeric(ces25b$cps25_party_rating_25), "-99=NA")
+table(ces25b$ndp_rating)
 
 #recode Bloc rating
 ces25b$bloc_rating<-Recode(as.numeric(ces25b$cps25_party_rating_26), "-99=NA")

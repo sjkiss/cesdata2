@@ -674,7 +674,7 @@ table(ces19web$national_retrospective, ces19web$cps19_econ_retro, useNA = "ifany
 
 #recode Education (cps19_spend_educ)
 look_for(ces19web, "education")
-ces19web$education_spend<-Recode(as.numeric(ces19web$cps19_spend_educ), "3=0; 3=1; 2=0.5; 4=0.5; else=NA")
+ces19web$education_spend<-Recode(as.numeric(ces19web$cps19_spend_educ), "1=0; 3=1; 2=0.5; 4=0.5; else=NA")
 #val_labels(ces19web$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 #val_labels(ces19web$education)

@@ -665,6 +665,10 @@ val_labels(ces88$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, 
 val_labels(ces88$prov_vote)
  table(ces88$prov_vote)
 
+# recode feminism (xh9)
+ces88$feminism_rating<-Recode(as.numeric(ces88$xh9 /100), "9.97:9.99=NA")
+table(ces88$feminism_rating)
+
 glimpse(ces88)
 #Add mode
 ces88$mode<-rep("Phone", nrow(ces88))

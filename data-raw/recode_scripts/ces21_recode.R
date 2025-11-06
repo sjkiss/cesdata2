@@ -455,8 +455,8 @@ ces21$conservative_rating<-Recode(as.numeric(ces21$cps21_party_rating_24), "-99=
 table(ces21$conservative_rating)
 
 #recode NDP rating
-ces21$NDP_rating<-Recode(as.numeric(ces21$cps21_party_rating_25), "-99=NA")
-table(ces21$NDP_rating)
+ces21$ndp_rating<-Recode(as.numeric(ces21$cps21_party_rating_25), "-99=NA")
+table(ces21$ndp_rating)
 
 #recode Bloc rating
 ces21$bloc_rating<-Recode(as.numeric(ces21$cps21_party_rating_26), "-99=NA")
@@ -527,11 +527,11 @@ table(ces21$national_retrospective, ces21$cps21_econ_retro, useNA = "ifany" )
 
 #recode Education (cps21_spend_educ)
 look_for(ces21, "education")
-ces21$education<-Recode(as.numeric(ces21$cps21_spend_educ), "2=0.5; 1=0; 3=1; 4=0.5; else=NA")
+ces21$education_spend<-Recode(as.numeric(ces21$cps21_spend_educ), "2=0.5; 1=0; 3=1; 4=0.5; else=NA")
 #val_labels(ces21$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 #val_labels(ces21$education)
-table(ces21$education, ces21$cps21_spend_educ , useNA = "ifany" )
+table(ces21$education_spend, ces21$cps21_spend_educ , useNA = "ifany" )
 
 #recode Break Promise (pes21_keepromises)
 look_for(ces21, "promise")
