@@ -88,6 +88,12 @@ val_labels(ces7980$party_id280)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces7980$party_id280)
 table(ces7980$party_id280, ces7980$V2043)
 
+#recode Party closeness (V2044)
+look_for(ces7980, "intensity")
+ces7980$party_close80<-Recode(ces7980$V2044  , "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces7980$V2044, ces7980$party_close80, useNA = "ifany" )
+
 #recode Vote (V2062)
 # look_for(ces7980, "vote")
 ces7980$vote80<-Recode(ces7980$V2062, "1=1; 2=2; 3=3; 4:5=0; else=NA")

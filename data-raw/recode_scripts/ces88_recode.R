@@ -101,6 +101,14 @@ val_labels(ces88$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces88$employment)
 # table(ces88$employment)
 
+#recode Unemployed (n5)
+# look_for(ces88, "employment")
+ces88$unemployed<-Recode(ces88$n5, "1=0; 2:3=1; else=NA")
+val_labels(ces88$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces88$unemployed)
+table(ces88$unemployed)
+
 #recode Sector (n8 & n5)
 # look_for(ces88, "sector")
 # look_for(ces88, "firm")
@@ -121,19 +129,51 @@ val_labels(ces88$sector)
 
 #recode Party ID (i1)
 # look_for(ces88, "identification")
-ces88$party_id<-Recode(ces88$i1, "1=1; 2=2; 3=3; else=NA")
+#ces88$party_id<-Recode(ces88$i1, "1=1; 2=2; 3=3; else=NA")
+ces88 %>%
+  mutate(party_id=case_when(
+    xl4==1 | xl7==1 ~ 1,
+    xl4==2 | xl7==2 ~ 2,
+    xl4==3 | xl7==3 ~ 3,
+  ))->ces88
 val_labels(ces88$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces88$party_id)
-# table(ces88$party_id)
+table(ces88$party_id)
 
 #recode Party ID 2 (i1)
 # look_for(ces88, "identification")
-ces88$party_id2<-Recode(ces88$i1, "1=1; 2=2; 3=3; else=NA")
+#ces88$party_id2<-Recode(ces88$i1, "1=1; 2=2; 3=3; else=NA")
+ces88 %>%
+  mutate(party_id2=case_when(
+    xl4==1 | xl7==1 ~ 1,
+    xl4==2 | xl7==2 ~ 2,
+    xl4==3 | xl7==3 ~ 3,
+  ))->ces88
 val_labels(ces88$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces88$party_id2)
- table(ces88$party_id2, ces88$i1)
+table(ces88$party_id2)
+
+#recode Party ID 3 (xl4, xl7)
+# look_for(ces88, "identification")
+#ces88$party_id3<-Recode(ces88$xl4, "1=1; 2=2; 3=3; else=NA")
+ces88 %>%
+  mutate(party_id3=case_when(
+    i1==1 | i4==1 ~ 1,
+    i1==2 | i4==2 ~ 2,
+    i1==3 | i4==3 ~ 3,
+  ))->ces88
+val_labels(ces88$party_id3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces88$party_id3)
+table(ces88$party_id3)
+
+#recode Party closeness (i2 )
+look_for(ces88, "strongly")
+ces88$party_close<-Recode(ces88$i2 , "1=1; 3=0.5; 5=0; else=NA")
+#checks
+table(ces88$i2  , ces88$party_close, useNA = "ifany" )
 
 #recode Vote (xb2)
 # look_for(ces88, "vote")

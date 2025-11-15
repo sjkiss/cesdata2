@@ -239,6 +239,14 @@ val_labels(ces19web$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces19web$employment)
 table(ces19web$employment , ces19web$cps19_employment , useNA = "ifany" )
 
+#recode Unemployed (cps19_employment)
+# look_for(ces19web, "employment")
+ces19web$unemployed<-Recode(ces19web$cps19_employment, "1:3=0; 9:11=0; 5=1; else=NA")
+val_labels(ces19web$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces19web$unemployed)
+table(ces19web$unemployed)
+
 #### recode Sector ####
 lookfor(ces19web, "sector")
 lookfor(ces19web, "employ")
@@ -253,7 +261,6 @@ ces19web %>%
   ))->ces19web
 with(ces19web, table(cps19_sector, sector, useNA = "ifany"))
 val_labels(ces19web$sector)<-c(`Public`=1, `Private`=0)
-
 
 #### recode Sector Health and Welfare ####
 ces19web$NOC21_4
@@ -382,6 +389,23 @@ val_labels(ces19web$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Blo
 #checks
 val_labels(ces19web$party_id2)
 table(ces19web$party_id2, ces19web$cps19_fed_id , useNA = "ifany" )
+
+#recode Party ID 3 (pid_party_en) - same variable as cps19_fed_id
+# look_for(ces19web, "pid")
+# with(ces19web, table(pid_party_en, pid_party_fr, useNA = "ifany"))
+# ces19web$party_id3<-Recode(ces19web$pid_party_en, "'Liberal Party'=1; 'Conservative Party'=2; 'NDP'=3; 'Bloc Québécois'=4; 'Green Party'=5; else=NA")
+# val_labels(ces19web$party_id3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+# checks
+# val_labels(ces19web$party_id3)
+# with(ces19web, table(as_factor(party_id3)))
+# table(ces19web$party_id3, ces19web$pid_party_en , useNA = "ifany" )
+# nrow(ces19web)
+
+#recode Party closeness (cps19_fed_id_str)
+look_for(ces19web, "close")
+ces19web$party_close<-Recode(ces19web$cps19_fed_id_str, "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces19web$cps19_fed_id_str , ces19web$party_close, useNA = "ifany" )
 
 #### recode Vote (pes21_votechoice2019) ####
 lookfor(ces19web, "vote")

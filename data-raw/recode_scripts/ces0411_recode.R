@@ -162,6 +162,14 @@ val_labels(ces0411$employment04)<-c(Unemployed=0, Employed=1)
 val_labels(ces0411$employment04)
 # table(ces0411$employment04)
 
+#recode Unemployed (ces04_CPS_S4)
+# look_for(ces0411, "employment")
+ces0411$unemployed04<-Recode(ces0411$ces04_CPS_S4, "1:2=0; 9:11=0; 4=1; else=NA")
+val_labels(ces0411$unemployed04)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces0411$unemployed04)
+table(ces0411$unemployed04)
+
 #### #recode Sector (ces04_CPS_S5 & ces04_CPS_S4) ####
 # look_for(ces0411, "self-employed")
 ces0411 %>%
@@ -201,20 +209,20 @@ ces0411 %>%
 TRUE~ NA
   ))->ces0411
 with(ces0411, table(ces0411$sector_welfare04, useNA = "ifany"))
-#### #recode Party ID (ces04_CPS_Q1A@3 and  ces04_CPS_Q1B@3`) ***note needs `...` to recognize the variable***####
+
+#### #recode Party ID (ces04_CPS_Q1A@3 and  ces04_CPS_Q1B@3` ces04_CPS_Q4) ***note needs `...` to recognize the variable***####
 look_for(ces0411, "yourself")
 ces0411 %>%
   mutate(party_id04=case_when(
-    `ces04_CPS_Q1A@3`==1 | `ces04_CPS_Q1B@3`==1 ~ 1,
-    `ces04_CPS_Q1A@3`==2 | `ces04_CPS_Q1B@3`==2 ~ 2,
-    `ces04_CPS_Q1A@3`==3 | `ces04_CPS_Q1B@3`==3 ~ 3,
-    `ces04_CPS_Q1A@3`==5 | `ces04_CPS_Q1B@3`==5 ~ 2,
-    `ces04_CPS_Q1A@3`==6 | `ces04_CPS_Q1B@3`==6 ~ 2,
-    `ces04_CPS_Q1A@3`==8 | `ces04_CPS_Q1B@3`==8 ~ 5,
-    `ces04_CPS_Q1A@3`==4 | `ces04_CPS_Q1B@3`==4 ~ 4,
-    `ces04_CPS_Q1A@3`==9 | `ces04_CPS_Q1B@3`==9 ~ 0,
-    `ces04_CPS_Q1A@3`==10 | `ces04_CPS_Q1B@3`==10 ~ 0,
-    `ces04_CPS_Q1A@3`==97 | `ces04_CPS_Q1B@3`==97 ~ 0,
+    `ces04_PES_K1A@3`==1 | `ces04_PES_K1B@3`==1 | `ces04_PES_K4`==1 ~ 1,
+    `ces04_PES_K1A@3`==2 | `ces04_PES_K1B@3`==2 | `ces04_PES_K4`==2 ~ 2,
+    `ces04_PES_K1A@3`==3 | `ces04_PES_K1B@3`==3 | `ces04_PES_K4`==3 ~ 3,
+    `ces04_PES_K1A@3`==5 | `ces04_PES_K1B@3`==5 | `ces04_PES_K4`==5 ~ 2,
+    `ces04_PES_K1A@3`==6 | `ces04_PES_K1B@3`==6 | `ces04_PES_K4`==6 ~ 2,
+    `ces04_PES_K1A@3`==8 | `ces04_PES_K1B@3`==8 | `ces04_PES_K4`==8 ~ 5,
+    `ces04_PES_K1A@3`==4 | `ces04_PES_K1B@3`==4 | `ces04_PES_K4`==4 ~ 4,
+    `ces04_PES_K1A@3`==9 | `ces04_PES_K1B@3`==9 | `ces04_PES_K4`==9 ~ 0,
+    `ces04_PES_K1A@3`==0 | `ces04_PES_K1B@3`==0 | `ces04_PES_K4`==0 ~ 0,
   ))->ces0411
 
 val_labels(ces0411$party_id04)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
@@ -226,22 +234,49 @@ table(ces0411$party_id04)
 look_for(ces0411, "yourself")
 ces0411 %>%
   mutate(party_id204=case_when(
-    `ces04_CPS_Q1A@3`==1 | `ces04_CPS_Q1B@3`==1 ~ 1,
-    `ces04_CPS_Q1A@3`==2 | `ces04_CPS_Q1B@3`==2 ~ 2,
-    `ces04_CPS_Q1A@3`==3 | `ces04_CPS_Q1B@3`==3 ~ 3,
-    `ces04_CPS_Q1A@3`==5 | `ces04_CPS_Q1B@3`==5 ~ 2,
-    `ces04_CPS_Q1A@3`==6 | `ces04_CPS_Q1B@3`==6 ~ 2,
-    `ces04_CPS_Q1A@3`==8 | `ces04_CPS_Q1B@3`==8 ~ 5,
-    `ces04_CPS_Q1A@3`==4 | `ces04_CPS_Q1B@3`==4 ~ 4,
-    `ces04_CPS_Q1A@3`==9 | `ces04_CPS_Q1B@3`==9 ~ 0,
-    `ces04_CPS_Q1A@3`==10 | `ces04_CPS_Q1B@3`==10 ~ 0,
-    `ces04_CPS_Q1A@3`==97 | `ces04_CPS_Q1B@3`==97 ~ 0,
+    `ces04_PES_K1A@3`==1 | `ces04_PES_K1B@3`==1 | `ces04_PES_K4`==1 ~ 1,
+    `ces04_PES_K1A@3`==2 | `ces04_PES_K1B@3`==2 | `ces04_PES_K4`==2 ~ 2,
+    `ces04_PES_K1A@3`==3 | `ces04_PES_K1B@3`==3 | `ces04_PES_K4`==3 ~ 3,
+    `ces04_PES_K1A@3`==5 | `ces04_PES_K1B@3`==5 | `ces04_PES_K4`==5 ~ 2,
+    `ces04_PES_K1A@3`==6 | `ces04_PES_K1B@3`==6 | `ces04_PES_K4`==6 ~ 2,
+    `ces04_PES_K1A@3`==8 | `ces04_PES_K1B@3`==8 | `ces04_PES_K4`==8 ~ 5,
+    `ces04_PES_K1A@3`==4 | `ces04_PES_K1B@3`==4 | `ces04_PES_K4`==4 ~ 4,
+    `ces04_PES_K1A@3`==9 | `ces04_PES_K1B@3`==9 | `ces04_PES_K4`==9 ~ 0,
+    `ces04_PES_K1A@3`==0 | `ces04_PES_K1B@3`==0 | `ces04_PES_K4`==0 ~ 0,
   ))->ces0411
 
 val_labels(ces0411$party_id204)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id204)
 table(ces0411$party_id204)
+
+#recode Party ID 3 (ces04_CPS_Q1A@3 and  ces04_CPS_Q1B@3`) ***note needs `...` to recognize the variable***
+look_for(ces0411, "yourself")
+ces0411 %>%
+  mutate(party_id304=case_when(
+    `ces04_CPS_Q1A@3`==1 | `ces04_CPS_Q1B@3`==1 | `ces04_CPS_Q4`==1 ~ 1,
+    `ces04_CPS_Q1A@3`==2 | `ces04_CPS_Q1B@3`==2 | `ces04_CPS_Q4`==2 ~ 2,
+    `ces04_CPS_Q1A@3`==3 | `ces04_CPS_Q1B@3`==3 | `ces04_CPS_Q4`==3 ~ 3,
+    `ces04_CPS_Q1A@3`==5 | `ces04_CPS_Q1B@3`==5 | `ces04_CPS_Q4`==5 ~ 2,
+    `ces04_CPS_Q1A@3`==6 | `ces04_CPS_Q1B@3`==6 | `ces04_CPS_Q4`==6 ~ 2,
+    `ces04_CPS_Q1A@3`==8 | `ces04_CPS_Q1B@3`==8 | `ces04_CPS_Q4`==8 ~ 5,
+    `ces04_CPS_Q1A@3`==4 | `ces04_CPS_Q1B@3`==4 | `ces04_CPS_Q4`==4 ~ 4,
+    `ces04_CPS_Q1A@3`==9 | `ces04_CPS_Q1B@3`==9 | `ces04_CPS_Q4`==9 ~ 0,
+    `ces04_CPS_Q1A@3`==10 | `ces04_CPS_Q1B@3`==10 | `ces04_CPS_Q4`==10 ~ 0,
+    `ces04_CPS_Q1A@3`==97 | `ces04_CPS_Q1B@3`==97 | `ces04_CPS_Q4`==97 ~ 0,
+  ))->ces0411
+
+val_labels(ces0411$party_id304)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces0411$party_id304)
+table(ces0411$party_id304)
+
+#recode Party closeness (ces04_CPS_Q2 )
+look_for(ces0411, "strongly")
+ces0411$party_close04<-Recode(ces0411$ces04_CPS_Q2 , "1=1; 3=0.5; 5=0; else=NA")
+#checks
+table(ces0411$ces04_CPS_Q2, ces0411$party_close04, useNA = "ifany" )
+
 
 #### #recode Vote (ces04_PES_A3@3')####
 # ***note needs `...`` to recognize the variable***
@@ -1195,6 +1230,14 @@ val_labels(ces0411$employment06)<-c(Unemployed=0, Employed=1)
 val_labels(ces0411$employment06)
 # table(ces0411$employment06)
 
+#recode Unemployed (ces06_CPS_S4)
+# look_for(ces0411, "employment")
+ces0411$unemployed06<-Recode(ces0411$ces06_CPS_S4, "1:2=0; 9:12=0; 14:15=0; 4=1; else=NA")
+val_labels(ces0411$unemployed06)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces0411$unemployed06)
+table(ces0411$unemployed06)
+
 #### #recode Sector (ces06_CPS_S5 & ces06_CPS_S4)####
 # look_for(ces0411, "self-employed")
 ces0411 %>%
@@ -1260,17 +1303,16 @@ ces0411 %>%
 table(ces0411$sector_welfare06)
 table(ces0411$sector_security06)
 
-#### #recode Party ID (ces06_CPS_Q1A and ces06_CPS_Q1B)####
+#### #recode Party ID (ces06_PES_K1A, ces06_PES_K1B and ces06_PES_K4)####
 # look_for(ces0411, "yourself")
 ces0411 %>%
   mutate(party_id06=case_when(
-    ces06_CPS_Q1A==1 | ces06_CPS_Q1B==1 ~ 1,
-    ces06_CPS_Q1A==2 | ces06_CPS_Q1B==2 ~ 2,
-    ces06_CPS_Q1A==3 | ces06_CPS_Q1B==3 ~ 3,
-    ces06_CPS_Q1A==5 | ces06_CPS_Q1B==5 ~ 5,
-    ces06_CPS_Q1A==0 | ces06_CPS_Q1B==0 ~ 0,
-    ces06_CPS_Q1A==4 | ces06_CPS_Q1B==4 ~ 4,
-    ces06_CPS_Q1A==9 | ces06_CPS_Q1B==9 ~ 0,
+    ces06_PES_K1A==1 | ces06_PES_K1B==1 | ces06_PES_K4==1 ~ 1,
+    ces06_PES_K1A==2 | ces06_PES_K1B==2 | ces06_PES_K4==2 ~ 2,
+    ces06_PES_K1A==3 | ces06_PES_K1B==3 | ces06_PES_K4==3 ~ 3,
+    ces06_PES_K1A==5 | ces06_PES_K1B==5 | ces06_PES_K4==5 ~ 5,
+    ces06_PES_K1A==4 | ces06_PES_K1B==4 | ces06_PES_K4==4 ~ 4,
+    ces06_PES_K1A==9 | ces06_PES_K1B==9 | ces06_PES_K4==9 ~ 0,
   ))->ces0411
 
 val_labels(ces0411$party_id06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
@@ -1278,23 +1320,47 @@ val_labels(ces0411$party_id06)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces0411$party_id06)
 table(ces0411$party_id06)
 
-#recode Party ID 2 (ces06_CPS_Q1A and ces06_CPS_Q1B)
+#recode Party ID 2 (ces06_PES_K1A, ces06_PES_K1B and ces06_PES_K4)
 # look_for(ces0411, "yourself")
 ces0411 %>%
   mutate(party_id206=case_when(
-    ces06_CPS_Q1A==1 | ces06_CPS_Q1B==1 ~ 1,
-    ces06_CPS_Q1A==2 | ces06_CPS_Q1B==2 ~ 2,
-    ces06_CPS_Q1A==3 | ces06_CPS_Q1B==3 ~ 3,
-    ces06_CPS_Q1A==5 | ces06_CPS_Q1B==5 ~ 5,
-    ces06_CPS_Q1A==0 | ces06_CPS_Q1B==0 ~ 0,
-    ces06_CPS_Q1A==4 | ces06_CPS_Q1B==4 ~ 4,
-    ces06_CPS_Q1A==9 | ces06_CPS_Q1B==9 ~ 0,
+    ces06_PES_K1A==1 | ces06_PES_K1B==1 | ces06_PES_K4==1 ~ 1,
+    ces06_PES_K1A==2 | ces06_PES_K1B==2 | ces06_PES_K4==2 ~ 2,
+    ces06_PES_K1A==3 | ces06_PES_K1B==3 | ces06_PES_K4==3 ~ 3,
+    ces06_PES_K1A==5 | ces06_PES_K1B==5 | ces06_PES_K4==5 ~ 5,
+    ces06_PES_K1A==4 | ces06_PES_K1B==4 | ces06_PES_K4==4 ~ 4,
+    ces06_PES_K1A==9 | ces06_PES_K1B==9 | ces06_PES_K4==9 ~ 0,
   ))->ces0411
 
 val_labels(ces0411$party_id206)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id206)
 table(ces0411$party_id206)
+
+#recode Party ID 3 (ces06_CPS_Q1A, ces06_CPS_Q1B and ces06_CPS_Q4 )
+look_for(ces0411, "yourself")
+ces0411 %>%
+  mutate(party_id306=case_when(
+    ces06_CPS_Q1A==1 | ces06_CPS_Q1B==1 | ces06_CPS_Q4==1 ~ 1,
+    ces06_CPS_Q1A==2 | ces06_CPS_Q1B==2 | ces06_CPS_Q4==2 ~ 2,
+    ces06_CPS_Q1A==3 | ces06_CPS_Q1B==3 | ces06_CPS_Q4==3 ~ 3,
+    ces06_CPS_Q1A==5 | ces06_CPS_Q1B==5 | ces06_CPS_Q4==5 ~ 5,
+    ces06_CPS_Q1A==6 | ces06_CPS_Q1B==6 | ces06_CPS_Q4==6 ~ 2,
+    ces06_CPS_Q1A==8 | ces06_CPS_Q1B==8 | ces06_CPS_Q4==8 ~ 5,
+    ces06_CPS_Q1A==4 | ces06_CPS_Q1B==4 | ces06_CPS_Q4==4 ~ 4,
+    ces06_CPS_Q1A==9 | ces06_CPS_Q1B==9 | ces06_CPS_Q4==9 ~ 0,
+  ))->ces0411
+
+val_labels(ces0411$party_id306)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces0411$party_id306)
+table(ces0411$party_id306)
+
+#recode Party closeness (ces06_CPS_Q2 )
+look_for(ces0411, "strongly")
+ces0411$party_close06<-Recode(ces0411$ces06_CPS_Q2 , "1=1; 3=0.5; 5=0; else=NA")
+#checks
+table(ces0411$ces06_CPS_Q2, ces0411$party_close06, useNA = "ifany" )
 
 #### #recode Vote (ces06_PES_B4A and ces06_PES_B4B) ####
 # look_for(ces0411, "party did you vote")
@@ -2246,6 +2312,14 @@ val_labels(ces0411$employment08)<-c(Unemployed=0, Employed=1)
 val_labels(ces0411$employment08)
 # table(ces0411$employment08)
 
+#recode Unemployed (ces08_CPS_S4)
+# look_for(ces0411, "employment")
+ces0411$unemployed08<-Recode(ces0411$ces08_CPS_S4, "1:2=0; 9:11=0; 4=1; else=NA")
+val_labels(ces0411$unemployed08)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces0411$unemployed08)
+table(ces0411$unemployed08)
+
 #recode Sector (ces08_CPS_S5 & ces08_CPS_S4)
 # look_for(ces0411, "self-employed")
 ces0411 %>%
@@ -2324,21 +2398,59 @@ val_labels(ces0411$vote08)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4,
 val_labels(ces0411$vote08)
 table(ces0411$vote08)
 
-#recode Party ID (ces08_PES_K1)
+#recode Party ID (ces08_PES_K1 and ces08_PES_K4)
 # look_for(ces0411, "yourself")
-ces0411$party_id08<-Recode(ces0411$ces08_PES_K1, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+ces0411 %>%
+  mutate(party_id08=case_when(
+    ces08_PES_K1==1 | ces08_PES_K4==1  ~ 1,
+    ces08_PES_K1==2 | ces08_PES_K4==2  ~ 2,
+    ces08_PES_K1==3 | ces08_PES_K4==3  ~ 3,
+    ces08_PES_K1==4 | ces08_PES_K4==4  ~ 4,
+    ces08_PES_K1==5 | ces08_PES_K4==5  ~ 5,
+    ces08_PES_K1==0 | ces08_PES_K4==0  ~ 0,
+  ))->ces0411
 val_labels(ces0411$party_id08)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id08)
 table(ces0411$party_id08)
 
-#recode Party ID 2 (ces08_PES_K1)
+#recode Party ID 2 (ces08_PES_K1 and ces08_PES_K4)
 # look_for(ces0411, "yourself")
-ces0411$party_id208<-Recode(ces0411$ces08_PES_K1, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+ces0411 %>%
+  mutate(party_id208=case_when(
+    ces08_PES_K1==1 | ces08_PES_K4==1  ~ 1,
+    ces08_PES_K1==2 | ces08_PES_K4==2  ~ 2,
+    ces08_PES_K1==3 | ces08_PES_K4==3  ~ 3,
+    ces08_PES_K1==4 | ces08_PES_K4==4  ~ 4,
+    ces08_PES_K1==5 | ces08_PES_K4==5  ~ 5,
+    ces08_PES_K1==0 | ces08_PES_K4==0  ~ 0,
+  ))->ces0411
 val_labels(ces0411$party_id208)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id208)
 table(ces0411$party_id208)
+
+#recode Party ID 3 (ces08_CPS_Q1A and ces08_CPS_Q4 )
+look_for(ces0411, "yourself")
+ces0411 %>%
+  mutate(party_id308=case_when(
+    ces08_CPS_Q1A==1 | ces08_CPS_Q4==1  ~ 1,
+    ces08_CPS_Q1A==2 | ces08_CPS_Q4==2  ~ 2,
+    ces08_CPS_Q1A==3 | ces08_CPS_Q4==3  ~ 3,
+    ces08_CPS_Q1A==4 | ces08_CPS_Q4==4  ~ 4,
+    ces08_CPS_Q1A==5 | ces08_CPS_Q4==5  ~ 5,
+    ces08_CPS_Q1A==0 | ces08_CPS_Q4==0  ~ 0,
+  ))->ces0411
+val_labels(ces0411$party_id308)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces0411$party_id308)
+table(ces0411$party_id308)
+
+#recode Party closeness (ces08_CPS_Q2 )
+look_for(ces0411, "strongly")
+ces0411$party_close08<-Recode(ces0411$ces08_CPS_Q2 , "1=1; 3=0.5; 5=0; else=NA")
+#checks
+table(ces0411$ces08_CPS_Q2, ces0411$party_close08, useNA = "ifany" )
 
 #### #recode Occupation (ces08_PES_S3_NOCS)####
 # look_for(ces0411, "occupation")
@@ -3388,6 +3500,14 @@ val_labels(ces0411$employment11)<-c(Unemployed=0, Employed=1)
 val_labels(ces0411$employment11)
 # table(ces0411$employment11, useNA = "ifany" )
 
+#recode Unemployed (CPS11_91)
+# look_for(ces0411, "employment")
+ces0411$unemployed11<-Recode(ces0411$CPS11_91, "1:2=0; 9:11=0; 4=1; else=NA")
+val_labels(ces0411$unemployed11)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces0411$unemployed11)
+table(ces0411$unemployed11)
+
 #### #recode Sector (PES11_92 & CPS11_91)####
 # look_for(ces0411, "company")
 ces0411 %>%
@@ -3464,21 +3584,51 @@ ces0411 %>%
     PES11_92==8 ~NA_real_ ,
   ))->ces0411
 
-#### #recode Party ID (PES11_59a)####
+#### #recode Party ID (PES11_59a and PES11_83)####
 # look_for(ces0411, "identify")
-ces0411$party_id11<-Recode(ces0411$PES11_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+  ces0411 %>%
+    mutate(party_id11=case_when(
+      PES11_59a==1 | PES11_83==1  ~ 1,
+      PES11_59a==2 | PES11_83==2  ~ 2,
+      PES11_59a==3 | PES11_83==3  ~ 3,
+      PES11_59a==4 | PES11_83==4  ~ 4,
+      PES11_59a==5 | PES11_83==5  ~ 5,
+      PES11_59a==0 | PES11_83==0  ~ 0,
+    ))->ces0411
 val_labels(ces0411$party_id11)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id11)
 table(ces0411$party_id11, useNA = "ifany" )
 
-#recode Party ID 2 (PES11_59a)
+#recode Party ID 2 (PES11_59a and PES11_83)
 # look_for(ces0411, "identify")
-ces0411$party_id211<-Recode(ces0411$PES11_59a, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+ces0411 %>%
+  mutate(party_id211=case_when(
+    PES11_59a==1 | PES11_83==1  ~ 1,
+    PES11_59a==2 | PES11_83==2  ~ 2,
+    PES11_59a==3 | PES11_83==3  ~ 3,
+    PES11_59a==4 | PES11_83==4  ~ 4,
+    PES11_59a==5 | PES11_83==5  ~ 5,
+    PES11_59a==0 | PES11_83==0  ~ 0,
+  ))->ces0411
 val_labels(ces0411$party_id211)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces0411$party_id211)
 table(ces0411$party_id211, useNA = "ifany" )
+
+#recode Party ID 3 (CPS11_71 )
+look_for(ces0411, "yourself")
+ces0411$party_id311<-Recode(ces0411$CPS11_71, "1=1; 2=2; 3=3; 4=4; 5=5; 0=0; else=NA")
+val_labels(ces0411$party_id311)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces0411$party_id311)
+table(ces0411$party_id311)
+
+#recode Party closeness (PES11_59b )
+look_for(ces0411, "strongly")
+ces0411$party_close11<-Recode(ces0411$PES11_59b , "1=1; 3=0.5; 5=0; else=NA")
+#checks
+table(ces0411$PES11_59b, ces0411$party_close11, useNA = "ifany" )
 
 #### #recode Vote (PES11_6)####
 # look_for(ces0411, "party did you vote")
