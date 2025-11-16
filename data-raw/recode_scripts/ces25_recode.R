@@ -133,7 +133,7 @@ table(as_factor(ces25$party_id2))
 table(ces25$party_id2)
 
 #recode Party closeness (cps25_fed_id_str)
-look_for(ces25, "str")
+look_for(ces25, "fed_id_str")
 ces25$party_close<-Recode(ces25$cps25_fed_id_str, "1=1; 2=0.5; 3=0; else=NA")
 #checks
 table(ces25$cps25_fed_id_str , ces25$party_close, useNA = "ifany" )
