@@ -102,6 +102,14 @@ val_labels(ces25$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces25$employment)
 table(ces25$employment , ces25$cps25_employment , useNA = "ifany" )
 
+#recode Unemployed (cps25_employment)
+# look_for(ces25, "employment")
+ces25$unemployed<-Recode(ces25$cps25_employment, "1:3=0; 9:11=0; 5=1; else=NA")
+val_labels(ces25$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces25$unemployed)
+table(ces25$unemployed)
+
 #recode Sector (cps25_sector)
 lookfor(ces25, "sector")
 ces25$sector<-Recode(ces25$cps25_sector, "1=0; 3=0; 2=1; else=NA")
