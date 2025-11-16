@@ -132,6 +132,12 @@ val_labels(ces25$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4
 table(as_factor(ces25$party_id2))
 table(ces25$party_id2)
 
+#recode Party closeness (cps25_fed_id_str)
+look_for(ces25, "str")
+ces25$party_close<-Recode(ces25$cps25_fed_id_str, "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces25$cps25_fed_id_str , ces25$party_close, useNA = "ifany" )
+
 #### Create income ####
 lookfor(ces25, "income")
 # Matt - I moved tertile 3 down a category so those over $110K to match with ces21 and provides an even balance in respondents
