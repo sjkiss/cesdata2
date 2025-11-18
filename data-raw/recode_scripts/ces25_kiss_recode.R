@@ -298,19 +298,14 @@ ces25b$occupation3<-ifelse(ces25b$cps25_employment==3, 6, ces25b$occupation)
 # Add value labels for occupation3
 val_labels(ces25b$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 
-# Create Oesch variable
-
 #Check, did I get everyone?
 ces25b %>%
   filter(is.na(occupation3)) %>%
   select(cps25_employment, occupation_name, occupation3) %>%
   as_factor()
-ces25b$NOC21_5
 
-#code logic of authority
 
 #First extract the first two digits of each NOC
-
 ces25b$occupational_category_teer<-str_extract_all(ces25b$NOC21_5, "^\\d{2}") %>% unlist()
 #Now separate
 ces25b %>%
@@ -339,82 +334,404 @@ ces25b %>%
   ))->ces25b
 table(ces25b$logic)
 
-# Introduce level of authority for the 8-class schema
-#Note that Rehm and Kitchelt have four gradations here; Oesch has only two.
-ces25b %>%
-  mutate(authority=case_when(
-    working==1&cps25_employment!=3&teer<3~"Higher",
-    working==1&cps25_employment!=3&teer>2~"Lower"
-  ))->ces25b
-table(ces25b$authority)
-ces25b %>%
-  select(cps25_employment, teer, authority) %>%
-  count(cps25_employment, teer, authority)
 
-#Check most frequent self-employed
-ces25b %>%
-  filter(cps25_employment==3) %>%
-  select(NOC21_5) %>%
-  count(NOC21_5)
 
-#Note, most doctors are not self-employed
-ces25b %>%
-  filter(NOC21_5==31102) %>%
-  count(cps25_employment)
 
-ces25b %>%
-  mutate(occupation_oesch=case_when(
-    logic=="Technical"& authority=="Higher"~'Technical Professionals',
-    logic=="Organizational"&authority=="Higher"~'(Associate) Managers',
-    logic=="Interpersonal"&authority=="Higher"~'Socio-cultural (semi) Professionals',
-    logic=="Technical"&authority=="Lower"~'Production workers',
-    logic=="Organizational"&authority=="Lower"~'Office clerks',
-    logic=="Interpersonal"&authority=="Lower"~'Service workers'
-  ))->ces25b
-
-ces25b %>%
-  mutate(occupation_oesch=case_when(
-    cps25_employment==3~"Self-employed",
-    TRUE~ occupation_oesch
-  ))->ces25b
-table(ces25b$logic)
-table(ces25b$authority)
-table(ces25b$occupation_oesch, useNA = "ifany")
-
-#This code checks to see that everyone with an NOC21_5 has also been given an oesch
-ces25b %>%
-  filter(working==1) %>%
-  select(NOC21_5, occupation_oesch) %>% filter(!is.na(!NOC21_5)&is.na(occupation_oesch))
-table(ces25b$occupation_oesch)
-#How many non-missing oesch do we hvave
-table(is.na(ces25b$occupation_oesch)) #1999
 
 #How many more will we get from the open-ended
+# ces25b %>%
+#   filter(working==1) %>%
+#   filter(occupation_code=="") %>%
+#   select(occupation_code, NOC21_5, pes25_occ_select_2) %>%
+#   filter(pes25_occ_select_2!="-99"&pes25_occ_select_2!="") %>%
+#   nrow()
+?save
 ces25b %>%
-  filter(working==1) %>%
-  filter(occupation_code=="") %>%
-  select(occupation_code, NOC21_5, pes25_occ_select_2) %>%
-  filter(pes25_occ_select_2!="-99"&pes25_occ_select_2!="") %>%
-  nrow()
-
-# check self-employed
-table(as_factor(ces25b$cps25_employment))
-with(ces25b, table(cps25_employment, occupation_oesch))
-
-# Calculate Oesch-5
+  select(NOC21_5) %>%
+write.csv(., file="~/Desktop/ces25b.csv")
+# Calculate Oesch
 ces25b %>%
-  mutate(occupation_oesch_6=case_when(
-    teer==0~"Managers",
-    teer==1~"Professionals",
-    teer==2~"Semi-Professionals Associate Managers",
-    teer==3~"Skilled Workers",
-    teer>3~"Unskilled Workers",
-    cps25_employment==3~"Self-employed"
+  mutate(occupation_oesch=case_when(
+    #Legislators
+NOC21_5<16~9,
+NOC21_5>=10010&NOC21_5<=10022~9,
+NOC21_5==10029~10,
+NOC21_5==10030~9,
+NOC21_5>=20010&NOC21_5<=20012~9,
+NOC21_5==30010~9,
+#Police military officers, fire chiefs
+NOC21_5>=40010&NOC21_5<=40042~9,
+NOC21_5>=50010&NOC21_5<=50012~10,
+#Middle Management
+NOC21_5>=60010&NOC21_5<=60019~9,
+#Retail hotel managers
+NOC21_5 >=60020&NOC21_5<=60049~10,
+NOC21_5>=70010&NOC21_5<=70021~9,
+NOC21_5==80010~9,
+NOC21_5>=80020&NOC21_5<=80022~10,
+NOC21_5>=90010&NOC21_5<=90011~9,
+#The following are exceptions
+#Forestry agricultural managers
+NOC21_5 >= 80010 &NOC21_5<=80029~10,
+#5001 – Managers in art, culture, recreation and sport
+NOC21_5 >=50010&NOC21_5<=50012~10,
+#Major group 11
+#Finance Professionals
+NOC21_5>=11100&NOC21_5<=11102~9,
+#Finance Associate Professionals
+NOC21_5>=11103&NOC21_5<=11100~10,
+#Major group 21
+NOC21_5>=21100&NOC21_5<=21399~5,
+#Major group 31
+#Physicians
+NOC21_5>=31100&NOC21_5<=31104~13,
+#Dentists
+NOC21_5==31110~13,
+#Optomotrists
+NOC21_5==31111~14,
+#Audiologists
+NOC21_5==31112~14,
+#Psychologists
+NOC21_5==3200~13,
+#chiropractors, phsyiotherapists, occupational therapists
+NOC21_5>=31201&NOC21_5<=31209~13,
+#Nursing
+NOC21_5>=31300&NOC21_5<=31303~13,
+##Major Group 41
+# Judges & lawyers
+NOC21_5>=41100&NOC21_5<=41101~9,
+#Teachers & Professors
+NOC21_5>=41200&NOC21_5<=41229~13,
+#elementary teachers
+NOC21_5==41220~14,
+#Social Work and counselling
+NOC21_5==41300|NOC21_5==41301~14,
+#Religious leaders
+NOC21_5==41302~13,
+# Police investogators
+NOC21_5==41310~10,
+#Parole
+NOC21_5==41311~14,
+#Guidance counsellor
+NOC21_5==41320~13,
+#Employment Counsellr
+NOC21_5==41321~9,
+#Policy professionals
+NOC21_5>=41400&NOC21_5<=41409~9,
+#Major group 51
+# librarians 14
+NOC21_5==51100~14,
+NOC21_5==51101|NOC21_5==51102~13,
+#Editors
+NOC21_5==51110~13,
+#Authors
+NOC21_5==51111~14,
+# Journalists
+NOC21_5==51113~13,
+# technical writers
+NOC21_5==51112~13,
+# Translators
+NOC21_5==51114~13,
+#Musicians; dancers; choreographers
+NOC21_5>=51120&NOC21_5<=51122~14,
+###Major group 12
+#Office supervisors
+NOC21_5>=12010&NOC21_5<=12013~11,
+#Executiv assistants
+NOC21_5==12100~11,
+# HR recruitment
+NOC21_5==12101~11,
+NOC21_5>=12101&NOC21_5<=12104~10,
+#Court reporters
+NOC21_5==12110 ~10,
+#Health information Records
+NOC21_5==12111 ~6,
+NOC21_5==12112 ~11,
+#Statistical research assistants non -university
+NOC21_5==12113~10,
+#Insurance associates
+NOC21_5>=12200&NOC21_5<=12203~10,
+#Major Gtroup 22
+#Technicians
+NOC21_5>=22100 &NOC21_5<=22114~6,
+#Draughtsperson architectural technicains
+NOC21_5==22210 ~6,
+#industrial designers
+NOC21_5==22211 ~5,
+#Draughting technicians; surveying technicians
+NOC21_5>=22212&NOC21_5<=22222 ~6,
+#Engineering inspectors
+NOC21_5==22230|NOC21_5==22231~6,
+#Environmental health and safety officer
+NOC21_5==22232~14,
+#construction inspectors
+NOC21_5==22233~6,
+NOC21_5>=22300&NOC21_5<=22314~6,
+#major Group 32
+#Opticians
+NOC21_5==32100~6,
+#Veterinary technologists
+NOC21_5==32100~6,
+#LPN
+NOC21_5>=32101&NOC21_5<=32103~14,
+NOC21_5==32109~14,
+#denturists
+NOC21_5==32110~6,
+#Dental hygienists
+NOC21_5==32111|NOC21_5==32112~15,
+#Medical imaging technicians
+NOC21_5>=32120&NOC21_5<=32129~6,
+#traditional medicine
+NOC21_5>=32200&NOC21_5<=32209~14,
+NOC21_5>=42100&NOC21_5<=42102~15,
+#Paralegals
+NOC21_5==42200~11,
+NOC21_5>=4201&NOC21_5<=42202~14,
+NOC21_5==42203~13,
+NOC21_5==42204~14,
+## major group 52
+NOC21_5==52100~14,
+#Camera operators
+NOC21_5==52110~6,
+#graphic arts technicians
+NOC21_5==52111~14,
+#broadcast technicians
+NOC21_5==52112|NOC21_5==52113~6,
+#Announers
+NOC21_5==52114~14,
+NOC21_5==52119~6,
+#graphic designers
+NOC21_5==52120|NOC21_5==52121~14,
+#Retail supervisors
+NOC21_5==62010~15,
+# Food supervisor
+NOC21_5==62011~15,
+#Executive housekeeping
+NOC21_5==62012|NOC21_5==62013~16,
+#Call centre supervisor
+NOC21_5==62023~11,
+NOC21_5==62024~16,
+NOC21_5==62029~15,
+#Technical sales, retail buyers
+NOC21_5==62100|NOC21_5==62101~10,
+#Chef
+NOC21_5==62200~15,
+#Jewellers
+NOC21_5==62202~7,
+#funeral director
+NOC21_5==62201~15,
+#Contractors supervisors up to 72021
+NOC21_5>=72010&NOC21_5<=72021~6,
+#Railway and truck transport supervisors
+NOC21_5>=72023&NOC21_5<=72024~11,
+NOC21_5>=72100&NOC21_5<=72106~7,
+NOC21_5>=72200&NOC21_5<=72205~7,
+NOC21_5>=72300&NOC21_5<=72321~7,
+NOC21_5>=72420&NOC21_5<=72429~7,
+NOC21_5>=72500&NOC21_5<=72501~7,
+NOC21_5==72999~7,
+#pilots, air traffic ontrollers
+NOC21_5>=72600&NOC21_5<=72604~6,
+#messenger service supervisors
+NOC21_5==72025~11,
+#Supervisors logging and forestry
+NOC21_5>=82010&NOC21_5<=82031~10,
+#Manufacturing Supervisors
+NOC21_5>=92010&NOC21_5<=92101~6,
+##Major group 13
+NOC21_5>=13100&NOC21_5<=13102~11,
+NOC21_5>=13110&NOC21_5<=13111~11,
+#Medical assistants
+NOC21_5==13112~14,
+NOC21_5==13200~11,
+NOC21_5==13201~11,
+#Dental assistants
+NOC21_5==33100~15,
+#Medical lab technicians
+NOC21_5==33101~6,
+NOC21_5>=33102&NOC21_5<=33109~15,
+NOC21_5==43100~15,
+NOC21_5==43109~15,
+NOC21_5>=43200&NOC21_5<=43204~15,
+#museum interpreters
+NOC21_5==53100~15,
+NOC21_5>=53110&NOC21_5<=53111~14,
+NOC21_5>=53120&NOC21_5<=53125~14,
+NOC21_5>=53200&NOC21_5<=53202~15,
+#Real estate and insurance agents
+NOC21_5>=63100&NOC21_5<=63102~10,
+#Butchers and Bakers
+NOC21_5==63201|NOC21_5==63202~7,
+#cooks
+NOC21_5==63200~15,
+#hairstylists
+NOC21_5>=63210&NOC21_5<=63211~15,
+#Shusters and upholsters,
+NOC21_5>=63220&NOC21_5<=63221~7,
+#concrete plastereres
+## Major gruop 73
+NOC21_5>=73100&NOC21_5<=73102~7,
+NOC21_5>=73110&NOC21_5<=7313~7,
+NOC21_5==73200|NOC21_5==73202~7,
+NOC21_5==73201~15,
+NOC21_5==73209~7,
+#Transport Truck drivers
+NOC21_5==73300~7,
+NOC21_5==73310|NOC21_5==73311~7,
+NOC21_5==73301~15,
+NOC21_5>=73400&NOC21_5<=73402~7,
+##Major Group 83
+NOC21_5>=83100&NOC21_5<=83101~8,
+NOC21_5>=83110&NOC21_5<=83121~7,
+##Major Group 93
+#Plant process operators
+#aircraft assemblers
+NOC21_5>=93100&NOC21_5<=93200~8,
+##major Group 14
+#Office clerks
+NOC21_5>=14100&NOC21_5<=14103~14,
+NOC21_5==14110~12,
+NOC21_5==14111~11,
+NOC21_5==14112~11,
+NOC21_5>=14200&NOC21_5<=14202~11,
+NOC21_5>=14300&NOC21_5<=14301~11,
+NOC21_5>=14400&NOC21_5<=14405~11,
+#Major Group 44
+NOC21_5>=44100&NOC21_5<=44101~16,
+NOC21_5==44200~10,
+#Major Group 54
+NOC21_5==54100~15,
+#Major Group 64
+NOC21_5==64100~15,
+NOC21_5==64101~10,
+NOC21_5==64200~7,
+NOC21_5>=64300&NOC21_5<=64301~16,
+NOC21_5==64310~11,
+NOC21_5==64311~15,
+NOC21_5==64312~11,
+NOC21_5==64313~12,
+NOC21_5==64314~11,
+NOC21_5>=64320&NOC21_5<=64322~15,
+NOC21_5>=64400&NOC21_5<=64409~11,
+#Security guards
+NOC21_5==64411~16,
+#letter carriers
+NOC21_5==74100|NOC21_5==74101~11,
+#Messengers
+NOC21_5==74102~12,
+# railway and deck workers
+NOC21_5>=74200&NOC21_5<=7202~8,
+NOC21_5==74203~7,
+NOC21_5==74204~7,
+#Garbage truck
+NOC21_5==74205~8,
+## Major Group 84
+NOC21_5>=84100&NOC21_5<=84121 ~8,
+## Major Group 94
+NOC21_5>=94100&NOC21_5<=94107~8,
+NOC21_5>=94110&NOC21_5<=94112~8,
+NOC21_5>=94120&NOC21_5<=94129~8,
+NOC21_5>=94130&NOC21_5<=94133~8,
+NOC21_5>=94140&NOC21_5<=94143~8,
+#printing
+NOC21_5>=94150&NOC21_5<=94153~7,
+#Assemblers
+NOC21_5>=94200&NOC21_5<=94205~8,
+NOC21_5>=94210&NOC21_5<=94219~8,
+NOC21_5==45100~16,
+NOC21_5==54109~16,
+NOC21_5>=65100&NOC21_5<=65109~12,
+NOC21_5>=65200&NOC21_5<=65329~12,
+NOC21_5==75100~8,
+NOC21_5==75101~8,
+NOC21_5==75110~8,
+NOC21_5>=75200&NOC21_5<=75201~16,
+NOC21_5>=75210&NOC21_5<=75212~8,
+NOC21_5>=85110&NOC21_5<=85121~8,
+NOC21_5>=95100&NOC21_5<=95109~8
+))->ces25b
+#tests
+ces25b %>%
+  filter(NOC21_5>=84100&NOC21_5<=84123) %>%
+  select(NOC21_5, occupation_oesch)
+#Tests
+ces25b %>%
+  filter(NOC21_5>94100&NOC21_5<=94143) %>%
+  select(NOC21_5, occupation_oesch)
+
+val_labels(ces25b$occupation_oesch)<-c(`Technical experts`=5, `Technicians`=6,
+                                       `Skilled manual`=7, `Low-skilled manual`=8,
+                                       `Higher-grade managers`=9, `Lower-grade managers`=10,
+                                       `Skilled clerks`=11, `Unskilled clerks`=12,
+                                       `Socio-cultural professionals`=13, `Socio-cultural (semi-professionals)`=14,
+                                       `Skilled service`=15, `Low-skilled service`=16)
+
+# with(ces25b, table(as_factor(occupation_oesch)))
+#
+# with(ces25b, prop.table(table(as_factor(occupation_oesch))))
+#
+# with(ces25b, prop.table(table(as_factor(occupation_oesch_5))))
+
+#check employment status
+# ces25b %>%
+#   count(cps25_employment, occupation_oesch) %>% as_factor() %>% view()
+#table(ces25b$employment, as_factor(ces25b$cps25_employment))
+#Delete Unemployed oesch
+ces25b %>%
+  mutate(occupation_oesch=case_when(
+    employment==1~occupation_oesch,
+    employment==0~NA_integer_
   ))->ces25b
-table(ces25b$occupation_oesch_6)
-ces25b$occupation_oesch_6<-factor(ces25b$occupation_oesch_6, levels=c("Unskilled Workers", "Skilled Workers",
-                                           "Semi-Professionals Associate Managers",
-                                           "Self-employed","Professionals", "Managers"))
+ces25b$cps25_employment
+#Create Occupation_oesch_5
+ces25b %>%
+  mutate(occupation_oesch_5=case_when(
+    cps25_employment==3~3,
+    occupation_oesch==1|occupation_oesch==2|occupation_oesch==5|occupation_oesch==9|occupation_oesch==13~1,
+    occupation_oesch==6|occupation_oesch==10|occupation_oesch==14~2,
+    occupation_oesch==7|occupation_oesch==11|occupation_oesch==15~4,
+    occupation_oesch==8|occupation_oesch==12|occupation_oesch==16~5
+  ))->ces25b
+val_labels(ces25b$occupation_oesch_5)<-c(`Higher-grade service`=1,
+                                         `Lower-grade service`=2,
+                                         `Self-employed`=3,
+                                         `Skilled manual`=4,
+                                         `Unskilled manual`=5)
+#Check
+
+
+# ces25b %>%
+#   mutate(occupation_oesch_6=case_when(
+#     cps25_employment==3~4,
+#     occupation_oesch==1|occupation_oesch==2|occupation_oesch==5|occupation_oesch==9~1,
+#     occupation_oesch==13~2,
+#     occupation_oesch==6|occupation_oesch==10|occupation_oesch==14~3,
+#     occupation_oesch==7|occupation_oesch==11|occupation_oesch==15~5,
+#     occupation_oesch==8|occupation_oesch==12|occupation_oesch==16~6
+#   ))->ces25b
+
+# val_labels(ces25b$occupation_oesch_6)<-c(`Managers`=1,
+#                                          `Socio-Cultural Professionals`=2,
+#                                          `Lower service`=3,
+#                                          `Self-employed`=4,
+#                                          `Skilled manual`=5,
+#                                          `Unskilled manual`=6)
+# #Check
+# table(as_factor(ces25b$occupation_oesch_6))
+
+# ces25b %>%
+#   mutate(occupation_oesch_6=case_when(
+#     teer==0~"Managers",
+#     teer==1~"Professionals",
+#     teer==2~"Semi-Professionals Associate Managers",
+#     teer==3~"Skilled Workers",
+#     teer>3~"Unskilled Workers",
+#     cps25_employment==3~"Self-employed"
+#   ))->ces25b
+
+#ces25b$occupation_oesch_6<-factor(ces25b$occupation_oesch_6, levels=c("Unskilled Workers", "Skilled Workers",
+#                                           "Semi-Professionals Associate Managers",
+#                                           "Self-employed","Professionals", "Managers"))
 
 
 # Add Subjective social class

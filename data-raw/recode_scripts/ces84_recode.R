@@ -192,25 +192,314 @@ val_labels(ces84$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3
 #checks
 val_labels(ces84$occupation3)
 # table(ces84$occupation3)
-
-
-#Add occupation Oesch 6
-ces84$VAR525
 ces84 %>%
-  mutate(occupation_oesch_6=case_when(
-#Managers
-    VAR533==1~"Self-employed",
-    VAR525==2~"Managers",
-    VAR525==1~"Professionals",
-    VAR525==5~"Skilled Workers",
-    VAR525==6~"Unskilled Workers",
-    VAR525==4~"Unskilled Workers",
-    VAR525==3~"Semi-Professionals Associate Managers",
-    VAR525==7~"Skilled Workers"
+  rename(SOC=VAR526)->ces84
+ces84 %>%
+  filter(SOC==11) %>%
+  select(SOC, VAR525)
+val_labels(ces84$VAR525)
+var_label(ces84$SOC)
+ces84 %>%
+  mutate(occupation_oesch=case_when(
+    #Additional codes are taken from the codebook for the CES84
+    #11 is teacher
+    SOC==11~14,
+    #machine operator
+    SOC==12~7,
+    #foreman
+    SOC==13~6,
+    #mechaniec
+    SOC==14~7,
+    #maintenance
+    SOC==15~8,
+    SOC==16~6,
+    SOC==17~13,
+SOC==18~6,
+SOC==31~NA_integer_,
+SOC==32~NA_integer_,
+SOC==33~NA_integer_,
+SOC==34~NA_integer_,
+SOC>=1111&SOC<=1141~9,
+SOC==1142~10,
+SOC==1143~9,
+SOC==1145~9,
+SOC==1146~10,
+SOC==1147|SOC==1149~9,
+SOC>=1171&SOC<=1179~9,
+SOC>=2111&SOC<=2119~5,
+SOC>=2131&SOC<=2139~5,
+SOC>=2140&SOC<=2159~5,
+#Surveyors, Draughtspersons
+SOC>=2160&SOC<=2161~6,
+SOC>=2163&SOC<=2169~6,
+SOC>=2181&SOC<=2189~5,
+SOC==2311~9,
+SOC>=2313&SOC<=2319~13,
+SOC>=2331&SOC<=2339~14,
+SOC>=2341&SOC<=2349~9,
+#Library Supervisors
+SOC==2350~13,
+#Librarians, Archivists, Curators
+SOC==2351~13,
+SOC==2353|SOC==2359~14,
+SOC==2391|SOC==2399~9,
+SOC==2511|SOC==2519|SOC==2513~13,
+SOC==2711|SOC==2719~13,
+SOC==2731|SOC==2733~13,
+SOC==2739~14,
+SOC>=2791&SOC<=2799~14,
+SOC>=3111&SOC<=3115~13,
+SOC==3117~14,
+SOC==3119~6,
+#Nursing
+SOC>=3130&SOC<=3139~14,
+SOC==3151~13,
+SOC>=3152&SOC<=3154~14,
+SOC>=3155&SOC<=3157~6,
+SOC==3158~15,
+SOC>=3161&SOC<=3169~6,
+SOC>=3311&SOC<=3339~14,
+SOC>=3351&SOC<=3359~13,
+SOC>=3360&SOC<=3373~15,
+SOC==3375~15,
+SOC==3379~15,
+SOC>=4110&SOC<=4113~11,
+#Accountant
+SOC==4130~11,
+SOC==4131~11,
+#Cashiers
+SOC==4133~12,
+SOC>=4135&SOC<=4139~11,
+SOC>=4140&SOC<=4143 ~11,
+#Stock clerks, shipping receivers
+SOC>=4150&SOC<=4159~11,
+#Library clerks
+SOC>=4160&SOC<=4169~11,
+#Receptionists
+SOC>=4170&SOC<=4176~11,
+#Messengers telephone clerks
+SOC>=4175&SOC<=4177~12,
+#General reception
+SOC==4179~11,
+SOC>=4190&SOC<=4199~11,
+SOC==5130~10,
+SOC==5131~10,
+SOC==5133~10,
+SOC==5135~15,
+SOC>=5141&SOC<=5149~16,
+#Sales occupations services
+SOC>=5170&SOC<=5179~10,
+SOC==5190~10,
+SOC==5191~10,
+SOC>=5193&SOC<=5199~16,
+SOC>=6111&SOC<=6113~15,
+SOC==6115~16,
+SOC==6116~9,
+SOC==6117~10,
+SOC==6119~15,
+#food and beverage preparation
+#restaurant supervisors
+SOC==6120~16,
+#Chef
+SOC==6121~15,
+#bartender
+SOC>=6123&SOC<=6129~16,
+#Hotel and Lodging
+SOC==6135~12,
+SOC>=6130&SOC<=6133~16,
+SOC==6139~16,
+#Personal Service
+SOC==6141~15,
+SOC==6142~16,
+#Barbers
+SOC==6143~15,
+SOC==6144|SOC==6145~15,
+SOC==6147~15,
+SOC==6149~16,
+# Apparel and Furnishings
+SOC>=6160&SOC<=6169~16,
+#janitors, elevators
+SOC>=6190&SOC<=6199~16,
+#Famers
+SOC>=7113&SOC<=7119~7,
+#Farm labourers
+SOC==7180~6,
+SOC>=7181&SOC<=7195~8,
+SOC>=7196&SOC<=7197~7,
+SOC==7199~8,
+SOC==7311~6,
+SOC>=7313&SOC<=7319~7,
+#Forestry foreman
+SOC==7510~6,
+SOC==7511~7,
+SOC==7513~8,
+SOC==7516~7,
+SOC>=7517&SOC<=7519~7,
+SOC==7710~6,
+SOC>=7711&SOC<=7719~8,
+SOC==8110~6,
+SOC>=8111&SOC<=8119~8,
+SOC==8130~6,
+SOC>=8133&SOC<=8143~7,
+SOC==8146~6,
+SOC>=8148&SOC<=8149~8,
+SOC==8150~6,
+SOC>=8151&SOC<=8155~8,
+SOC==8158|SOC==8159~8,
+SOC==8156~7,
+SOC==8160~6,
+SOC>=8160&SOC<=8173~8,
+SOC==8176~7,
+SOC>=8178&SOC<=8179~8,
+SOC>=8210&SOC<=8227~7,
+SOC>=8228&SOC<=8229~8,
+SOC==8230~6,
+SOC>=8231&SOC<=8235~7,
+SOC==8236~7,
+SOC>=8238&SOC<=8239~8,
+SOC==8250~6,
+SOC>=8251&SOC<=8253~8,
+SOC==8256~7,
+SOC==8258|SOC==8259~8,
+SOC==8250~6,
+SOC>=8261&SOC<=8299~8,
+SOC==8290~6,
+SOC>=8293&SOC<=8295~7,
+SOC==8296~7,
+SOC>=8298&SOC<=8299~8,
+SOC==8310~6,
+SOC>=8311&SOC<=8319~7,
+SOC==8330~6,
+SOC>=8331&SOC<=8339~7,
+SOC==8350~6,
+SOC>=8351&SOC<=8351~7,
+SOC==8370~6,
+SOC>=8371&SOC<=8379~7,
+SOC==8390~6,
+SOC>=8391&SOC<=8399~7,
+SOC==8510~6,
+SOC>=8511&SOC<=8525~8,
+SOC==8526~7,
+SOC>=8527&SOC<=8529~8,
+SOC==8530~6,
+SOC>=8531&SOC<=8535~8,
+SOC>=8536&SOC<=8537~7,
+SOC>=8538&SOC<=8539~8,
+SOC==8540~6,
+SOC==8541~7,
+SOC==8546~7,
+SOC==8548|SOC==8549~8,
+SOC==8550~6,
+SOC>=8551&SOC<=8569~7,
+SOC==8570~6,
+SOC>=8571&SOC<=8575~8,
+SOC==8576~7,
+SOC>=8578&SOC<=8579~8,
+SOC==8580~6,
+SOC>=8581&SOC<=8589~7,
+SOC==8590~6,
+SOC>=8591&SOC<=8595~8,
+SOC==8596~7,
+SOC==8598|SOC==8599~8,
+SOC==8710~6,
+SOC>=8711&SOC<=8719~8,
+SOC==8730~6,
+SOC>=8731&SOC<=8739~7,
+SOC==8780~6,
+SOC>=8781&SOC<=8797~7,
+SOC==8798|SOC==8799~8,
+SOC==9111~6,
+SOC==9113~6,
+SOC==9110~6,
+SOC==9119~11,
+SOC==9130~6,
+SOC==9133~7,
+SOC==9131~7,
+SOC==9135~8,
+#This one is probably a mistake
+# but was coded by 84 as afarmer.
+SOC==7179~7,
+SOC==9139~8,
+SOC==9155~8,
+SOC==9157~8,
+#bus driver
+SOC==9170~6,
+SOC==9171~15,
+#Truck drivers
+SOC==9175~7,
+SOC==9179~15,
+SOC==9310~6,
+SOC>=9311&SOC<=9319~8,
+SOC==9510~6,
+SOC>=9511&SOC<=9519~7,
+SOC>=9530&SOC<=9539~6,
+SOC>=9550&SOC<=9559~6,
+SOC==9910~6,
+SOC==9916~7,
+SOC==9918~8,
+SOC==9590~6,
+SOC==9591~7,
+SOC==9599~7,
+SOC==9919~NA_integer_
   ))->ces84
-ces84$occupation_oesch_6<-factor(ces84$occupation_oesch_6, levels=c("Unskilled Workers", "Skilled Workers",
-                                          "Semi-Professionals Associate Managers",
-                                          "Self-employed","Professionals", "Managers"))
+val_labels(ces84$occupation_oesch)<-c(`Technical experts`=5, `Technicians`=6,
+                                      `Skilled manual`=7, `Low-skilled manual`=8,
+                                      'Higher-grade managers'=9, `Lower-grade managers`=10,
+                                      `Skilled clerks`=11, `Unskilled clerks`=12,
+                                      `Socio-cultural professionals`=13, `Socio-cultural (semi-professionals)`=14,
+                                      `Skilled service`=15, `Low-skilled service`=16)
+
+
+#Check
+with(ces84, table(as_factor(occupation_oesch)))
+
+#This deletes self-employed from oesch
+ces84 %>%
+  mutate(occupation_oesch=case_when(
+    VAR533==2~occupation_oesch,
+    VAR533==1~NA_integer_
+  ))->ces84
+#Create occupation_oesch_5
+ces84 %>%
+  mutate(occupation_oesch_5=case_when(
+    VAR533==1~3,
+    occupation_oesch==1|occupation_oesch==2|occupation_oesch==5|occupation_oesch==9|occupation_oesch==13~1,
+    occupation_oesch==6|occupation_oesch==10|occupation_oesch==14~2,
+    occupation_oesch==7|occupation_oesch==11|occupation_oesch==15~4,
+    occupation_oesch==8|occupation_oesch==12|occupation_oesch==16~5
+  ))->ces84
+val_labels(ces84$occupation_oesch_5)<-c(`Higher-grade service`=1,
+                                         `Lower-grade service`=2,
+                                         `Self-employed`=3,
+                                         `Skilled manual`=4,
+                                         `Unskilled manual`=5)
+
+# Test
+#Let's compare
+# ces84 %>%
+#   count(VAR525, SOC,occupation_oesch) %>%
+#   as_factor() %>% view()
+
+# #Add occupation Oesch 6
+# ces84 %>%
+#   mutate(occupation_oesch_6=case_when(
+#
+#   ))
+# ces84 %>%
+#   mutate(occupation_oesch_6=case_when(
+# #Managers
+#     VAR533==1~"Self-employed",
+#     VAR525==2~"Managers",
+#     VAR525==1~"Professionals",
+#     VAR525==5~"Skilled Workers",
+#     VAR525==6~"Unskilled Workers",
+#     VAR525==4~"Unskilled Workers",
+#     VAR525==3~"Semi-Professionals Associate Managers",
+#     VAR525==7~"Skilled Workers"
+#   ))->ces84
+#ces84$occupation_oesch_6<-factor(ces84$occupation_oesch_6, levels=c("Unskilled Workers", "Skilled Workers",
+#                                          "Semi-Professionals Associate Managers",
+#                                          "Self-employed","Professionals", "Managers"))
 #recode Income (VAR442 and VAR443)
 #recode Income (VAR442 and VAR443)
 # look_for(ces84, "income")
@@ -565,3 +854,5 @@ ces84$mode<-rep("Phone", nrow(ces84))
 ces84$election<-rep(1984, nrow(ces84))
 # Save the file
 save(ces84, file=here("data/ces84.rda"))
+# names(ces84)
+# table(as_factor(ces84$occupation_oesch))

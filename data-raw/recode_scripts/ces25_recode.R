@@ -376,6 +376,9 @@ table(as_factor(ces25$cps25_employment))
 with(ces25, table(cps25_employment, occupation_oesch))
 
 # Calculate Oesch-5
+
+
+
 ces25 %>%
   mutate(occupation_oesch_6=case_when(
     teer==0~"Managers",
@@ -575,8 +578,8 @@ ces25 %>%
   select(starts_with("efficacy")) %>%
   summary()
 #Check distribution of political_efficacy
-qplot(ces21$political_efficacy, geom="histogram")
-table(ces21$political_efficacy, useNA="ifany")
+# qplot(ces21$political_efficacy, geom="histogram")
+# table(ces21$political_efficacy, useNA="ifany")
 
 #Calculate Cronbach's alpha
 library(psych)
