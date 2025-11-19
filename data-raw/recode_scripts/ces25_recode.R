@@ -102,6 +102,14 @@ val_labels(ces25$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces25$employment)
 table(ces25$employment , ces25$cps25_employment , useNA = "ifany" )
 
+#recode Unemployed (cps25_employment)
+# look_for(ces25, "employment")
+ces25$unemployed<-Recode(ces25$cps25_employment, "1:3=0; 9:11=0; 5=1; else=NA")
+val_labels(ces25$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces25$unemployed)
+table(ces25$unemployed)
+
 #recode Sector (cps25_sector)
 lookfor(ces25, "sector")
 ces25$sector<-Recode(ces25$cps25_sector, "1=0; 3=0; 2=1; else=NA")
@@ -121,16 +129,22 @@ val_labels(ces25$vote3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Gr
 table(as_factor(ces25$vote3))
 
 #### Create party ID####
-ces25$partyid<-Recode(ces25$cps25_fed_id , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 9=2; else=NA")
-val_labels(ces25$partyid)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
-table(as_factor(ces25$partyid))
-table(ces25$partyid)
+ces25$party_id<-Recode(ces25$cps25_fed_id , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 9=2; else=NA")
+val_labels(ces25$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5)
+table(as_factor(ces25$party_id))
+table(ces25$party_id)
 
 #### Create party ID - splitting out PPC from Cons ####
-ces25$partyid2<-Recode(ces25$cps25_fed_id , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 9=6; else=NA")
-val_labels(ces25$partyid2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, PPC=6)
-table(as_factor(ces25$partyid2))
-table(ces25$partyid2)
+ces25$party_id2<-Recode(ces25$cps25_fed_id , "1=1; 2=2; 3=3; 4=4; 5=5; 6=0; 9=6; else=NA")
+val_labels(ces25$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, PPC=6)
+table(as_factor(ces25$party_id2))
+table(ces25$party_id2)
+
+#recode Party closeness (cps25_fed_id_str)
+look_for(ces25, "fed_id_str")
+ces25$party_close<-Recode(ces25$cps25_fed_id_str, "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces25$cps25_fed_id_str , ces25$party_close, useNA = "ifany" )
 
 #### Create income ####
 lookfor(ces25, "income")
@@ -467,8 +481,8 @@ ces25$conservative_rating<-Recode(as.numeric(ces25$cps25_party_rating_24), "-99=
 table(ces25$conservative_rating)
 
 #recode NDP rating
-ces25$NDP_rating<-Recode(as.numeric(ces25$cps25_party_rating_25), "-99=NA")
-table(ces25$NDP_rating)
+ces25$ndp_rating<-Recode(as.numeric(ces25$cps25_party_rating_25), "-99=NA")
+table(ces25$ndp_rating)
 
 #recode Bloc rating
 ces25$bloc_rating<-Recode(as.numeric(ces25$cps25_party_rating_26), "-99=NA")
@@ -484,7 +498,7 @@ table(ces25$ppc_rating)
 
 #### recode Redistribution (pes25_gap)####
 look_for(ces25, "rich")
-ces25$redistribution<-Recode(as.numeric(ces25$pes25_gap), "; 1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
+ces25$redistribution<-Recode(as.numeric(ces25$pes25_gap), "; 1=1; 2=0.75; 3=0.5; 4=0.25; 5=0; else=NA", as.numeric=T)
 #val_labels(ces25$redistribution)<-c(Much_more=0, Somewhat_more=0.25, Same_amount=0.5, Somewhat_less=0.75, Much_less=1) #LEFT TO RIGHT#
 #checks
 #val_labels(ces25$redistribution)
@@ -757,7 +771,7 @@ table(ces25$postgrad)
 
 #recode Education (cps25_spend_educ)
 look_for(ces25, "education")
-ces25$education_spend<-Recode(as.numeric(ces25$cps25_spend_educ), "2=0.5; 1=1; 3=0; 4=0.5; else=NA")
+ces25$education_spend<-Recode(as.numeric(ces25$cps25_spend_educ), "2=0.5; 1=0; 3=1; 4=0.5; else=NA")
 #val_labels(ces25$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 #val_labels(ces25$education)

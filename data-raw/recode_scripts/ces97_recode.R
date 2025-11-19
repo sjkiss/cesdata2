@@ -102,6 +102,14 @@ val_labels(ces97$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces97$employment)
 # (ces97$employment)
 
+#recode Unemployed (cpsm4)
+# look_for(ces97, "employment")
+ces97$unemployed<-Recode(ces97$cpsm4, "1=0; 2:3=1; else=NA")
+val_labels(ces97$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces97$unemployed)
+table(ces97$unemployed)
+
 ####recode Sector (cpsm7 & cpsm4) ####
 # (ces97, "firm")
 ces97 %>%
@@ -146,12 +154,12 @@ look_for (ces97, "federal")
 lookfor(ces97, "occupation")
 ces97 %>%
   mutate(party_id=case_when(
-    cpsk1==1 | cpsk4==1 ~ 1,
-    cpsk1==2 | cpsk4==2 ~ 2,
-    cpsk1==3 | cpsk4==3 ~ 3,
-    cpsk1==4 | cpsk4==4 ~ 2,
-    cpsk1==5 | cpsk4==5 ~ 4,
-    cpsk1==6 | cpsk4==6 ~ 0,
+    pesh1==1 | pesh4==1 ~ 1,
+    pesh1==2 | pesh4==2 ~ 2,
+    pesh1==3 | pesh4==3 ~ 3,
+    pesh1==4 | pesh4==4 ~ 2,
+    pesh1==5 | pesh4==5 ~ 4,
+    pesh1==6 | pesh4==6 ~ 0,
   ))->ces97
 
 val_labels(ces97$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
@@ -163,18 +171,40 @@ table(ces97$party_id)
 look_for (ces97, "federal")
 ces97 %>%
   mutate(party_id2=case_when(
-    cpsk1==1 | cpsk4==1 ~ 1,
-    cpsk1==2 | cpsk4==2 ~ 2,
-    cpsk1==3 | cpsk4==3 ~ 3,
-    cpsk1==4 | cpsk4==4 ~ 6,
-    cpsk1==5 | cpsk4==5 ~ 4,
-    cpsk1==6 | cpsk4==6 ~ 0,
+    pesh1==1 | pesh4==1 ~ 1,
+    pesh1==2 | pesh4==2 ~ 2,
+    pesh1==3 | pesh4==3 ~ 3,
+    pesh1==4 | pesh4==4 ~ 6,
+    pesh1==5 | pesh4==5 ~ 4,
+    pesh1==6 | pesh4==6 ~ 0,
   ))->ces97
 
 val_labels(ces97$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces97$party_id2)
 table(ces97$party_id2)
+
+# recode Party ID 3 (pesh1 and pesh4)
+look_for (ces97, "federal")
+ces97 %>%
+  mutate(party_id3=case_when(
+    cpsk1==1 | cpsk4==1 ~ 1,
+    cpsk1==2 | cpsk4==2 ~ 2,
+    cpsk1==3 | cpsk4==3 ~ 3,
+    cpsk1==4 | cpsk4==4 ~ 6,
+    cpsk1==5 | cpsk4==5 ~ 4,
+      cpsk1==6 | cpsk4==6 ~ 0,
+  ))->ces97
+val_labels(ces97$party_id3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces97$party_id3)
+table(ces97$party_id3)
+
+#recode Party closeness (cpsk2 )
+look_for(ces97, "strongly")
+ces97$party_close<-Recode(ces97$cpsk2 , "1=1; 3=0.5; 5=0; else=NA")
+#checks
+table(ces97$cpsk2  , ces97$party_close, useNA = "ifany" )
 
 ####recode Vote (pesa4) ####
 # (ces97, "vote")

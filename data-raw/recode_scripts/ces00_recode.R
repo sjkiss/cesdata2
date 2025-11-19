@@ -112,6 +112,14 @@ val_labels(ces00$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces00$employment)
 # table(ces00$employment)
 
+#recode Unemployed (cpsm4)
+# look_for(ces00, "employment")
+ces00$unemployed<-Recode(ces00$cpsm4, "1:3=0; 4=1; else=NA")
+val_labels(ces00$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces00$unemployed)
+table(ces00$unemployed)
+
 ####Sector ####
 #recode Sector (cpsm7 & cpsm4)
 # look_for(ces00, "company")
@@ -136,16 +144,16 @@ val_labels(ces00$sector)
 # table(ces00$sector)
 
 ####party id ####
-#recode Party ID (pesk1a and pesk1ab)
+#recode Party ID (pesk1a, pesk1ab and pesk4)
 look_for(ces00, "yourself")
 ces00 %>%
   mutate(party_id=case_when(
-    pesk1a==1 | pesk1b==1 ~ 1,
-    pesk1a==2 | pesk1b==2 ~ 2,
-    pesk1a==3 | pesk1b==3 ~ 3,
-    pesk1a==4 | pesk1b==4 ~ 2,
-    pesk1a==0 | pesk1b==0 ~ 0,
-    pesk1a==5 | pesk1b==5 ~ 4,
+    pesk1a==1 | pesk1b==1 | pesk4==1 ~ 1,
+    pesk1a==2 | pesk1b==2 | pesk4==2 ~ 2,
+    pesk1a==3 | pesk1b==3 | pesk4==3 ~ 3,
+    pesk1a==4 | pesk1b==4 | pesk4==4 ~ 2,
+    pesk1a==0 | pesk1b==0 | pesk4==0 ~ 0,
+    pesk1a==5 | pesk1b==5 | pesk4==5 ~ 4,
   ))->ces00
 
 val_labels(ces00$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
@@ -153,22 +161,45 @@ val_labels(ces00$party_id)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 val_labels(ces00$party_id)
 table(ces00$party_id)
 
-#recode Party ID 2 (pesk1a and pesk1ab)
+#recode Party ID 2 (pesk1a, pesk1ab and pesk4)
 look_for(ces00, "yourself")
 ces00 %>%
   mutate(party_id2=case_when(
-    pesk1a==1 | pesk1b==1 ~ 1,
-    pesk1a==2 | pesk1b==2 ~ 2,
-    pesk1a==3 | pesk1b==3 ~ 3,
-    pesk1a==4 | pesk1b==4 ~ 6,
-    pesk1a==0 | pesk1b==0 ~ 0,
-    pesk1a==5 | pesk1b==5 ~ 4,
+    pesk1a==1 | pesk1b==1 | pesk4==1 ~ 1,
+    pesk1a==2 | pesk1b==2 | pesk4==2 ~ 2,
+    pesk1a==3 | pesk1b==3 | pesk4==3 ~ 3,
+    pesk1a==4 | pesk1b==4 | pesk4==4 ~ 6,
+    pesk1a==0 | pesk1b==0 | pesk4==0 ~ 0,
+    pesk1a==5 | pesk1b==5 | pesk4==5 ~ 4,
   ))->ces00
 
 val_labels(ces00$party_id2)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
 #checks
 val_labels(ces00$party_id2)
 table(ces00$party_id2)
+
+#recode Party ID 3 (cpsk1a, cpsk1ab, cpsk3b and cpsk4a)
+look_for(ces00, "yourself")
+ces00 %>%
+  mutate(party_id3=case_when(
+    cpsk1a==1 | cpsk1b==1 | cpsk3b==1 | cpsk4a==1 ~ 1,
+    cpsk1a==2 | cpsk1b==2 | cpsk3b==2 | cpsk4a==2 ~ 4,
+    cpsk1a==3 | cpsk1b==3 | cpsk3b==3 | cpsk4a==3 ~ 6,
+    cpsk1a==4 | cpsk1b==4 | cpsk3b==4 | cpsk4a==4 ~ 2,
+    cpsk1a==97 | cpsk1b==97 | cpsk3b==97 | cpsk4a==97 ~ 0,
+    cpsk1a==5 | cpsk1b==5 | cpsk3b==5 | cpsk4a==5 ~ 3,
+  ))->ces00
+
+val_labels(ces00$party_id3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3)
+#checks
+val_labels(ces00$party_id3)
+table(ces00$party_id3)
+
+#recode Party closeness (pesk2 )
+look_for(ces00, "strongly")
+ces00$party_close<-Recode(ces00$pesk2 , "1=1; 3=0.5; 5=0; else=NA")
+#checks
+table(ces00$pesk2  , ces00$party_close, useNA = "ifany" )
 
 ####vote ####
 #recode Vote (pesa3a and pesa3b)

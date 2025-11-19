@@ -224,6 +224,14 @@ val_labels(ces21$employment)<-c(Unemployed=0, Employed=1)
 val_labels(ces21$employment)
 table(ces21$employment , ces21$cps21_employment , useNA = "ifany" )
 
+#recode Unemployed (cps21_employment)
+# look_for(ces21, "employment")
+ces21$unemployed<-Recode(ces21$cps21_employment, "1:3=0; 9:11=0; 5=1; else=NA")
+val_labels(ces21$unemployed)<-c(Employed=0, Unemployed=1)
+#checks
+val_labels(ces21$unemployed)
+table(ces21$unemployed)
+
 #No Sector available
 nrow(ces21)
 
@@ -246,11 +254,27 @@ nrow(ces21)
 #checks
 #val_labels(ces21$party_id2)
 #with(ces21, table(as_factor(party_id2)))
-#table(ces21$party_id2, cps21_fed_id , useNA = "ifany" )
 
-# keep these 2 variables an code in Stata
+ces21$party_id2<-ces21$party_id
+table(ces21$party_id2 , useNA = "ifany" )
+
+# *** keep these 2 variables and code in Stata ***
 #look_for(ces21, "cps21_ResponseId")
 #look_for(ces21, "cps21_fed_id_6_TEXT")
+
+#recode Party ID 3 (pes21_pidtrad)
+look_for(ces21, "pid")
+ces21$party_id3<-Recode(ces21$pes21_pidtrad, "1=1; 2=2; 3=3; 4=4; 5=5; 7=0; 6=6; else=NA")
+val_labels(ces21$party_id3)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, Bloc=4, Green=5, PPC=6)
+#checks
+val_labels(ces21$party_id3)
+table(ces21$party_id3 , useNA = "ifany" )
+
+#recode Party closeness (cps21_fed_id_str)
+look_for(ces21, "pid")
+ces21$party_close<-Recode(ces21$cps21_fed_id_str, "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces21$cps21_fed_id_str , ces21$party_close, useNA = "ifany" )
 
 #recode Vote (pes21_votechoice2021)
 look_for(ces21, "party did you vote")
@@ -455,8 +479,8 @@ ces21$conservative_rating<-Recode(as.numeric(ces21$cps21_party_rating_24), "-99=
 table(ces21$conservative_rating)
 
 #recode NDP rating
-ces21$NDP_rating<-Recode(as.numeric(ces21$cps21_party_rating_25), "-99=NA")
-table(ces21$NDP_rating)
+ces21$ndp_rating<-Recode(as.numeric(ces21$cps21_party_rating_25), "-99=NA")
+table(ces21$ndp_rating)
 
 #recode Bloc rating
 ces21$bloc_rating<-Recode(as.numeric(ces21$cps21_party_rating_26), "-99=NA")
@@ -527,11 +551,11 @@ table(ces21$national_retrospective, ces21$cps21_econ_retro, useNA = "ifany" )
 
 #recode Education (cps21_spend_educ)
 look_for(ces21, "education")
-ces21$education<-Recode(as.numeric(ces21$cps21_spend_educ), "2=0.5; 1=0; 3=1; 4=0.5; else=NA")
+ces21$education_spend<-Recode(as.numeric(ces21$cps21_spend_educ), "2=0.5; 1=0; 3=1; 4=0.5; else=NA")
 #val_labels(ces21$education)<-c(Spend_less=0, Spend_same=0.5, Spend_more=1)
 #checks
 #val_labels(ces21$education)
-table(ces21$education, ces21$cps21_spend_educ , useNA = "ifany" )
+table(ces21$education_spend, ces21$cps21_spend_educ , useNA = "ifany" )
 
 #recode Break Promise (pes21_keepromises)
 look_for(ces21, "promise")
@@ -852,6 +876,12 @@ val_labels(ces21$prov_vote)<-c(Other=0, Liberal=1, Conservative=2, NDP=3, PQ=4, 
 val_labels(ces21$prov_vote)
 table(ces21$prov_vote)
 
+#recode daycare (PES15_56)
+# look_for(ces21, "childcare")
+ces21$daycare<-Recode(as.numeric(ces21$cps21_spend_nation_c), "1=1; 3=0; 2=0.5; else=NA")
+#checks
+table(ces21$daycare, ces21$cps21_spend_nation_c , useNA = "ifany" )
+
 #### recode Homeowner(cps21_property_1) ####
 look_for(ces21, "home")
 ces21 %>%
@@ -865,6 +895,12 @@ ces21 %>%
   ))->ces21
 #checks
 table(ces21$homeowner, ces21$cps21_property_1, useNA = "ifany")
+
+# recode Housing - gov't spend (L-R)
+look_for(ces21, "housing")
+ces21$housing<-Recode(as.numeric(ces21$cps21_spend_afford_h) , "1=1; 2=0.5; 3=0; else=NA")
+#checks
+table(ces21$housing)
 
 #### recode feminism (cps21_groups_therm_6)
 ces21$feminism_rating<-Recode(as.numeric(ces21$cps21_groups_therm_6 /100), "-99=NA")
