@@ -345,10 +345,12 @@ table(ces25b$logic)
 #   select(occupation_code, NOC21_5, pes25_occ_select_2) %>%
 #   filter(pes25_occ_select_2!="-99"&pes25_occ_select_2!="") %>%
 #   nrow()
-?save
-ces25b %>%
-  select(NOC21_5) %>%
-write.csv(., file="~/Desktop/ces25b.csv")
+#?save
+# ces25b %>%
+#   select(NOC21_5) %>%
+# write.csv(., file="~/Desktop/ces25b.csv")
+
+
 # Calculate Oesch
 ces25b %>%
   mutate(occupation_oesch=case_when(
@@ -486,7 +488,7 @@ NOC21_5>=32200&NOC21_5<=32209~14,
 NOC21_5>=42100&NOC21_5<=42102~15,
 #Paralegals
 NOC21_5==42200~11,
-NOC21_5>=4201&NOC21_5<=42202~14,
+NOC21_5>=42201&NOC21_5<=42202~14,
 NOC21_5==42203~13,
 NOC21_5==42204~14,
 ## major group 52
@@ -650,6 +652,8 @@ NOC21_5>=75210&NOC21_5<=75212~8,
 NOC21_5>=85110&NOC21_5<=85121~8,
 NOC21_5>=95100&NOC21_5<=95109~8
 ))->ces25b
+ces25b %>% filter(NOC21_5==14101) %>%
+  select(occupation_oesch)
 #tests
 ces25b %>%
   filter(NOC21_5>=84100&NOC21_5<=84123) %>%
@@ -658,7 +662,8 @@ ces25b %>%
 ces25b %>%
   filter(NOC21_5>94100&NOC21_5<=94143) %>%
   select(NOC21_5, occupation_oesch)
-
+ces25b %>%
+  filter(NOC21_5==14101) %>% select(occupation_oesch)
 #Add self-employed
 ces25b$cps25_employment
 ces25b %>%
