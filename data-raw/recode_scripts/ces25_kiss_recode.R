@@ -589,7 +589,7 @@ NOC21_5>=83110&NOC21_5<=83121~7,
 NOC21_5>=93100&NOC21_5<=93200~8,
 ##major Group 14
 #Office clerks
-NOC21_5>=14100&NOC21_5<=14103~14,
+NOC21_5>=14100&NOC21_5<=14103~11,
 NOC21_5==14110~12,
 NOC21_5==14111~11,
 NOC21_5==14112~11,
@@ -658,11 +658,14 @@ ces25b %>%
 ces25b %>%
   filter(NOC21_5>94100&NOC21_5<=94143) %>%
   select(NOC21_5, occupation_oesch)
+
 #Add self-employed
+ces25b$cps25_employment
 ces25b %>%
   mutate(occupation_oesch=case_when(
-    employment==1~occupation_oesch,
-    employment==0~4
+    cps25_employment>0&cps25_employment<3~occupation_oesch,
+    cps25_employment>8&cps25_employment<12~occupation_oesch,
+    cps25_employment==3~4
   ))->ces25b
 val_labels(ces25b$occupation_oesch)<-c(`Self-employed`=4,`Technical experts`=5, `Technicians`=6,
                                        `Skilled manual`=7, `Low-skilled manual`=8,
@@ -670,7 +673,7 @@ val_labels(ces25b$occupation_oesch)<-c(`Self-employed`=4,`Technical experts`=5, 
                                        `Skilled clerks`=11, `Unskilled clerks`=12,
                                        `Socio-cultural professionals`=13, `Socio-cultural (semi-professionals)`=14,
                                        `Skilled service`=15, `Low-skilled service`=16)
-
+#table(ces25b$occupation_oesch)
 # with(ces25b, table(as_factor(occupation_oesch)))
 #
 # with(ces25b, prop.table(table(as_factor(occupation_oesch))))
