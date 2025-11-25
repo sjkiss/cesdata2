@@ -658,8 +658,13 @@ ces25b %>%
 ces25b %>%
   filter(NOC21_5>94100&NOC21_5<=94143) %>%
   select(NOC21_5, occupation_oesch)
-
-val_labels(ces25b$occupation_oesch)<-c(`Technical experts`=5, `Technicians`=6,
+#Add self-employed
+ces25b %>%
+  mutate(occupation_oesch=case_when(
+    employment==1~occupation_oesch,
+    employment==0~4
+  ))->ces25b
+val_labels(ces25b$occupation_oesch)<-c(`Self-employed`=4,`Technical experts`=5, `Technicians`=6,
                                        `Skilled manual`=7, `Low-skilled manual`=8,
                                        `Higher-grade managers`=9, `Lower-grade managers`=10,
                                        `Skilled clerks`=11, `Unskilled clerks`=12,
@@ -676,13 +681,7 @@ val_labels(ces25b$occupation_oesch)<-c(`Technical experts`=5, `Technicians`=6,
 # ces25b %>%
 #   count(cps25_employment, occupation_oesch) %>% as_factor() %>% view()
 #table(ces25b$employment, as_factor(ces25b$cps25_employment))
-#Delete Unemployed oesch
-ces25b %>%
-  mutate(occupation_oesch=case_when(
-    employment==1~occupation_oesch,
-    employment==0~NA_integer_
-  ))->ces25b
-ces25b$cps25_employment
+
 #Create Occupation_oesch_5
 ces25b %>%
   mutate(occupation_oesch_5=case_when(
@@ -695,8 +694,8 @@ ces25b %>%
 val_labels(ces25b$occupation_oesch_5)<-c(`Higher-grade service`=1,
                                          `Lower-grade service`=2,
                                          `Self-employed`=3,
-                                         `Skilled manual`=4,
-                                         `Unskilled manual`=5)
+                                         `Skilled workers`=4,
+                                         `Unskilled workers`=5)
 #Check
 
 

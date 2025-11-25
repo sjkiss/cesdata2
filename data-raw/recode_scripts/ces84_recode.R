@@ -456,9 +456,16 @@ SOC==9591~7,
 SOC==9599~7,
 SOC==9919~NA_integer_
   ))->ces84
-val_labels(ces84$occupation_oesch)<-c(`Technical experts`=5, `Technicians`=6,
+
+#Add a self-employed category
+ces84 %>%
+  mutate(occupation_oesch=case_when(
+    VAR533==2~occupation_oesch,
+    VAR533==1~4
+  ))->ces84
+val_labels(ces84$occupation_oesch)<-c(`Self-employed`=4,`Technical experts`=5, `Technicians`=6,
                                       `Skilled manual`=7, `Low-skilled manual`=8,
-                                      'Higher-grade managers'=9, `Lower-grade managers`=10,
+                                      `Higher-grade managers`=9, `Lower-grade managers`=10,
                                       `Skilled clerks`=11, `Unskilled clerks`=12,
                                       `Socio-cultural professionals`=13, `Socio-cultural (semi-professionals)`=14,
                                       `Skilled service`=15, `Low-skilled service`=16)
@@ -467,12 +474,7 @@ val_labels(ces84$occupation_oesch)<-c(`Technical experts`=5, `Technicians`=6,
 #Check
 with(ces84, table(as_factor(occupation_oesch)))
 
-#This deletes self-employed from oesch
-ces84 %>%
-  mutate(occupation_oesch=case_when(
-    VAR533==2~occupation_oesch,
-    VAR533==1~NA_integer_
-  ))->ces84
+
 #Create occupation_oesch_5
 ces84 %>%
   mutate(occupation_oesch_5=case_when(
@@ -485,8 +487,8 @@ ces84 %>%
 val_labels(ces84$occupation_oesch_5)<-c(`Higher-grade service`=1,
                                          `Lower-grade service`=2,
                                          `Self-employed`=3,
-                                         `Skilled manual`=4,
-                                         `Unskilled manual`=5)
+                                         `Skilled workers`=4,
+                                         `Unskilled workers`=5)
 
 # Test
 #Let's compare
