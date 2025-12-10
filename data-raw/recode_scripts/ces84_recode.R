@@ -205,14 +205,11 @@ ces84$occupation3<-ifelse(ces84$VAR533==1, 6, ces84$occupation)
 val_labels(ces84$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 #checks
 val_labels(ces84$occupation3)
-# table(ces84$occupation3)
+
+#### Code OESCH
 ces84 %>%
   rename(SOC=VAR526)->ces84
-ces84 %>%
-  filter(SOC==11) %>%
-  select(SOC, VAR525)
-val_labels(ces84$VAR525)
-var_label(ces84$SOC)
+
 ces84 %>%
   mutate(occupation_oesch=case_when(
     #Additional codes are taken from the codebook for the CES84
@@ -488,8 +485,74 @@ val_labels(ces84$occupation_oesch_5)<-c(`Higher-grade service`=1,
                                          `Lower-grade service`=2,
                                          `Self-employed`=3,
                                          `Skilled workers`=4,
-                                         `Unskilled workers`=5)
+                                    `Unskilled workers`=5)
+#### Code Kiss
 
+# Get Major group
+ces84 %>%
+  mutate(SOC_major_group=str_extract(SOC, "^.{2}")) %>%
+  select(SOC_major_group, SOC)
+
+# Get Major group
+nchar(ces84$SOC)
+ces84 %>%
+  mutate(SOC_major_group=case_when(
+    nchar(SOC)!=2~str_extract(SOC, "^.{2}"),
+nchar(SOC)==2~as.character(SOC)
+    ))->ces84
+ces84$SOC_major_group<-as.numeric(ces84$SOC_major_group)
+ces84$SOC
+ces84 %>%
+  mutate(SOC_major_group=case_when(
+    #Teacheres
+    SOC==11~27,
+    #Machine Operator
+    SOC==12~83,
+    #Foreman
+    SOC==13~NA_integer_,
+    #Mechanic
+    SOC==14~85,
+    #Maintenance
+    SOC==15~61,
+    #Technician
+    SOC==16~21,
+    #Scientific Research
+    SOC==17~21,
+    SOC==18~87,
+    SOC==34~NA_integer_,
+    nchar(SOC)==4~as.numeric(str_extract(SOC, "^.{2}"))
+  ))->ces84
+val_labels(ces84$SOC_major_group)<-c(`Managerial, Administrative`=11,
+                               `Natural Sciences, Engineering and Mathematics`=21,
+                               `Social Sciences`=23,
+                               `Religion`=25,
+                               `Teaching`=27,
+                               `Medicine and Health`=31,
+                               `Artistic, Literary and Recreational`=33,
+                               `Clerical`=41,
+                               `Sales`=51,
+                               `Service`=61,
+                               `Farming, husbandry, horticulture`=71,
+                               `Fishing, trapping`=73,
+                               `Forestry and logging`=75,
+                               `Mining, quarrying`=77,
+                               `Processing`=81,
+                               `Processing`=82,
+                               `Machining`=83,
+                               `Manufacturing`=85,
+                               `Construction Trades`=87,
+                               `Transport`=91,
+                               `Material Handling`=93,
+                               `Craft and equipment operating`=95)
+ces84 %>%
+  filter(SOC==11) %>%
+  select(SOC, SOC_major_group)
+ces84 %>%
+  select(VAR525, SOC_major_group) %>%
+  filter(VAR525<8) %>%
+  as_factor() %>%
+  count(VAR525, SOC_major_group) %>%
+  arrange(desc(n)) %>% view()
 # Test
 #Let's compare
 # ces84 %>%

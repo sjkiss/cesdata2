@@ -350,7 +350,47 @@ table(ces25b$logic)
 #   select(NOC21_5) %>%
 # write.csv(., file="~/Desktop/ces25b.csv")
 
+#Read in open-ended responess.
+library(openxlsx)
+ces25_occupations<-read.xlsx(xlsxFile=here("data-raw/ces25_occupations.xlsx"), cols=1:2)
+ces25_occupations$NOC21_5<-as.numeric(ces25_occupations$NOC21_5)
+# glimpse(ces25_occupations)
+# class(ces25b$NOC21_5)
+# class(ces25_occupations$NOC21_5)
+ces25b %>%
+  mutate(pes25_occ_select_2_lower=case_when(
+    pes25_occ_select_2!="-99"~str_to_lower(pes25_occ_select_2),
+  ))->ces25b
+head(ces25b$pes25_occ_select_2_lower)
+#Create variable with open-ended occupation response if select =-99
+ces25b %>%
+  left_join(.,
+            ces25_occupations,
+            by=c("pes25_occ_select_2_lower"="response"),keep=F)->ces25b
 
+
+# ces25b %>%
+#   #  filter(pes25_occ_select_2!="-99") %>%
+#   select(contains("NOC21_5")) %>%
+#   view()
+#Check respondents with two respondents
+
+# ces25b %>%
+#   filter(!is.na(NOC21_5.x)&!is.na(NOC21_5.y)) %>%
+#   select(occupation_code, occupation_name, pes25_occ_select_2_lower,starts_with("NOC21")) %>%
+#   view()
+#Combine
+ces25b %>%
+  mutate(NOC21_5=case_when(
+    #If both are not missing
+    !is.na(NOC21_5.x)&!is.na(NOC21_5.y)~NOC21_5.x,
+    #the the NOC21 from the coded responses is not missing
+    #select the NOC21 frmo the coded response
+    !is.na(NOC21_5.x)~NOC21_5.x,
+    #But if the NOC21 from the open response is not missing
+    #select the open response
+    !is.na(NOC21_5.y)~NOC21_5.y
+  ))->ces25b
 # Calculate Oesch
 ces25b %>%
   mutate(occupation_oesch=case_when(
@@ -381,7 +421,8 @@ NOC21_5 >=50010&NOC21_5<=50012~10,
 #Finance Professionals
 NOC21_5>=11100&NOC21_5<=11102~9,
 #Finance Associate Professionals
-NOC21_5>=11103&NOC21_5<=11100~10,
+NOC21_5>=11103&NOC21_5<=11110~10,
+NOC21_5>=11200&NOC21_5<=11203~9,
 #Major group 21
 NOC21_5>=21100&NOC21_5<=21399~5,
 #Major group 31
@@ -393,8 +434,10 @@ NOC21_5==31110~13,
 NOC21_5==31111~14,
 #Audiologists
 NOC21_5==31112~14,
+#Pharmacits
+NOC21_5==31120~13,
 #Psychologists
-NOC21_5==3200~13,
+NOC21_5==31200~13,
 #chiropractors, phsyiotherapists, occupational therapists
 NOC21_5>=31201&NOC21_5<=31209~13,
 #Nursing
@@ -507,9 +550,9 @@ NOC21_5==52120|NOC21_5==52121~14,
 #Retail supervisors
 NOC21_5==62010~15,
 # Food supervisor
-NOC21_5==62011~15,
+NOC21_5==62020~16,
 #Executive housekeeping
-NOC21_5==62012|NOC21_5==62013~16,
+NOC21_5==62021|NOC21_5==62022~16,
 #Call centre supervisor
 NOC21_5==62023~11,
 NOC21_5==62024~16,
@@ -529,6 +572,8 @@ NOC21_5>=72023&NOC21_5<=72024~11,
 NOC21_5>=72100&NOC21_5<=72106~7,
 NOC21_5>=72200&NOC21_5<=72205~7,
 NOC21_5>=72300&NOC21_5<=72321~7,
+#Mechanics
+NOC21_5>=72400&NOC21_5<=72411~7,
 NOC21_5>=72420&NOC21_5<=72429~7,
 NOC21_5>=72500&NOC21_5<=72501~7,
 NOC21_5==72999~7,
@@ -554,6 +599,8 @@ NOC21_5==33101~6,
 NOC21_5>=33102&NOC21_5<=33109~15,
 NOC21_5==43100~15,
 NOC21_5==43109~15,
+#Firefighters
+NOC21_5==43120~15,
 NOC21_5>=43200&NOC21_5<=43204~15,
 #museum interpreters
 NOC21_5==53100~15,
@@ -616,13 +663,13 @@ NOC21_5==64314~11,
 NOC21_5>=64320&NOC21_5<=64322~15,
 NOC21_5>=64400&NOC21_5<=64409~11,
 #Security guards
-NOC21_5==64411~16,
+NOC21_5==64410~16,
 #letter carriers
 NOC21_5==74100|NOC21_5==74101~11,
 #Messengers
 NOC21_5==74102~12,
 # railway and deck workers
-NOC21_5>=74200&NOC21_5<=7202~8,
+NOC21_5>=74200&NOC21_5<=74202~8,
 NOC21_5==74203~7,
 NOC21_5==74204~7,
 #Garbage truck
@@ -643,29 +690,34 @@ NOC21_5>=94210&NOC21_5<=94219~8,
 NOC21_5==45100~16,
 NOC21_5==54109~16,
 NOC21_5>=65100&NOC21_5<=65109~12,
-NOC21_5>=65200&NOC21_5<=65329~12,
+NOC21_5>=65200&NOC21_5<=65329~16,
 NOC21_5==75100~8,
 NOC21_5==75101~8,
 NOC21_5==75110~8,
 NOC21_5>=75200&NOC21_5<=75201~16,
 NOC21_5>=75210&NOC21_5<=75212~8,
-NOC21_5>=85110&NOC21_5<=85121~8,
+NOC21_5>=85100&NOC21_5<=85121~8,
 NOC21_5>=95100&NOC21_5<=95109~8
 ))->ces25b
-ces25b %>% filter(NOC21_5==14101) %>%
-  select(occupation_oesch)
-#tests
-ces25b %>%
-  filter(NOC21_5>=84100&NOC21_5<=84123) %>%
-  select(NOC21_5, occupation_oesch)
-#Tests
-ces25b %>%
-  filter(NOC21_5>94100&NOC21_5<=94143) %>%
-  select(NOC21_5, occupation_oesch)
-ces25b %>%
-  filter(NOC21_5==14101) %>% select(occupation_oesch)
+
+
+# ces25b %>%
+# select(contains("NOC21")) %>% view()
+
+# ces25b %>% filter(NOC21_5==14101) %>%
+#   select(occupation_oesch)
+# #tests
+# ces25b %>%
+#   filter(NOC21_5>=84100&NOC21_5<=84123) %>%
+#   select(NOC21_5, occupation_oesch)
+# #Tests
+# ces25b %>%
+#   filter(NOC21_5>94100&NOC21_5<=94143) %>%
+#   select(NOC21_5, occupation_oesch)
+# ces25b %>%
+#   filter(NOC21_5==14101) %>% select(occupation_oesch)
 #Add self-employed
-ces25b$cps25_employment
+#ces25b$cps25_employment
 ces25b %>%
   mutate(occupation_oesch=case_when(
     cps25_employment>0&cps25_employment<3~occupation_oesch,
@@ -678,7 +730,7 @@ val_labels(ces25b$occupation_oesch)<-c(`Self-employed`=4,`Technical experts`=5, 
                                        `Skilled clerks`=11, `Unskilled clerks`=12,
                                        `Socio-cultural professionals`=13, `Socio-cultural (semi-professionals)`=14,
                                        `Skilled service`=15, `Low-skilled service`=16)
-#table(ces25b$occupation_oesch)
+
 # with(ces25b, table(as_factor(occupation_oesch)))
 #
 # with(ces25b, prop.table(table(as_factor(occupation_oesch))))
@@ -688,6 +740,10 @@ val_labels(ces25b$occupation_oesch)<-c(`Self-employed`=4,`Technical experts`=5, 
 #check employment status
 # ces25b %>%
 #   count(cps25_employment, occupation_oesch) %>% as_factor() %>% view()
+
+
+ces25b %>%
+  count(occupation_oesch)
 #table(ces25b$employment, as_factor(ces25b$cps25_employment))
 
 #Create Occupation_oesch_5
@@ -704,9 +760,16 @@ val_labels(ces25b$occupation_oesch_5)<-c(`Higher-grade service`=1,
                                          `Self-employed`=3,
                                          `Skilled workers`=4,
                                          `Unskilled workers`=5)
+
+# ces25b %>%
+#   filter(cps25_employment==1&is.na(occupation_oesch_5)) %>%
+#   #filter(nchar(occupation_code)>1) %>%
+#   select(cps25_employment, occupation_code, pes25_occ_select,pes25_occ_select_2,occupation_name,occupation_oesch) %>% as_factor() %>%
+#   view()
 #Check
-
-
+# ces25b %>%
+#   count(occupation_oesch_5)
+# table(!is.na(ces25b$NOC21_5.y))
 # ces25b %>%
 #   mutate(occupation_oesch_6=case_when(
 #     cps25_employment==3~4,
