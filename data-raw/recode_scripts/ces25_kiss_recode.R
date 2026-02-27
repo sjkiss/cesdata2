@@ -12,7 +12,7 @@ library(car)
 look_for(ces25b, "class")
 look_for(ces25b, "vote")
 look_for(ces25b, "vote")
-
+names(ces25b)
 #### recode Gender ####
 ces25b$male<-Recode(ces25b$cps25_genderid, "1=1; 2=0; else=NA")
 val_labels(ces25b$male)<-c(Female=0, Male=1)
@@ -891,6 +891,13 @@ ces25b$ppc_leader<-Recode(as.numeric(ces25b$cps25_lead_rating_29), "-99=NA")
 #ces25b$ppc_leader<-(ces25b$ppc_leader2 /100)
 table(ces25b$ppc_leader)
 
+#Average leader rating
+
+ces25b %>%
+  rowwise() %>%
+  ungroup() %>%
+  mutate(leader_average=mean(c_across(liberal_leader:ppc_leader), na.rm=T))->ces25b
+
 #recode Liberal rating
 look_for(ces25b, "parties")
 ces25b$liberal_rating<-Recode(as.numeric(ces25b$cps25_party_rating_23), "-99=NA")
@@ -916,6 +923,11 @@ table(ces25b$green_rating)
 ces25b$ppc_rating<-Recode(as.numeric(ces25b$cps25_party_rating_29), "-99=NA")
 table(ces25b$ppc_rating)
 
+# Average party rating
+ces25b %>%
+  rowwise( )%>%
+  mutate(party_average=mean(c_across(liberal_rating:ppc_rating), na.rm=T)) %>%
+  ungroup() ->ces25b
 #### recode Redistribution (kiss_module_Q8 )####
 look_for(ces25b, "rich")
 ces25b$redistribution_mod<-Recode(as.numeric(ces25b$kiss_module_Q8), "; 1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA", as.numeric=T)
@@ -1085,6 +1097,7 @@ val_labels(ces25b$class_close)<-c(Not_close=0, Fairly_close=0.5, Very_close=1)
 #checks
 val_labels(ces25b$class_close)
 table(ces25b$class_close)
+table(as_factor(ces25b$class_close))
 
 # recode Class conflict (kiss_module_Q4)
 look_for(ces25b, "class")
@@ -1170,7 +1183,7 @@ table(ces25b$racial_rating)
 
 #recode Immigrant minority thermometer
 ces25b$immigrant_rating<-Recode(as.numeric(ces25b$cps25_groups_therm_2 /100), "-0.99=NA")
-table(ces25b$immigrant_rating)
+summary(ces25b$immigrant_rating)
 
 #recode Francophones thermometer
 ces25b$francophone_rating<-Recode(as.numeric(ces25b$cps25_groups_therm_3 /100), "-0.99=NA")
@@ -1179,10 +1192,41 @@ table(ces25b$francophone_rating)
 #recode Indigenous thermometer
 ces25b$indigenous_rating<-Recode(as.numeric(ces25b$cps25_groups_therm_4 /100), "-0.99=NA")
 table(ces25b$indigenous_rating)
+names(ces25b)
+# Minority group averages feelings
+
+
+#new_party_names<-c("liberal_leader", "conservative_leader", "ndp_leader", "bloc_leader", "green_leader", "ppc_leader")
+
+
+
+# party leader average feelings
+# new_party_leader_names<-c("liberal_leader", "conservative_leader", "ndp_leader", "bloc_leader", "green_leader", "ppc_leader")
+# names(ces25b)
+# ces25b %>%
+#   #select(cps25_lead_rating_23:cps25_lead_rating_29) %>%
+#   mutate(across(cps25_lead_rating_23:cps25_lead_rating_29, ~Recode(.x/100, "-0.99=NA"), .names="{.col}_x")) %>%
+#   rename_with(~new_party_leader_names, .cols=ends_with("_x"))
+#   rowwise() %>%
+#   mutate(leader_average=mean(c_across(liberal_leader:ppc_leader), na.rm=T)) ->ces25b
+# names(ces25b)
+#
+# # party average feelings
+# new_party_names<-c("liberal_rating", "conservative_rating", "ndp_rating", "bloc_rating", "green_rating", "ppc_rating")
+#
+# ces25b %>%
+#   select(cps25_party_rating_23) %>%
+#   mutate(across(cps25_lead_rating_23:cps25_lead_rating_29, ~Recode(.x/100, "-0.99=NA"), .names="{.col}_x")) %>%
+#   rename_with(~new_party_names, .cols=ends_with("_x")) %>%
+#   rowwise() %>%
+#   mutate(leader_average=mean(c_across(liberal_leader:ppc_leader), na.rm=T)) ->ces25b
+
 
 #Add mode and election
 ces25b$mode<-rep("Web", nrow(ces25b))
 ces25b$election<-rep(2025, nrow(ces25b))
+
+
 
 #Write out the dataset
 # #### Resave the file in the .rda file
