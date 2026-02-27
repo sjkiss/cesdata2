@@ -1198,7 +1198,11 @@ names(ces25b)
 
 #new_party_names<-c("liberal_leader", "conservative_leader", "ndp_leader", "bloc_leader", "green_leader", "ppc_leader")
 
-
+# new names for kiss_module_lispop_5
+new_names_lispop_5<-c("speak_mind", "work_life_balance", "physical_safety", "online_harrassment", "pay_benefits")
+ces25b %>%
+  mutate(across(kiss_module_lispop_5_1:kiss_module_lispop_5_5, ~Recode(as.numeric(.), "-99=NA"), .names="{.col}_x")) %>%
+  rename_with(., ~new_names_lispop_5, .cols=kiss_module_lispop_5_1_x:kiss_module_lispop_5_5_x)->ces25b
 
 # party leader average feelings
 # new_party_leader_names<-c("liberal_leader", "conservative_leader", "ndp_leader", "bloc_leader", "green_leader", "ppc_leader")
