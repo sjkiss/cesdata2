@@ -865,8 +865,15 @@ ces97$business<-Recode(as.numeric(ces97$pese20), "1=1; 3=0.75; 5=0.25; 7=0; 8=0.
 table(ces97$business,  ces97$pese20, useNA = "ifany")
 
 #### recode feminism (pesf3)
-ces97$feminism_rating<-Recode(as.numeric(ces97$pesf3 /100), "9.97:9.99=NA")
-table(ces97$feminism_rating)
+summary(ces97$pesf13)
+lookfor(ces97, "immigrants")
+#Note I am changing this to use the rescale function. But I checked: there are no 997 and 998
+ces97 %>%
+  mutate(feminism_rating=case_when(
+    as.numeric(pesf3)>996~NA,
+    TRUE~as.numeric(pesf3)
+  )) %>%
+  mutate(feminism_rating=scales::rescale(feminism_rating, to=c(0,1)))->ces97
 
 #Add mode
 ces97$mode<-rep("Phone", nrow(ces97))

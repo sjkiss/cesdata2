@@ -926,19 +926,18 @@ val_labels(ces93$prov_vote)
 table(ces93$prov_vote)
 
 # recode feminism (PESH7)
+library(scales)
 ces93$feminism_rating<-Recode(as.numeric(ces93$PESH7 /100), "9.97:9.99=NA")
-table(ces93$feminism_rating)
+ces93$PESH7
+mean(ces93$feminism_rating, na.rm=T)
+class(ces93$PESH7)
+table(ces93$PESH7)
+summary(as.numeric(ces93$PESH7))
 
-glimpse(ces93)
-lookfor(ces93, "election")
-lookfor(ces93, "referendum")
-ces93$RTYPE3
-table(as_factor(ces93$CESTYPE), as_factor(ces93$RTYPE4), useNA = "ifany")
-var_label(ces93$RTYPE4)
-table(as_factor(ces93$RTYPE4), useNA = "ifany")
-table(as_factor(ces93$CESTYPE), as_factor(ces93$RTYPE3), useNA = "ifany")
-table(as_factor(ces93$RTYPE1), as_factor(ces93$RTYPE3), useNA = "ifany")
-table(as_factor(ces93$RTYPE2), as_factor(ces93$RTYPE3), useNA = "ifany")
+ces93 %>%
+   mutate(feminism_rating=scales::rescale(as.numeric(ces93$PESH7), to=c(0,1)))->ces93
+ces93 %>%
+  mutate(immigration_rating=scales::rescale(as.numeric(ces93$REFH30), to=c(0,1)))->ces93
 
 ### Filter out ces93 referendum respondents only by removing missing values from RTYPE4 (indicates ces93 respondents)
 ces93 %>%

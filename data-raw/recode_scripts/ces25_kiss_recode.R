@@ -150,8 +150,10 @@ ces25b %>%
 #weight the survey
 ces25b_des<-as_survey_design(subset(ces25b, !is.na(cps25_weight_kiss_module)), weights=cps25_weight_kiss_module)
 #now calculate the income tertiles
-ces25b_des %>%
-  summarise(income_tertile=survey_quantile(cps25_income2, c(0.33,0.66)))
+# # ces25b_des %>%
+#   summarise(out=survey_quantile, c(0.33, 0.66))
+# ces25b_des %>%ces25b_des %>%ces25b_des %>%
+#   summarise(income_tertile=survey_quantile(cps25_income2, c(0.33,0.66)), na.rm=T)
 
 # tertiles are 3 and 6
 #assignh income values of 3 and below to 1
@@ -718,9 +720,14 @@ NOC21_5>=95100&NOC21_5<=95109~8
 #   filter(NOC21_5==14101) %>% select(occupation_oesch)
 #Add self-employed
 #ces25b$cps25_employment
+ces25b$cps25_employment
+# ces25b %>%
+#   group_by(cps25_employment) %>%
+#   count(valid_noc=!is.na(NOC21_5)) %>% as_factor() %>%
+#   filter(valid_noc==T)
 ces25b %>%
   mutate(occupation_oesch=case_when(
-    cps25_employment>0&cps25_employment<3~occupation_oesch,
+    cps25_employment>0&cps25_employment<5~occupation_oesch,
     cps25_employment>8&cps25_employment<12~occupation_oesch,
     cps25_employment==3~4
   ))->ces25b
@@ -730,7 +737,15 @@ val_labels(ces25b$occupation_oesch)<-c(`Self-employed`=4,`Technical experts`=5, 
                                        `Skilled clerks`=11, `Unskilled clerks`=12,
                                        `Socio-cultural professionals`=13, `Socio-cultural (semi-professionals)`=14,
                                        `Skilled service`=15, `Low-skilled service`=16)
-
+#table(as_factor(ces25b$occupation_oesch))
+# prop.table(table(as_factor(ces25b$occupation_oesch), as_factor(ces25b$degree)),1)
+ces25b %>%
+  group_by(as_factor(occupation_oesch), as_factor(degree)) %>%
+  summarize(n=n()) %>%
+  mutate(n=n/sum(n)) %>%
+ rename(degree=2) %>%
+  filter(degree=="degree") %>%
+  arrange(desc(n))
 # with(ces25b, table(as_factor(occupation_oesch)))
 #
 # with(ces25b, prop.table(table(as_factor(occupation_oesch))))
@@ -895,8 +910,8 @@ table(ces25b$ppc_leader)
 
 ces25b %>%
   rowwise() %>%
-  ungroup() %>%
-  mutate(leader_average=mean(c_across(liberal_leader:ppc_leader), na.rm=T))->ces25b
+  mutate(leader_average=mean(c_across(liberal_leader:ppc_leader), na.rm=T)) %>%
+  ungroup()->ces25b
 
 #recode Liberal rating
 look_for(ces25b, "parties")
@@ -981,6 +996,7 @@ table(ces25b$ideology, ces25b$cps25_lr_scale_bef_1 , useNA = "ifany" )
 # val_labels(ces21$turnout)
 # table(ces21$turnout)
 # table(ces21$turnout, ces21$vote)
+
 
 #### recode political efficacy ####
 #recode No Say (kiss_module_Q10_3)

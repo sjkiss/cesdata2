@@ -1,12 +1,17 @@
 library(tidyverse)
 library(here)
+library(labelled)
 # MATT I AM DOING SOME STUFF ONTHE BACK END
 # THAT REQUIRES ME TO UNCOMMENT THIS LINE
 # IF YOU COME BACK TO THIS, JUST UNCOMMENT THE data("ces21")
 # DO WHAT YOU NEED, RECOMMENT, THEN PUSH BACK UP TO mip
 # THANKS SIMON
+## Note to self:
+# For future diagnostics load ces21 with the original data set with the read_sav() command in the ces21_recode.R file
 #data("ces21")
-lookfor(ces21, "important issue")
+#ces21<-read_sav(file=here("data-raw/CES2021tab.sav"))
+
+#lookfor(ces21, "important issue")
 #Convert cps21_imp_iss to lower
 ces21 %>%
   mutate(mip_lower=str_trim(str_to_lower(cps21_imp_iss)))->ces21
@@ -367,6 +372,8 @@ ces21 %>%
     str_detect(mip_lower, "qiebec")~1,
     str_detect(mip_lower, "bill 96")~1,
     str_detect(mip_lower, "bloc")~1,
+    str_detect(mip_lower, "unity")~1,
+    str_detect(mip_lower, "unité")~1,
   ))->ces21
 # Inflation
 ces21 %>%
@@ -667,21 +674,48 @@ ces21 %>%
     TRUE ~ 0
   ))->ces21
 
+
 tail(names(ces21))
 #This code calculates the sum of issues that have been coded
 ces21 %>%
   mutate(mip_total=rowSums(across(ends_with("_mip")), na.rm=T))->ces21
+
 ### This code will show the responses that have no mip codes that have been assigned
 # This should be run repeatedly to iteratively capture as many topics as possible
-
-
 ces21 %>%
   filter(mip_total<1) %>%
   filter(mip_missing<1)%>%
   group_by(mip_lower) %>%
   count() %>%
   arrange(desc(n))%>%
-  print(n=1000)
+  print(n=1000) %>% view()
+ces21 %>%
+  filter(mip_total<1) %>%
+  filter(mip_missing<1)%>%
+count()
+## Coding Other
+# ces21 %>%
+#   mutate(mip_other=case_when(
+#     mip_missing!=1&mip_total<1~1,
+#     TRUE~0
+#   ))->ces21
+#
+#
+# ces21 %>%
+#   filter(mip_other==1) %>%
+#   select(mip_lower, contains("mip_")) %>% view()
+
+#This code calculates the sum of issues that have been coded
+ces21 %>%
+  mutate(mip_total=rowSums(across(ends_with("_mip")), na.rm=T))->ces21
+ces21 %>%
+  filter(mip_total<1) %>%
+  filter(mip_missing<1)%>%
+  group_by(mip_lower) %>%
+  count() %>%
+  arrange(desc(n))%>%
+  print(n=1000) %>% view()
+
 ### This will go quicker than you think.
 ### 1) For example, adding str_detect(mip_lower, "santé") combine multiple responses.
 ### As will housing.
@@ -704,8 +738,8 @@ ces21 %>%
 
 # How many respondents had multiple entries
 table(ces21$mip_total)
-ces21 %>%
-  select(ends_with("_mip")) %>% View()
+# ces21 %>%
+#   select(ends_with("_mip")) %>% View()
 # What were the biggest combinations
 ces21 %>%
   filter(mip_total==2) %>%
@@ -717,8 +751,8 @@ ces21 %>%
   mutate(mip_single=case_when(
     mip_total==1~ 1
   ))->ces21
-lookfor(ces21, "id")
-names(ces21)
+#lookfor(ces21, "id")
+#names(ces21)
 ces21 %>%
   select(ends_with("_mip"), id=cps21_ResponseId)->df
 names(df)
@@ -730,9 +764,11 @@ cbind(df,
                NA))))->df
 
 names(df)
+view(df)
+names(df)
 ces21 %>%
   left_join(., df, by=c("cps21_ResponseId"="id"))->ces21
-ces21$cps21_ResponseId
+
 ces21$mip
 #Now set mip to be a numeric value that maps our coding scheme
 # based on mip2
@@ -760,7 +796,7 @@ ces21 %>%
     str_detect(mip2, "covid")~ 20,
   ))->ces21
 table(ces21$mip2)
-
+table(ces21$mip)
 val_labels(ces21$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4, Energy=5, Jobs=6, Economy=7, Health=8, Taxes=9, Deficit_Debt=10,
                          Democracy=11, Foreign_Affairs=12,
                          Immigration=13, Socio_Cultural=14,

@@ -349,7 +349,8 @@ ces88$immigration_encourage<-Recode(as.numeric(ces88$qf10), "1=0; 2=1; 8=0.5; el
 # table(ces88$immigration_rates, ces88$l5 , useNA = "ifany" )
 # table(ces88$immigration_better, ces88$qf2 , useNA = "ifany" )
 # table(ces88$immigration_encourage, ces88$qf10 , useNA = "ifany" )
-#
+
+lookfor(ces88, "immigran")
 # ces88 %>%
 #   rowwise() %>%
 #   mutate(immigration=mean(
