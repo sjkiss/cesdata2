@@ -453,6 +453,7 @@ SOC==9591~7,
 SOC==9599~7,
 SOC==9919~NA_integer_
   ))->ces84
+ces84$SOC
 
 #Add a self-employed category
 ces84 %>%

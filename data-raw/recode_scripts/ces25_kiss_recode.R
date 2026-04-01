@@ -720,16 +720,16 @@ NOC21_5>=95100&NOC21_5<=95109~8
 #   filter(NOC21_5==14101) %>% select(occupation_oesch)
 #Add self-employed
 #ces25b$cps25_employment
-ces25b$cps25_employment
+# ces25b$cps25_employment
 # ces25b %>%
-#   group_by(cps25_employment) %>%
-#   count(valid_noc=!is.na(NOC21_5)) %>% as_factor() %>%
-#   filter(valid_noc==T)
+#   mutate(valid_oesch=!is.na(occupation_oesch), valid_noc=!is.na(NOC21_5))->ces25b
+# crosstable(ces25b, as_factor(cps25_employment)~valid_oesch)
 ces25b %>%
   mutate(occupation_oesch=case_when(
-    cps25_employment>0&cps25_employment<5~occupation_oesch,
-    cps25_employment>8&cps25_employment<12~occupation_oesch,
-    cps25_employment==3~4
+    #cps25_employment>0&cps25_employment<5~occupation_oesch,
+    #cps25_employment>8&cps25_employment<12~occupation_oesch,
+    cps25_employment==3~4,
+    TRUE~occupation_oesch
   ))->ces25b
 val_labels(ces25b$occupation_oesch)<-c(`Self-employed`=4,`Technical experts`=5, `Technicians`=6,
                                        `Skilled manual`=7, `Low-skilled manual`=8,
@@ -737,7 +737,7 @@ val_labels(ces25b$occupation_oesch)<-c(`Self-employed`=4,`Technical experts`=5, 
                                        `Skilled clerks`=11, `Unskilled clerks`=12,
                                        `Socio-cultural professionals`=13, `Socio-cultural (semi-professionals)`=14,
                                        `Skilled service`=15, `Low-skilled service`=16)
-#table(as_factor(ces25b$occupation_oesch))
+table(as_factor(ces25b$occupation_oesch))
 # prop.table(table(as_factor(ces25b$occupation_oesch), as_factor(ces25b$degree)),1)
 ces25b %>%
   group_by(as_factor(occupation_oesch), as_factor(degree)) %>%
@@ -1247,9 +1247,11 @@ ces25b$mode<-rep("Web", nrow(ces25b))
 ces25b$election<-rep(2025, nrow(ces25b))
 
 
-
+ces25b %>%
+  mutate(valid_oesch=!is.na(occupation_oesch), valid_noc=!is.na(NOC21_5))->ces25b
+crosstable(ces25b, as_factor(cps25_employment)~valid_oesch)
 #Write out the dataset
 # #### Resave the file in the .rda file
 save(ces25b, file=here("data/ces25b.rda"))
 
-#write_sav(ces25b, path=here("data-raw/ces25b_with_occupation.sav"))
+#write_savd(ces25b, path=here("data-raw/ces25b_with_occupation.sav"))
