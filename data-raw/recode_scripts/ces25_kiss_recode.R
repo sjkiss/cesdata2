@@ -135,6 +135,8 @@ table(as_factor(ces25b$partyid2))
 
 #### Create income ####
 lookfor(ces25b, "income")
+
+
 # This is a hacky way to assign respondents to income tertiles
 # convert original income to numeric
 ces25b$cps25_income2<-as.numeric(ces25b$cps25_income)
@@ -155,6 +157,10 @@ ces25b_des<-as_survey_design(subset(ces25b, !is.na(cps25_weight_kiss_module)), w
 # ces25b_des %>%ces25b_des %>%ces25b_des %>%
 #   summarise(income_tertile=survey_quantile(cps25_income2, c(0.33,0.66)), na.rm=T)
 
+# Calculate Income tertiles
+# Source script that calcluates tertiles from Canadian Income Survey 2022
+#source("data-raw/recode_scripts/ces25_kiss_income_tertile.R")
+ces25b$cps25_income
 # tertiles are 3 and 6
 #assignh income values of 3 and below to 1
 # between 3 and 7to be middle
@@ -301,10 +307,10 @@ ces25b$occupation3<-ifelse(ces25b$cps25_employment==3, 6, ces25b$occupation)
 val_labels(ces25b$occupation3)<-c(Professional=1, Managers=2, Routine_Nonmanual=3, Skilled=4, Unskilled=5, Self_employed=6)
 
 #Check, did I get everyone?
-ces25b %>%
-  filter(is.na(occupation3)) %>%
-  select(cps25_employment, occupation_name, occupation3) %>%
-  as_factor()
+# ces25b %>%
+#   filter(is.na(occupation3)) %>%
+#   select(cps25_employment, occupation_name, occupation3) %>%
+#   as_factor()
 
 
 #First extract the first two digits of each NOC
@@ -1249,7 +1255,13 @@ ces25b$election<-rep(2025, nrow(ces25b))
 
 ces25b %>%
   mutate(valid_oesch=!is.na(occupation_oesch), valid_noc=!is.na(NOC21_5))->ces25b
-crosstable(ces25b, as_factor(cps25_employment)~valid_oesch)
+
+#Rename response id
+ces25b$cps25_ResponseId
+
+ces25b %>%
+  rename(respid=cps25_ResponseId)->ces25b
+#crosstable(ces25b, as_factor(cps25_employment)~valid_oesch)
 #Write out the dataset
 # #### Resave the file in the .rda file
 save(ces25b, file=here("data/ces25b.rda"))

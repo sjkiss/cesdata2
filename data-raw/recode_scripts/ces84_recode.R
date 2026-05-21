@@ -6,7 +6,9 @@ library(here)
 library(haven)
 #load data
 ces84<-read_sav(file=here("data-raw/1984.sav"))
-
+#make respid character and rename
+var_label(ces84$VAR001)
+ces84$respid<-as.character(ces84$VAR001)
 #recode Gender (VAR456)
 # look_for(ces84, "sex")
 ces84$male<-Recode(ces84$VAR456, "1=1; 2=0")
