@@ -928,9 +928,17 @@ table(ces84$francophone_rating)
 ces84$CEOs_rating<-Recode(as.numeric(ces84$VAR296 /100), "9.97:9.99=NA")
 table(ces84$CEOs_rating)
 
-
-#Add mode
-
+# Fix missing constituency value labels
+#The value labels for the seven Nfld constituency
+# were alo botched. This script fixes them as per Claude
+source("data-raw/recode_scripts/ces84_recode_constituency.R")
+#Check
+ces84 %>%
+  select(VAR006, constituency) %>%
+  slice_sample(n=100)
+# ces84 %>%
+#   select(VAR006, constituency, prov) %>% as_factor() %>%
+#   slice(1:500) %>% view()
 ces84$mode<-rep("Phone", nrow(ces84))
 #Add Election
 ces84$election<-rep(1984, nrow(ces84))
