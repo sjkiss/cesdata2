@@ -19,16 +19,16 @@ labs   <- attr(x, "labels")
 lookup <- setNames(names(labs), unname(labs))   # names = code, value = riding
 
 # 2. Repair the label set
-lookup["002"] <- "BURIN-BURGEO"                  # add the missing FED
+lookup["002"] <- "BURIN-ST. GEORGE'S"                  # add the missing FED
 lookup <- lookup[!duplicated(names(lookup))]     # dedupe-safe (keeps first if any dup exists)
-
+length(lookup)
 # 3. Normalise data values to the zero-padded 3-char key format
 codes <- str_pad(str_trim(as.character(x)), width = 3, side = "left", pad = "0")
 
 # 4. Coverage check BEFORE converting -- surfaces any code with no label
 missing <- setdiff(unique(codes), names(lookup))
 if (length(missing)) warning("codes with no label: ", paste(missing, collapse = ", "))
-
+missing
 # 5. Build both a clean character and an ordered factor
 constituency_chr <- unname(lookup[codes])
 constituency     <- factor(constituency_chr,
@@ -43,6 +43,8 @@ ces84$constituency<-constituency_chr
 ces84 %>%
   select(VAR006, constituency) %>%
   slice_sample(n=25)
+ces84 %>%
+  count(constituency)
 rm(constituency)
 rm(constituency_chr)
 # Optional: drop the empty BURIN-BURGEO level if you want observed ridings only
