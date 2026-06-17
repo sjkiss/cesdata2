@@ -10,6 +10,8 @@ library(survey)
 
 # Load in federal
 census2021<-read.csv(file=here("data-raw/statscan/2022_federal_representation_order/98-401-X2021029_English_CSV_data.csv"))
+save(census2021,
+     file=here("data-raw/statscan/2022_federal_representation_order/2022_federal_representation_order_statistics_canada_profiles.rdata"), compress="xz")
 census2021 %>%
   count(GEO_LEVEL)
 census2021 %>%
