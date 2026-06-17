@@ -5,7 +5,7 @@ library(srvyr)
 library(survey)
 
 #Load data
-ces25<-read_dta(here("data-raw/ces25.dta"))
+ces25<-read_dta(here("data-raw/2025 Canadian Election Study v1.dta"))
 
 library(labelled)
 library(car)

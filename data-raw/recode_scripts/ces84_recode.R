@@ -932,6 +932,8 @@ table(ces84$CEOs_rating)
 #The value labels for the seven Nfld constituency
 # were alo botched. This script fixes them as per Claude
 source("data-raw/recode_scripts/ces84_recode_constituency.R")
+source("data-raw/recode_scripts/ces84_income_inequality.R")
+ces84<-basic_merge$matches
 #Check
 ces84 %>%
   select(VAR006, constituency) %>%
