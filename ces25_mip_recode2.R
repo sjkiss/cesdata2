@@ -1,8 +1,6 @@
 ################################################################################
 ## CES 2025 — "Most Important Problem" recode (CORRECTED)
 ##
-## What changed vs. the original, and why:
-##
 ## 1. TEXT CLEANING REWRITTEN.
 ##    - The old `sub("ˆ(\\w+)\\s+(\\w+)$", ...)` used a MODIFIER CIRCUMFLEX (ˆ),
 ##      not the regex anchor ^, so it never fired. Removed.
@@ -434,6 +432,12 @@ cat("combined : stripped =", sum(ces25$combined.dum, na.rm = TRUE),
 
 # To READ the cases the pronoun stripper removed (verify they are true pronouns):
 # ces25$imp_raw[ces25$borders.dum_raw == 1 & ces25$borders.dum == 0]
+
+
+validate_category(ces25, "idk.dum")
+
+validate_category(ces25, "idk.dum", n_show = 100)
+
 
 
 
