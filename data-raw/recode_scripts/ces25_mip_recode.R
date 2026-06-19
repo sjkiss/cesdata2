@@ -48,10 +48,11 @@ runDictionary <- function(
   tictoc::tic() # starts a timer (speedtesting the function)
   dataA <- dataA %>%
     mutate(word = {{word}}) # creates a copy of the input column called "word
-  corpusA <- tokens(dataA$word) # tokenizes text in the "word" column
+  corpusA <- tokens(dataA$word) %>% tokens_remove(c(stopwords("en"), stopwords("fr"))) # tokenizes text in the "word" column
   dfmA <- dfm(tokens_lookup(corpusA, # checks for frequency of each token
                             dictionaryA,
                             nested_scope = "dictionary"))
+
   ## Progress bar ##
   pb <- progress_bar$new(
     format = yellow(" downloading [:bar] :percent in :elapsed"),
@@ -68,6 +69,8 @@ runDictionary <- function(
 # Makes the text lowercase, removes some special characters and punctuation
 ces25$cps25_imp_iss <- stringr::str_replace_all(ces25$cps25_imp_iss, "[A-Z]",
                                                 ~tolower(.x))
+# We should try to figure out what this does.
+# Run this regex through AI.
 ces25$cps25_imp_iss <- sub("ˆ(\\w+)\\s+(\\w+)$", "\\2 \\1", ces25$cps25_imp_iss)
 ces25$cps25_imp_iss <- gsub("[[:punct:]]", "", ces25$cps25_imp_iss)
 
@@ -131,6 +134,7 @@ dictionaryenviro <-dictionary(
 ces25.enviro <- runDictionary(dataA = ces25,
                               word = cps25_imp_iss,
                               dictionaryA = dictionaryenviro)
+
 ces25$enviro <- ces25.enviro$enviro
 ces25 <- ces25 %>%
   mutate(enviro.dum = ifelse(enviro >= 1,1,0))
@@ -156,7 +160,7 @@ ces25 <- ces25 %>%
 
 
 ## Workflow - Healthcare
-dictionnaryhealthcare <- dictionary(
+dictionaryhealthcare <- dictionary(
   list(healthcare = c("health", "health-care", "care", "sant", "soins", "life",
                       "mental", "disability","pharmacare", "disabled", "drugs",
                       "drug", "medicare", "santé", "medical", "heath",
@@ -166,14 +170,14 @@ dictionnaryhealthcare <- dictionary(
                       "wellbeing", "hralthcare", "medicade", "medicaid")))
 ces25.healtchcare <- runDictionary(dataA = ces25,
                                    word = cps25_imp_iss,
-                                   dictionaryA = dictionnaryhealthcare)
+                                   dictionaryA = dictionaryhealthcare)
 ces25$healthcare <- ces25.healtchcare$healthcare
 ces25 <- ces25 %>%
   mutate(healthcare.dum = ifelse(healthcare >= 1, 1, 0))
 
 
 ## Workflow - Housing
-dictionnaryhousing <- dictionary(
+dictionaryhousing <- dictionary(
   list(housing = c("housing", "affordable", "rent", "homeless", "rental",
                    "unaffordable", "renting","home", "homes", "dwelling",
                    "loyer", "maisons", "sans-abris", "logement", "logements",
@@ -181,14 +185,14 @@ dictionnaryhousing <- dictionary(
                    "itinérance", "inflationhousingrenting")))
 ces25.housing <- runDictionary(dataA = ces25,
                                word = cps25_imp_iss,
-                               dictionaryA = dictionnaryhousing)
+                               dictionaryA = dictionaryhousing)
 ces25$housing <- ces25.housing$housing
 ces25 <- ces25 %>%
   mutate(housing.dum = ifelse(housing >= 1, 1, 0))
 
 
 ## Workflow - Seniors
-dictionnaryseniors <- dictionary(
+dictionaryseniors <- dictionary(
   list(seniors = c("pension", "pensions", "seniors", "senior", "aines", "ages",
                    "cpp", "elderly", "oas", "aging", "senior's", "retirement",
                    "âgées", "ainés", "65", "vieillisse", "viellesse",
@@ -197,14 +201,14 @@ dictionnaryseniors <- dictionary(
                    "retraite", "retired", "senoir")))
 ces25.seniors <- runDictionary(dataA = ces25,
                                word = cps25_imp_iss,
-                               dictionaryA = dictionnaryseniors)
+                               dictionaryA = dictionaryseniors)
 ces25$seniors <- ces25.seniors$seniors
 ces25 <- ces25 %>%
   mutate(seniors.dum = ifelse(seniors >= 1, 1,0))
 
 
 ## Workflow - Leaders
-dictionnaryleaders <- dictionary(
+dictionaryleaders <- dictionary(
   list(leaders = c("carney", "mark", "libéral", "libral", "liberals",
                    "leadership", "leader", "justin", "conservatives", "parties",
                    "leaders", "pm", "andrew", "sheer", "singh", "blanchet", "ndp",
@@ -216,14 +220,14 @@ dictionnaryleaders <- dictionary(
                    "conservatrices", "poliviere", "conservative")))
 ces25.leaders <- runDictionary(dataA = ces25,
                                word = cps25_imp_iss,
-                               dictionaryA = dictionnaryleaders)
+                               dictionaryA = dictionaryleaders)
 ces25$leaders <- ces25.leaders$leaders
 ces25 <- ces25 %>%
   mutate(leaders.dum = ifelse(leaders >= 1, 1, 0))
 
 
 ## Workflow - Ethics
-dictionnaryethics <- dictionary(
+dictionaryethics <- dictionary(
   list(ethics = c("gouvernement", "corruption", "honesty", "ethics",
                   "transparency", "accountability", "responsibility", "truth",
                   "lies", "lying", "ethical", "transparent", "integretity",
@@ -236,51 +240,51 @@ dictionnaryethics <- dictionary(
                   "responsible government")))
 ces25.ethics <- runDictionary(dataA = ces25,
                               word = cps25_imp_iss,
-                              dictionnaryethics)
+                              dictionaryethics)
 ces25$ethics <- ces25.ethics$ethics
 ces25 <- ces25 %>%
   mutate(ethics.dum = ifelse(ethics >=1,1,0))
 
 
 ## Workflow - Education
-dictionnaryeducation <- dictionary(
+dictionaryeducation <- dictionary(
   list(education = c("education", "ducation", "school", "schools",
                      "educational", "university", "tuition", "student",
                      "students", "schooling", "l'ducation", "l'education",
                      "deducation", "Éducation")))
 ces25.education <- runDictionary(dataA = ces25,
                                  word = cps25_imp_iss,
-                                 dictionnaryeducation)
+                                 dictionaryeducation)
 ces25$education <- ces25.education$education
 ces25 <- ces25 %>%
   mutate(education.dum = ifelse(education >=1,1,0))
 
 
 ## Workflow - Crime and Guns
-dictionnarycrime <- dictionary(
+dictionarycrime <- dictionary(
   list(crime = c("crime", "crimes", "criminal", "criminals", "gang", "gangs",
                  "safety", "gun", "firearm", "violence", "illegal", "cop")))
 ces25.crime <- runDictionary(dataA = ces25,
                              word = cps25_imp_iss,
-                             dictionnarycrime)
+                             dictionarycrime)
 ces25$crime <- ces25.crime$crime
 ces25 <- ces25 %>%
   mutate(crime.dum = ifelse(crime >=1,1,0))
 
 ## Workflow - Indigenous
-dictionnaryindigenous <- dictionary(
+dictionaryindigenous <- dictionary(
   list(indigenous = c("indigenous", "aboriginal", "reconciliation",
                       "first nations", "first nation", "indeginous", "native")))
 ces25.indigenous <- runDictionary(dataA = ces25,
                                   word = cps25_imp_iss,
-                                  dictionnaryindigenous)
+                                  dictionaryindigenous)
 ces25$indigenous <- ces25.indigenous$indigenous
 ces25 <- ces25 %>%
   mutate(indigenous.dum = ifelse(indigenous >=1,1,0))
 
 
 ## Workflow - Other Welfare
-dictionnarywelfare <- dictionary(
+dictionarywelfare <- dictionary(
   list(welfare = c("childcare", "children", "daycare", "dental", "welfare",
                    "social services", "social programs", "social service",
                    "social program", "family", "families", "famille", "child",
@@ -290,39 +294,39 @@ dictionnarywelfare <- dictionary(
                    "aide sociale", "social aid")))
 ces25.welfare <- runDictionary(dataA = ces25,
                                word = cps25_imp_iss,
-                               dictionnarywelfare)
+                               dictionarywelfare)
 ces25$welfare <- ces25.welfare$welfare
 ces25 <- ces25 %>%
   mutate(welfare.dum = ifelse(welfare >=1,1,0))
 
 
 ## Workflow - Electoral Reform
-dictionnaryelection <- dictionary(
+dictionaryelection <- dictionary(
   list(election = c("election", "electoral", "voting", "voter",
                     "representation", "democracy", "first past the post",
                     "proportional", "vote")))
 ces25.election <- runDictionary(dataA = ces25,
                                 word = cps25_imp_iss,
-                                dictionnaryelection)
+                                dictionaryelection)
 ces25$election <- ces25.election$election
 ces25 <- ces25 %>%
   mutate(election.dum = ifelse(election >=1,1,0))
 
 ## Workflow - Women's Issues and Abortion
-dictionnarywomen <- dictionary(
+dictionarywomen <- dictionary(
   list(women = c("women", "women's", "abortion", "abortions", "woman",
                  "woman's", "unborn", "reproductive", "femme", "femmes",
                  "gender", "maternity", "womens", "anatiabortion")))
 ces25.women <- runDictionary(dataA = ces25,
                              word = cps25_imp_iss,
-                             dictionnarywomen)
+                             dictionarywomen)
 ces25$women <- ces25.women$women
 ces25 <- ces25 %>%
   mutate(women.dum = ifelse(women >=1,1,0))
 
 
 ## Workflow - Security / Defense and Intarional Relations
-dictionnarysecurity <- dictionary(
+dictionarysecurity <- dictionary(
   list(security = c("security", "defense", "international", "china", "defence",
                     "war", "wars", "relations", "global", "israel", "u.s.",
                     "segurity", "scurit", "military", "palestin", "palestine",
@@ -331,57 +335,57 @@ dictionnarysecurity <- dictionary(
                     "weapons", "gaza")))
 ces25.security <- runDictionary(dataA = ces25,
                                 word = cps25_imp_iss,
-                                dictionnarysecurity)
+                                dictionarysecurity)
 ces25$security <- ces25.security$security
 ces25 <- ces25 %>%
   mutate(security.dum = ifelse(security >=1,1,0))
 ## Workflow - Quebec
-dictionnaryquebec <- dictionary(
+dictionaryquebec <- dictionary(
   list(quebec = c("quebec", "21", "qubec", "francophone", "lacit","laicit",
                   "laicite", "québec", "québécois")))
 ces25.quebec <- runDictionary(dataA = ces25,
                               word = cps25_imp_iss,
-                              dictionnaryquebec)
+                              dictionaryquebec)
 ces25$quebec <- ces25.quebec$quebec
 ces25 <- ces25 %>%
   mutate(quebec.dum = ifelse(quebec >=1,1,0))
 
 ## Workflow - Race
-dictionnaryrace <- dictionary(
+dictionaryrace <- dictionary(
   list(race = c("race", "racism", "black", "white", "antisemitism",
                 "islamophoby", "islamaphobia")))
 ces25.race <- runDictionary(dataA = ces25,
                             word = cps25_imp_iss,
-                            dictionnaryrace)
+                            dictionaryrace)
 ces25$race <- ces25.race$race
 ces25 <- ces25 %>%
   mutate(race.dum = ifelse(race >=1,1,0))
 
 ## Workflow - Trump
-dictionnarytrump <- dictionary(
+dictionarytrump <- dictionary(
   list(trump = c("trump", "turmp", "donald", "president", "président",
                  "trumps", "dtrump", "bufoontrump", "trumps", "usatrump")))
 ces25.trump <- runDictionary(dataA = ces25,
                              word = cps25_imp_iss,
-                             dictionnarytrump)
+                             dictionarytrump)
 ces25$trump <- ces25.trump$trump
 ces25 <- ces25 %>%
   mutate(trump.dum = ifelse(trump >=1,1,0))
 ## Workflow - Tariff
-dictionnarytariff <- dictionary(
+dictionarytariff <- dictionary(
   list(tariff = c("tariff", "tariffs", "tarif", "tarifs", "economist",
                   "économiste", "big beautiful bill", "tarriffs", "terrifs",
                   "economytariffs", "tarrifs", "tarriffs", "taxestariffs",
                   "thariff")))
 ces25.tariff <- runDictionary(dataA = ces25,
                               word = cps25_imp_iss,
-                              dictionnarytariff)
+                              dictionarytariff)
 ces25$tariff <- ces25.tariff$tariff
 ces25 <- ces25 %>%
   mutate(tariff.dum = ifelse(tariff >=1,1,0))
 
 ## Workflow - Borders
-dictionnaryborders <- dictionary(
+dictionaryborders <- dictionary(
   list(borders = c("soveriegnty", "border", "souveraineté", "frontière",
                    "annex", "annexation", "annexion", "trump", "sovereignty",
                    "us", "usa", "states", "the states", "america", "americans",
@@ -394,13 +398,13 @@ dictionnaryborders <- dictionary(
                    "neighbours")))
 ces25.borders <- runDictionary(dataA = ces25,
                                word = cps25_imp_iss,
-                               dictionnaryborders)
+                               dictionaryborders)
 ces25$borders <- ces25.borders$borders
 ces25 <- ces25 %>%
   mutate(borders.dum = ifelse(borders >=1,1,0))
 
 ## Workflow - Trump, Tariffs and Borders combined
-dictionnarycombined <- dictionary(
+dictionarycombined <- dictionary(
   list(combined = c("trump", "turmp", "donald", "president", "président",
                     "tariff", "tariffs", "tarif", "tarifs", "economist",
                     "économiste", "big beautiful bill", "soveriegnty",
@@ -418,20 +422,20 @@ dictionnarycombined <- dictionary(
                     "souverainté", "neighbours")))
 ces25.combined <- runDictionary(dataA = ces25,
                                 word = cps25_imp_iss,
-                                dictionnarycombined)
+                                dictionarycombined)
 ces25$combined <- ces25.combined$combined
 ces25 <- ces25 %>%
   mutate(combined.dum = ifelse(combined >=1,1,0))
 
 ## Workflow - Nonanswers
-dictionnaryidk <- dictionary(
+dictionaryidk <- dictionary(
   list(idk = c("99", "unsure", "don't know", "je ne sais pas", "idk",
                "prefer not", "nothing", "no", "don't know", "jw sais pas",
                "je sais pas", "je ne saos pas", "je ne connais", "je bsais pas",
                "jai pas de reponse")))
 ces25.idk <- runDictionary(dataA = ces25,
                            word = cps25_imp_iss,
-                           dictionaryA = dictionnaryidk)
+                           dictionaryA = dictionaryidk)
 ces25$idk <- ces25.idk$idk
 ces25 <- ces25 %>%
   mutate(idk.dum = ifelse(idk >= 1, 1, 0))
@@ -461,3 +465,31 @@ ces25 %>%
                            combined.dum ~ "US Relations, Trump and Tariffs",
                            tariff.dum ~ "Tariffs", trump.dum ~ "Trump",
                            borders.dum ~ "US Relations"))
+
+#### This code checks any terms in the code above that has not yet been included in the dictionaries
+rm(dictionary_terms)
+#Capture all items in the environment that start with the term dictionary and store them in
+#dicts
+dicts<-mget(ls(pattern="^dictionary"))
+#Take the list of dicdtionaries made above
+dicts %>%
+  #unlist them
+  map(., ~unlist(.x)) %>% unlist() %>%
+  #remove duplicates and store in the object dictionary_terms terms
+  unique()->dict_terms
+#Tokenize the important issue variable
+tokens(ces25$cps25_imp_iss) %>%
+  #Remove all stopwords
+  tokens_remove(c(stopwords("en"), stopwords("fr")))->toks
+toks_unmatched <- tokens_select(
+  toks,
+  pattern = dict_terms,
+  selection = "remove"
+)
+?tokens_select
+dfm_unmatched <- dfm(toks_unmatched)
+dfm_unmatched %>%
+  textstat_frequency()
+?topfeatures
+topfeatures(dfm_unmatched, n=50)
+
