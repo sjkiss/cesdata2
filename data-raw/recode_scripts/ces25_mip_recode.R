@@ -4,9 +4,11 @@ data("ces25")
 # load ces21
 # for comparison
 data("ces21")
+table(as_factor(ces21$mip))
+
 library(labelled)
 library(haven)
-table(as_factor(ces21$mip))
+val_labels(ces21$mip)
 
 ## lading packages
 # install.packages("tidyverse")
@@ -48,7 +50,8 @@ runDictionary <- function(
   tictoc::tic() # starts a timer (speedtesting the function)
   dataA <- dataA %>%
     mutate(word = {{word}}) # creates a copy of the input column called "word
-  corpusA <- tokens(dataA$word) %>% tokens_remove(c(stopwords("en"), stopwords("fr"))) # tokenizes text in the "word" column
+  corpusA <- tokens(dataA$word) %>% tokens_remove(c(stopwords("en"), stopwords("fr"))) %>%
+    tokens_compound(., dictionaryA)# tokenizes text in the "word" column
   dfmA <- dfm(tokens_lookup(corpusA, # checks for frequency of each token
                             dictionaryA,
                             nested_scope = "dictionary"))
@@ -161,7 +164,7 @@ ces25 <- ces25 %>%
 
 ## Workflow - Healthcare
 dictionaryhealthcare <- dictionary(
-  list(healthcare = c("health", "health-care", "care", "sant", "soins", "life",
+  list(healthcare = c("health", "health-care", "health care", "sant", "soins", "life",
                       "mental", "disability","pharmacare", "disabled", "drugs",
                       "drug", "medicare", "santé", "medical", "heath",
                       "prescriptions", "doctors", "sante", "santé", "soin",
@@ -304,7 +307,7 @@ ces25 <- ces25 %>%
 dictionaryelection <- dictionary(
   list(election = c("election", "electoral", "voting", "voter",
                     "representation", "democracy", "first past the post",
-                    "proportional", "vote")))
+                    "proportional", "vote", "fascism")))
 ces25.election <- runDictionary(dataA = ces25,
                                 word = cps25_imp_iss,
                                 dictionaryelection)
@@ -471,6 +474,7 @@ rm(dictionary_terms)
 #Capture all items in the environment that start with the term dictionary and store them in
 #dicts
 dicts<-mget(ls(pattern="^dictionary"))
+dicts
 #Take the list of dicdtionaries made above
 dicts %>%
   #unlist them
@@ -481,15 +485,20 @@ dicts %>%
 tokens(ces25$cps25_imp_iss) %>%
   #Remove all stopwords
   tokens_remove(c(stopwords("en"), stopwords("fr")))->toks
-toks_unmatched <- tokens_select(
-  toks,
-  pattern = dict_terms,
-  selection = "remove"
-)
-?tokens_select
+ces25.welfare
+
 dfm_unmatched <- dfm(toks_unmatched)
 dfm_unmatched %>%
   textstat_frequency()
-?topfeatures
-topfeatures(dfm_unmatched, n=50)
+
+topfeatures(dfm_unmatched, n=200)
+#### We will need code that combines all dictionary counts into one dataframe
+#ces25.housing %>%
+#  left_join(., ces25.trump) %>%
+ # left_join(., ces25.borders)
+
+# Then, once we have that, we will need to pick the maximum number of counts of dictionary terms a person had
+# That person picked that issue as the most important problem.
+# We will see how many ties we get.
+library(quanteda)
 
