@@ -1,15 +1,39 @@
+#File to Recode CES Data
+# library(tidyverse)
+# library(car)
+# library(labelled)
+# library(here)
+# library(haven)
+# #load data
+# ces84<-read_sav(file=here("data-raw/1984.sav"))
+# source("data-raw/recode_scripts/ces84_recode_constituency.R")
+# #make respid character and rename
+# var_label(ces84$VAR001)
+# ces84$respid<-as.character(ces84$VAR001)
 #This script calculates ginis for each district in 1984
-fed81<-read.csv(file=here("data-raw/statscan/1981_household_income/fed_household_income_1981_final.csv"))
+fed81<-read.csv(file=here("data-raw/statscan/1981_household_income/fed_household_income_dwelling_1981_final.csv"))
 names(fed81)
 # look at fed
 fed81$FED
 fed81 %>%
-  filter(str_detect(FED, "^Canada|^British Columbia|^Alberta|^Saskatchewan|Manitoba|^Ontario|^Quebec|^New Brun|^Nova Scotia|^Prince Edward Island|^Newfoundland", negate=T)) ->fed81
-names(fed81)
-
+  filter(FED=="Yukon")
+fed81 %>%
+ count(Province_Territory) %>%
+  summarise(n=sum(n))
+#this line removes provincial totals
+fed81 %>%  filter(
+  str_detect(FED, "^Canada|^British Columbia|^Alberta|^Saskatchewan|^Northwest|Manitoba|^Ontario$|^Quebec?|^New Brun|^Nova Scotia|^Prince Edward Island|^Newfoundland", negate=T))->fed81
+fed81 %>%
+  distinct(FED)
+#### Extract average household value
+fed81 %>%
+  select(FED, Avg_Value_Dwelling)->fed_dwelling_value
+#### Calculate Ginis
 #Rigth points of income intervals
 right_edges<-c(5000,9999,14999,19999,24999,29999,39999,Inf)
 fed81 %>%
+  # drop dwelling column
+  select(-Avg_Value_Dwelling) %>%
   pivot_longer(4:11, names_to=c("Income"), values_to=c("Count")) %>%
   mutate(right_edges=rep(right_edges, length(unique(.$FED))))->fed81
 library(binsmooth)
@@ -35,11 +59,24 @@ spline_fits %>%
   mutate(fed_avg_income=map_int(data, ~first(.x$`Avg_Income`))) %>%
 mutate(fed_median_income=map_int(data, ~first(.x$`Median_Income`))) %>%
 unnest(data) ->fed81_ginis
+
+# show histogram of the ginis
+
+fed81_ginis%>%
+  ggplot(., aes(x=gini))+geom_histogram()
 # fed81_ginis %>%
 #   ggplot(., aes(x=gini))+geom_histogram()
 # fed81_ginis %>%
 # write_csv(file=here('data-raw/statscan/1981_household_income/1981_fed_household_income_data.csv'))
-
+length(unique(fed81_ginis$FED))
+#Take the distinct rows of the ginis file
+fed81_ginis %>%
+  select(FED, Province_Territory, fed_avg_income, fed_median_income, gini,warn) %>%
+  distinct()->fed81_ginis_distinct
+#fed81_ginis_distinct %>% view()
+# merge with the household dwelling file
+fed81_ginis_distinct %>%
+  left_join(., fed_dwelling_value)->fed81_ginis_distinct
 # merge with ces84
 
 
@@ -51,10 +88,7 @@ ces84$constituency
 fed81_ginis$FED
 #Try the first join
 #detach("package:joyn")
-fed81_ginis %>%
-  select(FED, Province_Territory, fed_avg_income, fed_median_income, gini,warn) %>%
-  distinct()->fed81_ginis_distinct
-fed81_ginis_distinct %>% view()
+
 ces84 %>%
   full_join(., fed81_ginis_distinct, by=join_by("constituency"=="FED"), keep=T)->out
 
@@ -117,8 +151,7 @@ out %>%
 #Remove all the French directions out of FED
 
 fed81_ginis_distinct %>%
-  mutate(FED=str_remove_all(FED, " \\(Nord\\)| \\(Sud\\)| \\(Est\\)| \\(Ouest\\)| \\(Nord Centre\\)")) ->fed81_ginis
-
+  mutate(FED=str_remove_all(FED, " \\(Nord\\)| \\(Sud\\)| \\(Est\\)| \\(Ouest\\)| \\(Nord Centre\\)")) ->fed81_ginis_distinct
 #Remove Winn. and replace with Winnipeg
 
 ces84 %>%
@@ -138,7 +171,7 @@ ces84 %>%
 # Remove St Jean Ouest, sT.Jean Est and St. Jean
 
 fed81_ginis_distinct %>%
-  mutate(FED=str_remove_all(FED, " \\(Saint Jean Est\\)|\\(Saint Jean Ouest\\)|\\(Saint Jean\\)"))->fed81_ginis
+  mutate(FED=str_remove_all(FED, " \\(Saint Jean Est\\)|\\(Saint Jean Ouest\\)|\\(Saint Jean\\)")) ->fed81_ginis_distinct
 # Correct Kootenay West
 ces84 %>%
   filter(str_detect(constituency, "kootenay")) %>% as_factor() %>% select(constituency) %>%
@@ -182,7 +215,7 @@ fed81_ginis_distinct$id<-1:nrow(fed81_ginis_distinct)
 norm <- function(x) stringi::stri_trans_general(tolower(trimws(x)), "Latin-ASCII")
 ces84$constituency <- norm(ces84$constituency)
 fed81_ginis_distinct$FED<-norm(fed81_ginis_distinct$FED)
-library(fedmatch)
+
 #conduct fuzzy merge
 merge_plus(ces84, fed81_ginis_distinct, by.x="constituency",
            by.y="FED",
@@ -192,16 +225,12 @@ merge_plus(ces84, fed81_ginis_distinct, by.x="constituency",
 basic_merge$data1_nomatch %>% select(constituency, VAR006) %>%
   distinct() %>%
   view()
-#There are 6 respondents who just have "Ontario".
-# Go back and fix those.
-ces84 %>%
-  filter(constituency=="ontario") %>%
-  select(VAR006, prov)
+fed81_ginis_distinct %>% view()
 # Now check the unsuccesful data2 matches
 basic_merge$data2_nomatch %>% select(FED)
 
 #Now check the successful matches.
-#basic_merge$matches %>%select(constituency, FED) %>% distinct() %>%  View()
+# basic_merge$matches %>%select(constituency, FED) %>% distinct() %>%  View()
 basic_merge$matches$warn
 # fed81_ginis_distinct %>% group_by(warn) %>%
 #   summarize(avg=mean(fed_avg_income))
