@@ -1,6 +1,8 @@
+
 library(tidyverse)
 library(here)
 library(labelled)
+library(haven)
 # MATT I AM DOING SOME STUFF ONTHE BACK END
 # THAT REQUIRES ME TO UNCOMMENT THIS LINE
 # IF YOU COME BACK TO THIS, JUST UNCOMMENT THE data("ces21")
@@ -9,9 +11,9 @@ library(labelled)
 ## Note to self:
 # For future diagnostics load ces21 with the original data set with the read_sav() command in the ces21_recode.R file
 #data("ces21")
-#ces21<-read_sav(file=here("data-raw/CES2021tab.sav"))
+ces21<-read_sav(file=here("data-raw/CES2021tab.sav"))
 
-#lookfor(ces21, "important issue")
+lookfor(ces21, "important issue")
 #Convert cps21_imp_iss to lower
 ces21 %>%
   mutate(mip_lower=str_trim(str_to_lower(cps21_imp_iss)))->ces21
@@ -802,5 +804,8 @@ val_labels(ces21$mip)<-c(Other=0, Environment=1, Crime=2, Ethics=3, Education=4,
                          Immigration=13, Socio_Cultural=14,
                          Social_Programs=15, Brokerage=16, Free_Trade=17, Inflation=18, Housing=19, COVID19=20)
 table(as_factor(ces21$mip))
+
+
+
 
 
