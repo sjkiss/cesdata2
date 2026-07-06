@@ -65,8 +65,8 @@ dict_enviro <- dictionary(list(enviro = c(
   "lenvironnement", "enviournment", "envioroment", "enviornment",
   "enironment", "environement", "environmentalism")))
 ces25.enviro <- runDictionary(ces25, cps25_imp_iss, dict_enviro)
-ces25$enviro <- ces25.enviro$enviro
-ces25 <- ces25 %>% mutate(enviro.dum = ifelse(enviro >= 1, 1, 0))
+ces25$enviro_mip <- ces25.enviro$enviro
+ces25 <- ces25 %>% mutate(enviro.dum = ifelse(enviro_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -77,8 +77,8 @@ dict_crime <- dictionary(list(crime = c(
   "safe*", "safety", "gun", "guns", "firearm", "firearms", "violence",
   "illegal", "cop", "law", "terroris*", "catch and release", "protests")))
 ces25.crime <- runDictionary(ces25, cps25_imp_iss, dict_crime)
-ces25$crime <- ces25.crime$crime
-ces25 <- ces25 %>% mutate(crime.dum = ifelse(crime >= 1, 1, 0))
+ces25$crime_mip <- ces25.crime$crime
+ces25 <- ces25 %>% mutate(crime.dum = ifelse(crime_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -91,8 +91,8 @@ dict_ethics <- dictionary(list(ethics = c(
   "trust", "trustworthy", "credibility", "greed", "promesses", "promise*",
   "fair*", "justice", "governance", "integrity")))
 ces25.ethics <- runDictionary(ces25, cps25_imp_iss, dict_ethics)
-ces25$ethics <- ces25.ethics$ethics
-ces25 <- ces25 %>% mutate(ethics.dum = ifelse(ethics >= 1, 1, 0))
+ces25$ethics_mip <- ces25.ethics$ethics
+ces25 <- ces25 %>% mutate(ethics.dum = ifelse(ethics_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -103,8 +103,8 @@ dict_education <- dictionary(list(education = c(
   "deducation", "school", "schools", "schooling", "university", "tuition",
   "tuitition", "student", "students", "student loan*")))
 ces25.education <- runDictionary(ces25, cps25_imp_iss, dict_education)
-ces25$education <- ces25.education$education
-ces25 <- ces25 %>% mutate(education.dum = ifelse(education >= 1, 1, 0))
+ces25$education_mip <- ces25.education$education
+ces25 <- ces25 %>% mutate(education.dum = ifelse(education_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -115,8 +115,8 @@ dict_energy <- dictionary(list(energy = c(
   "energy", "energie", "énergie", "énergétiques", "nergtiques",
   "nuclear", "nucléaire")))
 ces25.energy <- runDictionary(ces25, cps25_imp_iss, dict_energy)
-ces25$energy <- ces25.energy$energy
-ces25 <- ces25 %>% mutate(energy.dum = ifelse(energy >= 1, 1, 0))
+ces25$energy_mip <- ces25.energy$energy
+ces25 <- ces25 %>% mutate(energy.dum = ifelse(energy_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -127,8 +127,8 @@ dict_jobs <- dictionary(list(jobs = c(
   "salar*", "wage", "wages", "unempl*", "unemployed", "unemployment",
   "d'oeuvre", "personnel")))
 ces25.jobs <- runDictionary(ces25, cps25_imp_iss, dict_jobs)
-ces25$jobs <- ces25.jobs$jobs
-ces25 <- ces25 %>% mutate(jobs.dum = ifelse(jobs >= 1, 1, 0))
+ces25$jobs_mip <- ces25.jobs$jobs
+ces25 <- ces25 %>% mutate(jobs.dum = ifelse(jobs_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -143,8 +143,8 @@ dict_economy <- dictionary(list(economy = c(
   "infrastructure*", "evonomy", "enconomie", "ecomomie", "econamy",
   "ecomomy", "econics", "ecomony", "leconomie", "léconomie", "l'economie")))
 ces25.economy <- runDictionary(ces25, cps25_imp_iss, dict_economy)
-ces25$economy <- ces25.economy$economy
-ces25 <- ces25 %>% mutate(economy.dum = ifelse(economy >= 1, 1, 0))
+ces25$economy_mip <- ces25.economy$economy
+ces25 <- ces25 %>% mutate(economy.dum = ifelse(economy_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -157,8 +157,8 @@ dict_health <- dictionary(list(health = c(
   "prescript*", "hospitals", "wellbeing", "bien être", "life",
   "medicade", "medicaid")))
 ces25.health <- runDictionary(ces25, cps25_imp_iss, dict_health)
-ces25$health <- ces25.health$health
-ces25 <- ces25 %>% mutate(health.dum = ifelse(health >= 1, 1, 0))
+ces25$health_mip <- ces25.health$health
+ces25 <- ces25 %>% mutate(health.dum = ifelse(health_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -169,8 +169,8 @@ dict_taxes <- dictionary(list(taxes = c(
   "impot", "impots", "impôt*", "impts", "d'impot", "d'impo", "d'impt",
   "dimpôts", "tqxes")))
 ces25.taxes <- runDictionary(ces25, cps25_imp_iss, dict_taxes)
-ces25$taxes <- ces25.taxes$taxes
-ces25 <- ces25 %>% mutate(taxes.dum = ifelse(taxes >= 1, 1, 0))
+ces25$taxes_mip <- ces25.taxes$taxes
+ces25 <- ces25 %>% mutate(taxes.dum = ifelse(taxes_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -182,8 +182,8 @@ dict_debt <- dictionary(list(debt = c(
   "budgtaire", "buget", "fiscal*", "spend*", "spending", "depenses*",
   "dépenses", "dpense", "austerity", "l'endettement", "government waste")))
 ces25.debt <- runDictionary(ces25, cps25_imp_iss, dict_debt)
-ces25$debt <- ces25.debt$debt
-ces25 <- ces25 %>% mutate(debt.dum = ifelse(debt >= 1, 1, 0))
+ces25$debt_mip <- ces25.debt$debt
+ces25 <- ces25 %>% mutate(debt.dum = ifelse(debt_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -194,8 +194,8 @@ dict_democracy <- dictionary(list(democracy = c(
   "vote", "ballot*", "scrutin", "representation", "proportional",
   "first past the post", "constitution", "federal", "citizen*", "citoyen*")))
 ces25.democracy <- runDictionary(ces25, cps25_imp_iss, dict_democracy)
-ces25$democracy <- ces25.democracy$democracy
-ces25 <- ces25 %>% mutate(democracy.dum = ifelse(democracy >= 1, 1, 0))
+ces25$democracy_mip <- ces25.democracy$democracy
+ces25 <- ces25 %>% mutate(democracy.dum = ifelse(democracy_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -217,8 +217,8 @@ dict_foreign <- dictionary(list(foreign = c(
   "israel", "palestin*", "gaza", "international", "relations", "global",
   "interference", "ingérence", "géopolitiques", "foreign", "foreign policy")))
 ces25.foreign <- runDictionary(ces25, cps25_imp_iss, dict_foreign)
-ces25$foreign <- ces25.foreign$foreign
-ces25 <- ces25 %>% mutate(foreign.dum = ifelse(foreign >= 1, 1, 0))
+ces25$foreign_mip <- ces25.foreign$foreign
+ces25 <- ces25 %>% mutate(foreign.dum = ifelse(foreign_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -231,8 +231,8 @@ dict_immigration <- dictionary(list(immigration = c(
   "emigration", "émigrat*", "illgale", "illégale", "refugee*", "réfugiés",
   "visa*")))
 ces25.immigration <- runDictionary(ces25, cps25_imp_iss, dict_immigration)
-ces25$immigration <- ces25.immigration$immigration
-ces25 <- ces25 %>% mutate(immigration.dum = ifelse(immigration >= 1, 1, 0))
+ces25$immigration_mip <- ces25.immigration$immigration
+ces25 <- ces25 %>% mutate(immigration.dum = ifelse(immigration_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -253,8 +253,8 @@ dict_socio <- dictionary(list(socio_cultural = c(
   "droit*", "freedom", "libert*", "minorit*", "discrimination", "divers*",
   "inclusiv*", "woke", "cultur*")))
 ces25.socio <- runDictionary(ces25, cps25_imp_iss, dict_socio)
-ces25$socio_cultural <- ces25.socio$socio_cultural
-ces25 <- ces25 %>% mutate(socio_cultural.dum = ifelse(socio_cultural >= 1, 1, 0))
+ces25$socio_cultural_mip <- ces25.socio$socio_cultural
+ces25 <- ces25 %>% mutate(socio_cultural.dum = ifelse(socio_cultural_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -274,8 +274,8 @@ dict_social <- dictionary(list(social = c(
   "retirement", "retraite", "retir*", "retirees", "old people", "65",
   "veteran*", "ei", "odsp")))
 ces25.social <- runDictionary(ces25, cps25_imp_iss, dict_social)
-ces25$social <- ces25.social$social
-ces25 <- ces25 %>% mutate(social.dum = ifelse(social >= 1, 1, 0))
+ces25$social_mip <- ces25.social$social
+ces25 <- ces25 %>% mutate(social.dum = ifelse(social_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -287,8 +287,8 @@ dict_brokerage <- dictionary(list(brokerage = c(
   "loi 21", "bill 96", "federalis*", "fédéral*", "provinc*", "autonomie",
   "unity", "unité", "bloc", "langue")))
 ces25.brokerage <- runDictionary(ces25, cps25_imp_iss, dict_brokerage)
-ces25$brokerage <- ces25.brokerage$brokerage
-ces25 <- ces25 %>% mutate(brokerage.dum = ifelse(brokerage >= 1, 1, 0))
+ces25$brokerage_mip <- ces25.brokerage$brokerage
+ces25 <- ces25 %>% mutate(brokerage.dum = ifelse(brokerage_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -300,8 +300,8 @@ dict_free_trade <- dictionary(list(free_trade = c(
   "taxestariffs", "economytariffs", "trade", "free trade", "free-trade",
   "trade war", "big beautiful bill")))
 ces25.free_trade <- runDictionary(ces25, cps25_imp_iss, dict_free_trade)
-ces25$free_trade <- ces25.free_trade$free_trade
-ces25 <- ces25 %>% mutate(free_trade.dum = ifelse(free_trade >= 1, 1, 0))
+ces25$free_trade_mip <- ces25.free_trade$free_trade
+ces25 <- ces25 %>% mutate(free_trade.dum = ifelse(free_trade_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -312,8 +312,8 @@ dict_inflation <- dictionary(list(inflation = c(
   "prices", "price", "prix", "expensive", "afford*", "afforability",
   "rising cost", "food")))
 ces25.inflation <- runDictionary(ces25, cps25_imp_iss, dict_inflation)
-ces25$inflation <- ces25.inflation$inflation
-ces25 <- ces25 %>% mutate(inflation.dum = ifelse(inflation >= 1, 1, 0))
+ces25$inflation_mip <- ces25.inflation$inflation
+ces25 <- ces25 %>% mutate(inflation.dum = ifelse(inflation_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -324,8 +324,8 @@ dict_housing <- dictionary(list(housing = c(
   "unaffordable", "rent", "rents", "rental", "renting", "loyer", "maison*",
   "logement*", "sans-abris", "itinérance", "propri*")))
 ces25.housing <- runDictionary(ces25, cps25_imp_iss, dict_housing)
-ces25$housing <- ces25.housing$housing
-ces25 <- ces25 %>% mutate(housing.dum = ifelse(housing >= 1, 1, 0))
+ces25$housing_mip <- ces25.housing$housing
+ces25 <- ces25 %>% mutate(housing.dum = ifelse(housing_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -335,8 +335,8 @@ dict_covid <- dictionary(list(covid = c(
   "covid", "co-vid", "co vid", "pandem*", "pandém*", "pandè*", "vaccin*",
   "vax*", "virus", "corona*", "lockdown*", "epidemic", "épidémie")))
 ces25.covid <- runDictionary(ces25, cps25_imp_iss, dict_covid)
-ces25$covid <- ces25.covid$covid
-ces25 <- ces25 %>% mutate(covid.dum = ifelse(covid >= 1, 1, 0))
+ces25$covid_mip <- ces25.covid$covid
+ces25 <- ces25 %>% mutate(covid.dum = ifelse(covid_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -347,8 +347,8 @@ dict_idk <- dictionary(list(idk = c(
   "jw sais pas", "je ne saos pas", "je ne connais", "je bsais pas",
   "jai pas de reponse", "idk", "prefer not", "nothing", "no")))
 ces25.idk <- runDictionary(ces25, cps25_imp_iss, dict_idk)
-ces25$idk <- ces25.idk$idk
-ces25 <- ces25 %>% mutate(idk.dum = ifelse(idk >= 1, 1, 0))
+ces25$idk_mip <- ces25.idk$idk
+ces25 <- ces25 %>% mutate(idk.dum = ifelse(idk_mip >= 1, 1, 0))
 
 
 ## =====================================================================
@@ -383,3 +383,13 @@ ces25 %>%
       housing.dum        ~ "Housing",
       covid.dum          ~ "COVID-19",
       idk.dum            ~ "Don't know / did not answer"))
+
+
+tail(names(ces25), 100)
+
+
+table(ces25$enviro.dum)
+table(ces25$enviro_mip, ces25$enviro.dum)
+
+
+ces25 %>% filter(enviro.dum == 1) %>% select(cps25_imp_iss) %>% slice_sample(n = 10)
