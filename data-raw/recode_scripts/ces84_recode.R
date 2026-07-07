@@ -937,13 +937,12 @@ ces84<-basic_merge$matches
 #Check
 ces84 %>%
   select(VAR006, constituency) %>%
-  slice_sample(n=100)
-# ces84 %>%
-#   select(VAR006, constituency, prov) %>% as_factor() %>%
-#   slice(1:500) %>% view()
+  slice_sample(n=100) %>% as_factor()
+
 ces84$mode<-rep("Phone", nrow(ces84))
 #Add Election
 ces84$election<-rep(1984, nrow(ces84))
+## Add income
 # Save the file
 save(ces84, file=here("data/ces84.rda"))
 # names(ces84)
