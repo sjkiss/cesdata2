@@ -26,7 +26,7 @@ census2021 %>%
   filter((CHARACTERISTIC_ID>260&CHARACTERISTIC_ID<281&CHARACTERISTIC_ID!=276)|
            str_detect(CHARACTERISTIC_NAME, "Gini index on adjusted household total income")|
           CHARACTERISTIC_ID==252) %>%
-  select(GEO_NAME,CHARACTERISTIC_NAME, CHARACTERISTIC_ID, C1_COUNT_TOTAL) %>%view()
+  select(GEO_NAME,CHARACTERISTIC_NAME, CHARACTERISTIC_ID, C1_COUNT_TOTAL) %>%
   pivot_wider(., id_cols=GEO_NAME,names_from=CHARACTERISTIC_NAME, values_from = C1_COUNT_TOTAL) %>%
   rename(`Gini`=22, `Income`=2)->census2021_income_data
 
@@ -114,20 +114,20 @@ fed2023 %>%
 census2021 %>%
   filter(ALT_GEO_CODE==59016) %>%
   select(GEO_NAME)
-ces25 %>%
-  filter(feduid==59016) %>%
-  select(feduid, fedname, cps25_ResponseId) %>%
-  print(n=20)
-# # Read in PCCF
-# library(haven)
-pccf<-read_sav(file=here("data-raw/statscan/2025_pccf/PCFRF_FCPCEF_V2503_2021.sav"))
-names(pccf)
-# glimpse(pccf)
-# ces25
-# library(labelled)
-# lookfor(ces25, "code")
-# lookfor(ces25, "fsa")
-# lookfor(ces25, "forward")
-# ces25$cps25_postalcode
-#Load data
-ces25<-read_dta(here("data-raw/ces25.dta"))
+# ces25 %>%
+#   filter(feduid==59016) %>%
+#   select(feduid, fedname, cps25_ResponseId) %>%
+#   print(n=20)
+# # # Read in PCCF
+# # library(haven)
+# pccf<-read_sav(file=here("data-raw/statscan/2025_pccf/PCFRF_FCPCEF_V2503_2021.sav"))
+# names(pccf)
+# # glimpse(pccf)
+# # ces25
+# # library(labelled)
+# # lookfor(ces25, "code")
+# # lookfor(ces25, "fsa")
+# # lookfor(ces25, "forward")
+# # ces25$cps25_postalcode
+# #Load data
+# ces25<-read_dta(here("data-raw/ces25.dta"))

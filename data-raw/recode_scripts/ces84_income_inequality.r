@@ -1,241 +1,244 @@
 #File to Recode CES Data
-# library(tidyverse)
-# library(car)
-# library(labelled)
-# library(here)
-# library(haven)
-# #load data
-# ces84<-read_sav(file=here("data-raw/1984.sav"))
-# source("data-raw/recode_scripts/ces84_recode_constituency.R")
-# #make respid character and rename
-# var_label(ces84$VAR001)
-# ces84$respid<-as.character(ces84$VAR001)
-#This script calculates ginis for each district in 1984
-fed81<-read.csv(file=here("data-raw/statscan/1981_household_income/fed_household_income_dwelling_1981_final.csv"))
-names(fed81)
-# look at fed
-fed81$FED
-fed81 %>%
-  filter(FED=="Yukon")
-fed81 %>%
- count(Province_Territory) %>%
-  summarise(n=sum(n))
-#this line removes provincial totals
-fed81 %>%  filter(
-  str_detect(FED, "^Canada|^British Columbia|^Alberta|^Saskatchewan|^Northwest|Manitoba|^Ontario$|^Quebec?|^New Brun|^Nova Scotia|^Prince Edward Island|^Newfoundland", negate=T))->fed81
-fed81 %>%
-  distinct(FED)
-#### Extract average household value
-fed81 %>%
-  select(FED, Avg_Value_Dwelling)->fed_dwelling_value
-#### Calculate Ginis
-#Rigth points of income intervals
-right_edges<-c(5000,9999,14999,19999,24999,29999,39999,Inf)
-fed81 %>%
-  # drop dwelling column
-  select(-Avg_Value_Dwelling) %>%
-  pivot_longer(4:11, names_to=c("Income"), values_to=c("Count")) %>%
-  mutate(right_edges=rep(right_edges, length(unique(.$FED))))->fed81
+library(tidyverse)
+library(car)
+library(labelled)
+library(here)
+library(haven)
 library(binsmooth)
 
-#This code runs the splinebins function on each federal electoral district
-fed81 %>%
-  #group_by(FED) %>%
-  #nest by federal electoral district
-  nest(-FED) %>%
-  #For each fed, run the function
-  mutate(fit = map(data, ~ {
-    edges <- .x$right_edges
-    edges[is.na(edges)] <- Inf
-    #Count is the C'ount variable from above
-    #avg_income is the average income from above
-    splinebins(edges, .x$Count, m = .x$Avg_Income[1])
-  }))->spline_fits
-#Unnest the fitWarn variable
-spline_fits %>%
-  mutate(warn=map_lgl(fit, "fitWarn")) %>%
-  #calcluate the gini
-  mutate(gini=map_dbl(fit, gini)) %>%
-  mutate(fed_avg_income=map_int(data, ~first(.x$`Avg_Income`))) %>%
-mutate(fed_median_income=map_int(data, ~first(.x$`Median_Income`))) %>%
-unnest(data) ->fed81_ginis
+# ==============================================================================
+# LOAD DATA
+# ==============================================================================
+ces84 <- read_sav(file = here("data-raw/1984.sav"))
+source("data-raw/recode_scripts/ces84_recode_constituency.R")
+var_label(ces84$VAR001)
+ces84$respid <- as.character(ces84$VAR001)
 
-# show histogram of the ginis
+fed81_raw <- read.csv(file = here("data-raw/statscan/1981_household_income/fed_full_1981_with_schooling.csv"))
+names(fed81_raw)
 
-fed81_ginis%>%
-  ggplot(., aes(x=gini))+geom_histogram()
-# fed81_ginis %>%
-#   ggplot(., aes(x=gini))+geom_histogram()
-# fed81_ginis %>%
-# write_csv(file=here('data-raw/statscan/1981_household_income/1981_fed_household_income_data.csv'))
+# Remove provincial/territorial totals -- keep individual FEDs only
+fed81_raw <- fed81_raw %>%
+  filter(str_detect(FED,
+                    "^Canada|^British Columbia|^Alberta|^Saskatchewan|^Northwest|Manitoba|^Ontario$|^Quebec?|^New Brun|^Nova Scotia|^Prince Edward Island|^Newfoundland",
+                    negate = TRUE))
+
+# Drop the territories for Gini estimation: smallest classified populations in
+# the dataset, structurally different (single-FED territories with no
+# province to nest under), and Nunatsiaq in particular fails to produce a
+# stable fit even with a supplied mean.
+fed81_wide <- fed81_raw %>%
+  filter(!Province_Territory %in% c("Yukon", "Northwest Territories", "Nunavut"))
+
+fed81_wide %>% distinct(FED)
+
+# ==============================================================================
+# INCOME GINI
+# ==============================================================================
+# Right endpoints of each income bracket. binsmooth's bEdges must be the same
+# length as bCounts (right endpoints only, left edge of first bin assumed 0;
+# the final edge value is always ignored -- top bin is unbounded regardless).
+income_cols <- c("Under_5000", "X5000_9999", "X10000_14999", "X15000_19999",
+                 "X20000_24999", "X25000_29999", "X30000_39999", "X40000_and_over")
+income_right_edges <- c(5000, 9999, 14999, 19999, 24999, 29999, 39999, Inf)
+stopifnot(length(income_right_edges) == length(income_cols))
+
+income_fits <- fed81_wide %>%
+  select(FED, Avg_Income, Median_Income, all_of(income_cols)) %>%
+  pivot_longer(all_of(income_cols), names_to = "Income_Category", values_to = "Income_Count") %>%
+  nest(data = -FED) %>%
+  # Avg_Income is StatCan's own published mean per FED -- an independently
+  # sourced mean, not derived from the bin structure itself.
+  mutate(fit = map(data, ~ splinebins(income_right_edges, .x$Income_Count, m = .x$Avg_Income[1]))) %>%
+  mutate(
+    income_gini       = map_dbl(fit, gini),
+    income_fitWarn     = map_lgl(fit, "fitWarn"),
+    fed_avg_income     = map_dbl(data, ~ first(.x$Avg_Income)),
+    fed_median_income  = map_dbl(data, ~ first(.x$Median_Income))
+  ) %>%
+  select(FED, income_gini, income_fitWarn, fed_avg_income, fed_median_income)
+
+# ==============================================================================
+# EDUCATION GINI
+# ==============================================================================
+# Trades / Other-non-university (no cert) / Other-non-university (with cert)
+# cannot be defensibly ordered against each other in years of schooling --
+# StatCan's own documentation notes the credential hierarchy is only loosely
+# tied to in-class duration, not a strict per-person years ordering. Merged
+# into a single "postsecondary, non-university" band rather than forcing an
+# arbitrary order among the three. See education_gini_crosswalk.xlsx.
+fed81_wide <- fed81_wide %>%
+  mutate(Postsec_NonUniv = Trades_cert + Other_nonuniv_no_cert + Other_nonuniv_with_cert)
+
+schooling_cols <- c("Less_than_Grade9", "Grades9_13_no_cert", "Grades9_13_with_cert",
+                    "Postsec_NonUniv", "Univ_no_degree", "Univ_with_degree")
+
+right_schooling_edges <- c(8, 11, 12, 14, 16, NA)   # length 6, matches schooling_cols
+stopifnot(length(right_schooling_edges) == length(schooling_cols))
+
+# Midpoints, used only to derive an internally-consistent mean years of
+# schooling per FED (external convenience -- never passed as bEdges). The top
+# bin's proxy upper value mirrors binsmooth's own fallback convention (2x the
+# previous edge) purely to get a representative point for the mean.
+left_schooling_edges    <- c(0, head(right_schooling_edges, -1))
+top_proxy               <- 2 * right_schooling_edges[length(right_schooling_edges) - 1]
+schooling_edges_for_mid <- c(right_schooling_edges[-length(right_schooling_edges)], top_proxy)
+schooling_bin_mids      <- (left_schooling_edges + schooling_edges_for_mid) / 2
+
+category_years <- tibble(
+  Schooling_Category = schooling_cols,
+  Schooling_Years     = schooling_bin_mids
+)
+
+education_long <- fed81_wide %>%
+  select(FED, all_of(schooling_cols)) %>%
+  pivot_longer(all_of(schooling_cols), names_to = "Schooling_Category", values_to = "Schooling_Count") %>%
+  left_join(category_years, by = "Schooling_Category") %>%
+  group_by(FED) %>%
+  mutate(mean_schooling = if_else(
+    sum(Schooling_Count, na.rm = TRUE) > 0,
+    sum(Schooling_Count * Schooling_Years, na.rm = TRUE) / sum(Schooling_Count, na.rm = TRUE),
+    NA_real_
+  )) %>%
+  ungroup()
+
+education_fits <- education_long %>%
+  nest(data = -FED) %>%
+  mutate(fit = map(data, ~ stepbins(right_schooling_edges, .x$Schooling_Count, m = .x$mean_schooling[1]))) %>%
+  mutate(
+    education_gini = map_dbl(fit, gini),
+    mean_schooling = map_dbl(data, ~ first(.x$mean_schooling))
+  ) %>%
+  select(FED, education_gini, mean_schooling)
+
+# ==============================================================================
+# COMBINE INTO ONE CLEAN PER-FED TABLE
+# ==============================================================================
+# One row per FED -- income_fits and education_fits are each already distinct
+# by FED, so this join cannot duplicate rows.
+fed81_ginis <- fed81_wide %>%
+  select(FED, Province_Territory, Avg_Value_Dwelling) %>%
+  left_join(income_fits, by = "FED") %>%
+  left_join(education_fits, by = "FED")
+
+stopifnot(nrow(fed81_ginis) == nrow(fed81_wide))
 length(unique(fed81_ginis$FED))
-#Take the distinct rows of the ginis file
-fed81_ginis %>%
-  select(FED, Province_Territory, fed_avg_income, fed_median_income, gini,warn) %>%
-  distinct()->fed81_ginis_distinct
-#fed81_ginis_distinct %>% view()
-# merge with the household dwelling file
-fed81_ginis_distinct %>%
-  left_join(., fed_dwelling_value)->fed81_ginis_distinct
-# merge with ces84
 
+# Quick histograms
+fed81_ginis %>% ggplot(aes(x = income_gini)) + geom_histogram()
+fed81_ginis %>% ggplot(aes(x = education_gini)) + geom_histogram()
+fed81_ginis
+#write_csv(fed81_ginis, here("data-raw/statscan/1981_household_income/1981_fed_ginis.csv"))
 
-#Note in order for this to run, the script ces84_recode_constituency.R has to run
-#source("data-raw/recode_scripts/ces84_recode_constituency.R")
-ces84 %>%
-  mutate(constituency=str_to_title(constituency))->ces84
-ces84$constituency
-fed81_ginis$FED
-#Try the first join
-#detach("package:joyn")
+# ==============================================================================
+# MERGE WITH CES84
+# ==============================================================================
+# Note: ces84_recode_constituency.R must have already run (sourced above).
+ces84 <- ces84 %>%
+  mutate(constituency = str_to_title(constituency))
 
-ces84 %>%
-  full_join(., fed81_ginis_distinct, by=join_by("constituency"=="FED"), keep=T)->out
+# First join attempt
+out <- ces84 %>%
+  full_join(fed81_ginis, by = join_by(constituency == FED), keep = TRUE)
 
-
-#This code prints the mismatches between the two datasets; so it is a useful diagnostic
-# to locate where the mismatches are occurring.
+# Diagnostic: mismatches between the two datasets
 out %>%
-  filter(
-    #This filters any rows that have missing values on the 84 data set and any values
-    # that are not missing on the FED
-    (is.na(constituency)&!is.na(FED))|
-      #This filters out any rows that have constituency data in the 84 but are missing in the FED
-      (!is.na(constituency)&is.na(FED))) %>%
-  select(constituency, FED, fed_median_income) %>% view()
+  filter((is.na(constituency) & !is.na(FED)) | (!is.na(constituency) & is.na(FED))) %>%
+  select(constituency, FED, fed_median_income) %>%
+  view()
 
 out %>%
-  #This filters out all the respondents that do not have constituencies
   filter(!is.na(constituency)) %>%
-  #And this then filters out how many respondents have missing data on MEDIAN INCOME
   filter(is.na(fed_median_income)) %>%
   count(constituency) # There are 115 constituencies that have not been matched
 
-# Remove hyphens in both to see what we get.
+# ---- Name-cleaning pass 1: hyphens ------------------------------------------
+ces84 <- ces84 %>%
+  mutate(constituency = str_replace_all(constituency, "-", " "))
+fed81_ginis <- fed81_ginis %>%
+  mutate(FED = str_replace_all(FED, "-", " "))
 
-ces84 %>%
-  mutate(constituency=str_replace_all(constituency, "-", " ")) ->ces84
-# Remove hyphens in both to see what we get.
-
-fed81_ginis_distinct %>%
-  mutate(FED=str_replace_all(FED, "-", " ")) ->fed81_ginis_distinct
-# Replace Bret with Breton
-
-ces84 %>%
-  mutate(constituency=str_replace_all(constituency, "Cape Bret E", "Cape Breton East")) %>%
-  mutate(constituency=str_replace_all(constituency, "Saint Henri", "Saint Henri-Westmount"))->ces84
+ces84 <- ces84 %>%
+  mutate(constituency = str_replace_all(constituency, "Cape Bret E", "Cape Breton East")) %>%
+  mutate(constituency = str_replace_all(constituency, "Saint Henri", "Saint Henri-Westmount"))
 
 # Rematch
-ces84 %>%
-  full_join(fed81_ginis_distinct, by=join_by("constituency"=="FED"), keep=T)->out
-out$constituency
-#This code prints the mismatches between the two datasets; so it is a useful diagnostic
-# to locate where the mismatches are occurring.
-out %>%
-  filter(
-    #This filters any rows that have missing values on the 84 data set and any values
-    # that are not missing on the FED
-    (is.na(constituency)&!is.na(FED))|
-      #This filters out any rows that have constituency data in the 84 but are missing in the FED
-      (!is.na(constituency)&is.na(FED))) %>%
-  select(constituency, FED, fed_median_income) %>% view()
+out <- ces84 %>%
+  full_join(fed81_ginis, by = join_by(constituency == FED), keep = TRUE)
 
 out %>%
-  #This filters out all the respondents that do not have constituencies
+  filter((is.na(constituency) & !is.na(FED)) | (!is.na(constituency) & is.na(FED))) %>%
+  select(constituency, FED, fed_median_income) %>%
+  view()
+
+out %>%
   filter(!is.na(constituency)) %>%
-  #And this then filters out how many respondents have missing data on MEDIAN INCOME
   filter(is.na(fed_median_income)) %>%
   count(constituency) # There are 113
 
+# ---- Name-cleaning pass 2: French directions --------------------------------
+fed81_ginis <- fed81_ginis %>%
+  mutate(FED = str_remove_all(FED, " \\(Nord\\)| \\(Sud\\)| \\(Est\\)| \\(Ouest\\)| \\(Nord Centre\\)"))
 
-#Remove all the French directions out of FED
+ces84 <- ces84 %>%
+  mutate(constituency = str_replace_all(constituency, "Winn. ", "Winnipeg "))
 
-fed81_ginis_distinct %>%
-  mutate(FED=str_remove_all(FED, " \\(Nord\\)| \\(Sud\\)| \\(Est\\)| \\(Ouest\\)| \\(Nord Centre\\)")) ->fed81_ginis_distinct
-#Remove Winn. and replace with Winnipeg
+ces84 <- ces84 %>%
+  mutate(constituency = str_replace_all(constituency, "Pr\\.", "Prince")) %>%
+  mutate(constituency = str_replace_all(constituency, "Pt\\.", "Port")) %>%
+  mutate(constituency = str_replace_all(constituency, "Rv\\.", "River")) %>%
+  mutate(constituency = str_replace_all(constituency, " V$", " Valley"))
 
-ces84 %>%
-  mutate(constituency=str_replace_all(constituency, "Winn. ", "Winnipeg "))->ces84
-#Replace Pr. with Prince Rv. with River and Pt. with Port
-ces84 %>%
-  mutate(constituency=str_replace_all(constituency, "Pr\\.","Prince")) %>%
-  mutate(constituency=str_replace_all(constituency, "Pt\\.", "Port")) %>%
-  mutate(constituency=str_replace_all(constituency, "Rv\\.", "River")) %>%
-  mutate(constituency=str_replace_all(constituency, " V$", " Valley"))->ces84
-ces84 %>%
-  filter(str_detect(constituency, "Bulkley")) %>%
-  select(constituency)
-ces84 %>%
-  filter(str_detect(constituency, "Proven")) %>%
-  select(constituency)
-# Remove St Jean Ouest, sT.Jean Est and St. Jean
+ces84 %>% filter(str_detect(constituency, "Bulkley")) %>% select(constituency)
+ces84 %>% filter(str_detect(constituency, "Proven")) %>% select(constituency)
 
-fed81_ginis_distinct %>%
-  mutate(FED=str_remove_all(FED, " \\(Saint Jean Est\\)|\\(Saint Jean Ouest\\)|\\(Saint Jean\\)")) ->fed81_ginis_distinct
-# Correct Kootenay West
-ces84 %>%
-  filter(str_detect(constituency, "kootenay")) %>% as_factor() %>% select(constituency) %>%
-  print(n=50)
-fed81_ginis_distinct %>%
-  filter(str_detect(FED, "Kootenay"))
-fed81_ginis_distinct %>%
-  mutate(FED=str_remove_all(FED," Revelstoke"))->fed81_ginis_distinct
-ces84$constituency
-ces84 %>%
-  mutate(constituency=str_replace_all(constituency, "W\\.", "White"))->ces84
+# ---- Name-cleaning pass 3: Saint Jean variants -------------------------------
+fed81_ginis <- fed81_ginis %>%
+  mutate(FED = str_remove_all(FED, " \\(Saint Jean Est\\)|\\(Saint Jean Ouest\\)|\\(Saint Jean\\)"))
+
+# ---- Name-cleaning pass 4: Kootenay West -------------------------------------
+ces84 %>% filter(str_detect(constituency, "kootenay")) %>% as_factor() %>% select(constituency) %>% print(n = 50)
+fed81_ginis %>% filter(str_detect(FED, "Kootenay"))
+fed81_ginis <- fed81_ginis %>%
+  mutate(FED = str_remove_all(FED, " Revelstoke"))
+
+ces84 <- ces84 %>%
+  mutate(constituency = str_replace_all(constituency, "W\\.", "White"))
+
 # Rematch
-ces84 %>%
-  full_join(fed81_ginis_distinct, by=join_by("constituency"=="FED"), keep=T)->out
-out$constituency
-#This code prints the mismatches between the two datasets; so it is a useful diagnostic
-# to locate where the mismatches are occurring.
-out %>%
-  filter(
-    #This filters any rows that have missing values on the 84 data set and any values
-    # that are not missing on the FED
-    (is.na(constituency)&!is.na(FED))|
-      #This filters out any rows that have constituency data in the 84 but are missing in the FED
-      (!is.na(constituency)&is.na(FED))) %>%
-  select(constituency, FED, fed_median_income) %>% view()
+out <- ces84 %>%
+  full_join(fed81_ginis, by = join_by(constituency == FED), keep = TRUE)
 
 out %>%
-  #This filters out all the respondents that do not have constituencies
+  filter((is.na(constituency) & !is.na(FED)) | (!is.na(constituency) & is.na(FED))) %>%
+  select(constituency, FED, fed_median_income) %>%
+  view()
+
+out %>%
   filter(!is.na(constituency)) %>%
-  #And this then filters out how many respondents have missing data on MEDIAN INCOME
   filter(is.na(fed_median_income)) %>%
   count(constituency) # There are 59 that are missing. So I think that got us two.
 
-
-# Let's try the fuzzy match!
+# ==============================================================================
+# FUZZY MATCH REMAINDER
+# ==============================================================================
 library(fedmatch)
-#Assign an id variable to fed81_ginis
-fed81_ginis_distinct$id<-1:nrow(fed81_ginis_distinct)
 
-# Get rid of accents
+fed81_ginis$id <- 1:nrow(fed81_ginis)
+
+# Strip accents for matching
 norm <- function(x) stringi::stri_trans_general(tolower(trimws(x)), "Latin-ASCII")
-ces84$constituency <- norm(ces84$constituency)
-fed81_ginis_distinct$FED<-norm(fed81_ginis_distinct$FED)
+ces84 <- ces84 %>% mutate(constituency = norm(constituency))
+fed81_ginis <- fed81_ginis %>% mutate(FED = norm(FED))
 
-#conduct fuzzy merge
-merge_plus(ces84, fed81_ginis_distinct, by.x="constituency",
-           by.y="FED",
-           unique_key_1="respid", unique_key_2="id",
-           match_type = "fuzzy", fuzzy_settings=build_fuzzy_settings(maxDist=0.25)) ->basic_merge
-#Check the ridings that were not matched
-basic_merge$data1_nomatch %>% select(constituency, VAR006) %>%
-  distinct() %>%
-  view()
-fed81_ginis_distinct %>% view()
-# Now check the unsuccesful data2 matches
+basic_merge <- merge_plus(ces84, fed81_ginis,
+                          by.x = "constituency", by.y = "FED",
+                          unique_key_1 = "respid", unique_key_2 = "id",
+                          match_type = "fuzzy", fuzzy_settings = build_fuzzy_settings(maxDist = 0.25))
+
+# Check the ridings that were not matched
+basic_merge$data1_nomatch %>% select(constituency, VAR006) %>% distinct() %>% view()
 basic_merge$data2_nomatch %>% select(FED)
 
-#Now check the successful matches.
-# basic_merge$matches %>%select(constituency, FED) %>% distinct() %>%  View()
-basic_merge$matches$warn
-# fed81_ginis_distinct %>% group_by(warn) %>%
-#   summarize(avg=mean(fed_avg_income))
-# fed81_ginis_distinct %>% group_by(warn) %>%
-#   summarize(avg_gini=mean(gini))
-
-#How many respondents are in bad ridings
+# Check the successful matches / flag any bad ridings
 table(basic_merge$matches$warn)
