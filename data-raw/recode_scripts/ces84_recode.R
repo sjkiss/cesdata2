@@ -938,8 +938,15 @@ ces84<-basic_merge$matches
 ces84 %>%
   select(VAR006, constituency) %>%
   slice_sample(n=100) %>% as_factor()
-
+ces84 %>%
+  #drop some superfluous variables from the income inequality script
+  select(-income_fitWarn, tier)->ces84
 ces84$mode<-rep("Phone", nrow(ces84))
+
+#Is there a correlation between education and income inequality?
+#
+# with(ces84, cor(education_gini, income_gini))
+# ggplot(ces84, aes(x=education_gini, income_gini))+geom_point()+geom_smooth(method="lm")
 #Add Election
 ces84$election<-rep(1984, nrow(ces84))
 ## Add income
