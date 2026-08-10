@@ -58,7 +58,8 @@ phrase_map <- c(
   "je ne sais pas"          = "jenesaispas",
   "je sais pas"             = "jesaispas",
   "j'ai pas de reponse"     = "jaipasdereponse",
-  "jai pas de reponse"      = "jaipasdereponse"
+  "jai pas de reponse"      = "jaipasdereponse",
+  "catch and release" = "catchandrelease"
 )
 
 ## FIX: one cleaning function, applied to BOTH the responses and the
@@ -272,10 +273,10 @@ ces25 <- ces25 %>% mutate(election.dum = ifelse(election >= 1, 1, 0))
 dictionnarycrime <- dictionary(list(crime = cleanTerms(c(
   "crime", "crimes", "criminal", "criminals", "criminality",
   "criminalité", "criminalite", "police", "policing", "gun", "guns",
-  "violence", "violent", "safety", "theft", "thefts", "murder",
-  "gang", "gangs", "justice", "prison", "prisons", "jail",
+  "violence", "violent", "safe", "safety", "theft", "thefts", "murder",
+  "gang", "gangs", "justice", "prison", "prisons", "jail","protests",
   "délinquance", "delinquance", "sécuritaire", "securitaire",
-  "vandalism", "trafficking", "fentanyl", "overdose"))))
+  "vandalism", "trafficking", "fentanyl", "overdose", "law", "catchandrelease"))))
 
 ces25.crime <- runDictionary(ces25, cps25_imp_iss, dictionnarycrime)
 ces25$crime <- ces25.crime$crime
