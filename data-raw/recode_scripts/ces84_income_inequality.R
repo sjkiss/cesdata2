@@ -9,10 +9,18 @@ library(binsmooth)
 # ==============================================================================
 # LOAD DATA
 # ==============================================================================
-ces84 <- read_sav(file = here("data-raw/1984.sav"))
-source("data-raw/recode_scripts/ces84_recode_constituency.R")
-var_label(ces84$VAR001)
-ces84$respid <- as.character(ces84$VAR001)
+# This script is sourced by ces84_recode.R, which already:
+#   1. loads   ces84 <- read_sav(here("data-raw/1984.sav"))   (line ~8)
+#   2. sources ces84_recode_constituency.R  (creates ces84$constituency)
+# so ces84 + constituency already exist here -- do NOT reload them.
+#
+# To run THIS script on its own (top to bottom), uncomment the two lines below
+# and also source the constituency recode; leave them commented under the
+# normal ces84_recode.R pipeline.
+# ces84 <- read_sav(file = here("data-raw/1984.sav"))
+# source(here("data-raw/recode_scripts/ces84_recode_constituency.R"))
+# ces84$respid <- as.character(ces84$VAR001)
+# var_label(ces84$VAR001)
 
 fed81_raw <- read.csv(file = here("data-raw/statscan/1981_household_income/fed_full_1981_with_schooling.csv"))
 names(fed81_raw)
@@ -160,112 +168,103 @@ write_csv(fed81_ginis, here("data-raw/statscan/1981_household_income/1981_fed_gi
 # ==============================================================================
 # MERGE WITH CES84
 # ==============================================================================
-# Note: ces84_recode_constituency.R must have already run (sourced above).
+# Requires ces84 (loaded + constituency recoded at the top of this script) and
+# fed81_ginis (built above).
+#
+# Goal: attach each 1981 FED's inequality measures to the 1984 CES respondents
+# who live in that riding. The anchor is the riding NAME. The two sources spell
+# ridings differently (CES truncates names, StatCan carries full bilingual
+# names), so we harmonise the obvious differences, then fuzzy-match the residual
+# -- and GUARD against the failure mode that a greedy fuzzy match silently
+# assigns a respondent to the WRONG riding.
+library(fedmatch)
+
 ces84 <- ces84 %>%
   mutate(constituency = str_to_title(constituency))
 
-# First join attempt
-out <- ces84 %>%
-  full_join(fed81_ginis, by = join_by(constituency == FED), keep = TRUE)
-
-# Diagnostic: mismatches between the two datasets
-out %>%
-  filter((is.na(constituency) & !is.na(FED)) | (!is.na(constituency) & is.na(FED))) %>%
-  select(constituency, FED, fed_median_income) %>%
-  view()
-
-out %>%
-  filter(!is.na(constituency)) %>%
-  filter(is.na(fed_median_income)) %>%
-  count(constituency) # There are 115 constituencies that have not been matched
-
-# ---- Name-cleaning pass 1: hyphens ------------------------------------------
+# ---- Name harmonisation: CES side -------------------------------------------
+# Hyphens -> spaces (StatCan uses spaces), plus known CES abbreviations.
 ces84 <- ces84 %>%
-  mutate(constituency = str_replace_all(constituency, "-", " "))
+  mutate(
+    constituency = str_replace_all(constituency, "-", " "),
+    constituency = str_replace_all(constituency, "Cape Bret E", "Cape Breton East"),
+    constituency = str_replace_all(constituency, "Saint Henri", "Saint Henri Westmount"),
+    constituency = str_replace_all(constituency, "Winn. ", "Winnipeg "),
+    constituency = str_replace_all(constituency, "Pr\\.", "Prince"),
+    constituency = str_replace_all(constituency, "Pt\\.", "Port"),
+    constituency = str_replace_all(constituency, "Rv\\.", "River"),
+    constituency = str_replace_all(constituency, " V$", " Valley"),
+    constituency = str_replace_all(constituency, "W\\.", "White")
+  )
+
+# ---- Name harmonisation: FED side -------------------------------------------
+# Hyphens -> spaces, then drop the bilingual direction qualifiers StatCan adds.
 fed81_ginis <- fed81_ginis %>%
-  mutate(FED = str_replace_all(FED, "-", " "))
+  mutate(
+    FED = str_replace_all(FED, "-", " "),
+    FED = str_remove_all(FED, " \\(Nord\\)| \\(Sud\\)| \\(Est\\)| \\(Ouest\\)| \\(Nord Centre\\)"),
+    FED = str_remove_all(FED, " \\(Saint Jean Est\\)|\\(Saint Jean Ouest\\)|\\(Saint Jean\\)"),
+    FED = str_remove_all(FED, " Revelstoke")
+  )
 
-ces84 <- ces84 %>%
-  mutate(constituency = str_replace_all(constituency, "Cape Bret E", "Cape Breton East")) %>%
-  mutate(constituency = str_replace_all(constituency, "Saint Henri", "Saint Henri-Westmount"))
-
-# Rematch
-out <- ces84 %>%
-  full_join(fed81_ginis, by = join_by(constituency == FED), keep = TRUE)
-
-out %>%
-  filter((is.na(constituency) & !is.na(FED)) | (!is.na(constituency) & is.na(FED))) %>%
-  select(constituency, FED, fed_median_income) %>%
-  view()
-
-out %>%
-  filter(!is.na(constituency)) %>%
-  filter(is.na(fed_median_income)) %>%
-  count(constituency) # There are 113
-
-# ---- Name-cleaning pass 2: French directions --------------------------------
-fed81_ginis <- fed81_ginis %>%
-  mutate(FED = str_remove_all(FED, " \\(Nord\\)| \\(Sud\\)| \\(Est\\)| \\(Ouest\\)| \\(Nord Centre\\)"))
-
-ces84 <- ces84 %>%
-  mutate(constituency = str_replace_all(constituency, "Winn. ", "Winnipeg "))
-
-ces84 <- ces84 %>%
-  mutate(constituency = str_replace_all(constituency, "Pr\\.", "Prince")) %>%
-  mutate(constituency = str_replace_all(constituency, "Pt\\.", "Port")) %>%
-  mutate(constituency = str_replace_all(constituency, "Rv\\.", "River")) %>%
-  mutate(constituency = str_replace_all(constituency, " V$", " Valley"))
-
-ces84 %>% filter(str_detect(constituency, "Bulkley")) %>% select(constituency)
-ces84 %>% filter(str_detect(constituency, "Proven")) %>% select(constituency)
-
-# ---- Name-cleaning pass 3: Saint Jean variants -------------------------------
-fed81_ginis <- fed81_ginis %>%
-  mutate(FED = str_remove_all(FED, " \\(Saint Jean Est\\)|\\(Saint Jean Ouest\\)|\\(Saint Jean\\)"))
-
-# ---- Name-cleaning pass 4: Kootenay West -------------------------------------
-ces84 %>% filter(str_detect(constituency, "kootenay")) %>% as_factor() %>% select(constituency) %>% print(n = 50)
-fed81_ginis %>% filter(str_detect(FED, "Kootenay"))
-fed81_ginis <- fed81_ginis %>%
-  mutate(FED = str_remove_all(FED, " Revelstoke"))
-
-ces84 <- ces84 %>%
-  mutate(constituency = str_replace_all(constituency, "W\\.", "White"))
-
-# Rematch
-out <- ces84 %>%
-  full_join(fed81_ginis, by = join_by(constituency == FED), keep = TRUE)
-
-out %>%
-  filter((is.na(constituency) & !is.na(FED)) | (!is.na(constituency) & is.na(FED))) %>%
-  select(constituency, FED, fed_median_income) %>%
-  view()
-
-out %>%
-  filter(!is.na(constituency)) %>%
-  filter(is.na(fed_median_income)) %>%
-  count(constituency) # There are 59 that are missing. So I think that got us two.
-
-# ==============================================================================
-# FUZZY MATCH REMAINDER
-# ==============================================================================
-library(fedmatch)
-
-fed81_ginis$id <- 1:nrow(fed81_ginis)
-
-# Strip accents for matching
+# ---- Accent/case normalisation (both sides) ---------------------------------
 norm <- function(x) stringi::stri_trans_general(tolower(trimws(x)), "Latin-ASCII")
-ces84 <- ces84 %>% mutate(constituency = norm(constituency))
+ces84       <- ces84       %>% mutate(constituency = norm(constituency))
 fed81_ginis <- fed81_ginis %>% mutate(FED = norm(FED))
 
+# ---- Keys for merge_plus ----------------------------------------------------
+if (!"respid" %in% names(ces84)) ces84$respid <- as.character(ces84$VAR001)
+stopifnot(anyDuplicated(ces84$respid) == 0)   # respid must uniquely key CES
+fed81_ginis$id <- seq_len(nrow(fed81_ginis))
+
+# ==============================================================================
+# FUZZY MATCH ON RIDING NAME
+# ==============================================================================
 basic_merge <- merge_plus(ces84, fed81_ginis,
   by.x = "constituency", by.y = "FED",
   unique_key_1 = "respid", unique_key_2 = "id",
   match_type = "fuzzy", fuzzy_settings = build_fuzzy_settings(maxDist = 0.25))
 
-# Check the ridings that were not matched
-basic_merge$data1_nomatch %>% select(constituency, VAR006) %>% distinct() %>% view()
-basic_merge$data2_nomatch %>% select(FED)
+matches <- as_tibble(basic_merge$matches)
 
-# Check the successful matches / flag any bad ridings
-table(basic_merge$matches$warn)
+# ==============================================================================
+# GUARDS -- fail loudly rather than write a silently-wrong file
+# ==============================================================================
+# (a) No real FED may be "stolen": if a CES riding's name exactly equals an
+#     existing FED name, it must map to THAT fed, not a fuzzy neighbour.
+stolen <- matches %>%
+  filter(constituency %in% fed81_ginis$FED, constituency != FED) %>%
+  distinct(constituency, FED)
+if (nrow(stolen) > 0) {
+  print(as.data.frame(stolen))
+  stop("Fuzzy match reassigned a riding whose exact FED exists (above). Fix name cleaning first.")
+}
+
+# (b) No FED may collect two different CES ridings (many-to-one collision).
+collide <- matches %>% distinct(constituency, FED) %>% count(FED) %>% filter(n > 1)
+if (nrow(collide) > 0) {
+  print(as.data.frame(collide))
+  stop("Two different CES ridings matched the same FED (above). Inspect before trusting the merge.")
+}
+
+# ---- Coverage report --------------------------------------------------------
+n_unmatched <- nrow(basic_merge$data1_nomatch)
+message(sprintf("Matched %d / %d CES respondents to a 1981 FED Gini (%d respondents unmatched).",
+                nrow(matches), nrow(ces84), n_unmatched))
+if (n_unmatched > 0) {
+  message("Unmatched CES ridings (no 1981 Gini available -- e.g. territories, which are dropped above):")
+  print(basic_merge$data1_nomatch %>% distinct(constituency) %>% as.data.frame())
+}
+
+# ==============================================================================
+# SAVE: 1984 CES respondents with 1981 riding inequality measures
+# ==============================================================================
+# One row per matched CES respondent (keyed by respid so it can be joined back
+# onto the main recoded ces84 object), carrying the riding-level Gini measures.
+ces84_income_inequality <- matches %>%
+  select(respid, constituency, FED, Province_Territory,
+         income_gini, income_fitWarn, fed_avg_income, fed_median_income,
+         education_gini, mean_schooling, top_bin_share, Avg_Value_Dwelling)
+
+# write_csv(ces84_income_inequality,
+#           here("data-raw/statscan/1981_household_income/ces84_with_1981_ginis.csv"))
