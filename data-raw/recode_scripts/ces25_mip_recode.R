@@ -1,1178 +1,920 @@
 ## =====================================================================
-## CES 2025 - Most Important Problem (cps25_imp_iss) dictionary coding
-## Cleaned version: multi-word entries hashed out, bugs fixed.
-## Every change is marked with ## FIX or ## HASHED
+## CES 2025 - Most Important Problem (cps25_imp_iss)
+## Dictionary coding, re-cut onto the CES 2021 category frame
 ## =====================================================================
+##
+## WHAT THIS IS
+## ------------
+## The CES21 script (ces21_recode.R) codes the MIP question with
+## str_detect() patterns; this script codes CES25 with quanteda
+## dictionaries. The two now use the SAME categories and the SAME
+## vocabulary, so the waves can be compared directly.
+##
+## CATEGORY FRAME (numbers match the CES21 val_labels)
+##    1 Environment            11 Democracy
+##    2 Crime                  12 Foreign Affairs   <- was "security"
+##    3 Ethics and Government  13 Immigration
+##    4 Education              14 Socio-Cultural    <- women/abortion/race/
+##    5 Energy                                         indigenous/rights/LGBTQ
+##    6 Jobs                   15 Social Programs   <- welfare + seniors
+##    7 Economy                16 Brokerage         <- Quebec, fed-prov
+##    8 Health                (17 Free Trade - not coded, as in CES21)
+##    9 Taxes                  18 Inflation         <- cost of living
+##   10 Debt and Deficit       19 Housing
+##                            (20 COVID - DROPPED for 2025)
+##   CES25-only additions:
+##   21 Trump  22 Tariffs  23 US Relations / Borders  24 Leaders
+##
+## CHANGES FROM THE PREVIOUS CES25 SCRIPT
+## --------------------------------------
+##  * "security" -> "foreign" (Foreign Affairs), and it now carries the
+##    CES21 foreign-affairs vocabulary (peace/war, china, defence, gaza,
+##    israel, foreign policy, armed forces...).
+##  * "ethics" -> Ethics AND Government (government, gouvernement,
+##    governance, bureaucracy added; "rights" moved OUT to socio-cultural).
+##  * The old catch-all "economy" dictionary is split the way CES21 splits
+##    it: economy / jobs / taxes / debt (incl. government spending) /
+##    inflation (cost of living).
+##  * "election" -> "democracy" (elections, voting, ballots, referendum,
+##    constitution, parliament).
+##  * "women" + "race" + "indigenous" -> one socio_cultural category, and
+##    it now includes rights, gay rights, LGBTQ, trans, abortion, freedom,
+##    values, culture, guns, misinformation.
+##  * "welfare" + "seniors" -> one social (Social Programs) category.
+##  * "quebec" -> "brokerage" (Quebec, provinces, federalism, language,
+##    Bill 21 / Bill 96, national unity, western alienation).
+##  * "energy" split out of the environment dictionary, as in CES21.
+##  * "healthcare" -> "health" (CES21 name), CES21 vocabulary added.
+##  * Trump / tariff / borders / combined / leaders kept as they were.
+##  * NO covid category.
+##  * Multi-word patterns ("cost of living", "basic income", "free speech",
+##    "first past the post", ...) are handled automatically - see the
+##    phrase-map section below.
+##
+## HOW TO EDIT: every category's vocabulary lives in ONE place, the
+## mip_terms list in part 2. Add a word there and everything downstream
+## (phrase map, dictionary, dummy, summary table, mip code) follows.
+## ---------------------------------------------------------------------
 
 ## ---- packages --------------------------------------------------------
-## FIX: packages now load BEFORE data() is called
 library(tidyverse)
 library(haven)
 library(magrittr)
-library(tidytext)
 library(quanteda)
-library(quanteda.textstats)
-library(tm)
-library(SnowballC)
+library(labelled)     ## for val_labels() on the single-issue mip variable
 library(crayon)
-library(lubridate)
 library(tictoc)
 library(gtsummary)
 library(stringi)
-## FIX: dropped library(progressr) / library(progress) - the progress bar
 
 data("ces25")
 
+## =====================================================================
+## 1. TEXT PIPELINE
+## =====================================================================
+## Responses and dictionary terms go through the SAME cleaning, so a term
+## can never be written in a form the responses can no longer contain.
+##
+## prepText()  accents -> ASCII, lower case, drop punctuation, squish
+##             (keep_glob = TRUE keeps the * wildcards used in dictionary
+##              terms; "[[:punct:]]" would otherwise delete them)
 
-## ---- shared text cleaning -------------------------------------------
-## Phrases that must survive tokenization as ONE token.
-## FIX: this now runs BEFORE punctuation is stripped, so keys with
-##      apostrophes ("don't know") actually match. In the old script the
-##      punctuation was removed first, so that replacement was dead code.
-## NOTE: longer patterns must come before shorter ones they contain.
-phrase_map <- c(
-  "prime minister"          = "primeminister",
-  "national security"       = "nationalsecurity",
-  "old people"              = "oldpeople",
-  "basic income"            = "basicincome",
-  "low income"              = "lowincome",
-  "middle class"            = "middleclass",
-  "cost of living"          = "costofliving",
-  "first past the post"     = "firstpastthepost",
-  "first nations"           = "firstnations",
-  "first nation"            = "firstnation",
-  "responsible government"  = "responsiblegovernment",
-  "aide sociale"            = "aidesociale",
-  "social aid"              = "socialaid",
-  "programs sociale"        = "programssociale",
-  "bien etre"               = "bienetre",
-  "big beautiful bill"      = "bigbeautifulbill",
-  "les etats unis"          = "etatsunis",
-  "etats unis"              = "etatsunis",
-  "canadian identity"       = "canadianidentity",
-  "keeping canada"          = "keepingcanada",
-  "lintegrite territoriale" = "lintegriteterritoriale",
-  "prefer not"              = "prefernot",
-  "don't know"              = "dontknow",
-  "dont know"               = "dontknow",
-  "je ne sais pas"          = "jenesaispas",
-  "je sais pas"             = "jesaispas",
-  "j'ai pas de reponse"     = "jaipasdereponse",
-  "jai pas de reponse"      = "jaipasdereponse"
-)
-
-## FIX: one cleaning function, applied to BOTH the responses and the
-##      dictionary terms. Previously ~30 dictionary entries could never
-##      match anything because they contained punctuation or accents that
-##      had already been stripped out of the responses
-##      (e.g. "l'environnement", "u.s.", "women's", "health-care",
-##      "o'toole", "sans-abris", "états-unis", "d'impot").
-cleanText <- function(x) {
+## FIX: punctuation is no longer all treated the same way. Apostrophes and
+##      periods CLOSE UP, so "don't" -> dont, "l'environnement" ->
+##      lenvironnement and "u.s." -> us. Every other separator becomes a
+##      SPACE. Deleting a slash outright fused responses together:
+##      "cost of living/taxes" became the single token costoflivingtaxes,
+##      which no dictionary could match - it shows up three times in the
+##      uncoded list.
+prepText <- function(x, keep_glob = FALSE) {
+  sep <- if (keep_glob) "[^[:alnum:][:space:]*]" else "[^[:alnum:][:space:]]"
   x %>%
     as.character() %>%
-    tidyr::replace_na("") %>%                              ## FIX: NA -> ""
-    stringi::stri_trans_general("Latin-ASCII") %>%         ## FIX: é -> e, ô -> o
-    stringr::str_to_lower() %>%                            ## FIX: replaces the
-    ## old str_replace_all(x, "[A-Z]", tolower), which missed accented capitals
-    stringr::str_replace_all(phrase_map) %>%
-    stringr::str_replace_all("[[:punct:]]", "") %>%
+    tidyr::replace_na("") %>%
+    stringi::stri_trans_general("Latin-ASCII") %>%   ## e -> e, o -> o
+    stringr::str_to_lower() %>%
+    stringr::str_remove_all("[’'`.]") %>%       ## elisions and u.s.
+    stringr::str_replace_all(sep, " ") %>%
     stringr::str_squish()
 }
 
-## helper: clean + de-duplicate dictionary terms
-cleanTerms <- function(terms) unique(cleanText(terms))
+## ---- multi-word phrases ----------------------------------------------
+## quanteda tokenises on whitespace, so "cost of living" is three tokens
+## and a three-word dictionary entry has to be matched as a sequence.
+## Rather than trust that, we glue every multi-word phrase into a single
+## token on BOTH sides: "cost of living" -> "costofliving" in the
+## responses, and the identical rewrite is applied to the dictionary
+## terms. Nothing can drift out of sync because the map is built FROM the
+## dictionaries themselves.
+##
+## buildPhraseMap() takes every term that contains a space, strips the
+## wildcards, and returns a named vector for str_replace_all().
+## Longer phrases are applied first so that "first nations" is consumed
+## before "first nation" can touch it.
 
+buildPhraseMap <- function(term_list, extra = character()) {
+  p <- unique(prepText(c(unlist(term_list, use.names = FALSE), extra)))
+  p <- p[stringr::str_detect(p, " ")]
+  p <- p[order(-stringr::str_count(p, " "), -nchar(p))]
+  stats::setNames(stringr::str_remove_all(p, " "), p)
+}
 
-## ---- clean the responses --------------------------------------------
-ces25$cps25_imp_iss <- cleanText(ces25$cps25_imp_iss)
+## FIX: the phrases are applied in ONE pass, as a single ordered
+##      alternation, not as 300 successive str_replace_all() calls. Applied
+##      one after another they cascade: "le cout de la vie" was being cut
+##      to "lecout de la vie" by an earlier pattern before the longer
+##      "cout de la vie" could match it. The trailing \\w* lets a phrase
+##      absorb its own plural, so "student loans" -> "studentloans".
+collapsePhrases <- function(x, map) {
+  if (length(map) == 0) return(x)
+  ## FIX: a phrase absorbs its own plural ("student loans" -> studentloans)
+  ##      but ONLY -s / -es, and only up to a word boundary. It used to
+  ##      absorb any trailing letters at all, which swallowed the next word
+  ##      whenever punctuation had closed the gap: "US relationship" was
+  ##      glued into usrelationship, which matched nothing.
+  rx <- paste0("\\b(?:", paste(names(map), collapse = "|"), ")(?:es|s)?\\b")
+  stringr::str_replace_all(x, rx, function(m) stringr::str_remove_all(m, " "))
+}
 
-## FIX (important): removed
-##   sub("^(\\w+)\\s+(\\w+)$", "\\2 \\1", ces25$cps25_imp_iss)
-## That line silently REVERSED the word order of every response that was
-## exactly two words long ("climate change" -> "change climate",
-## "prime minister" -> "minister prime"). It was corrupting the data.
+## cleanText()  - for the survey responses
+## cleanTerms() - for dictionary terms (keeps * ; warns about any phrase
+##                that somehow did not make it into the phrase map)
+## phrase_map is filled in properly in section 3; this empty default just
+## means cleanText() still works (as a no-op on phrases) if it is called
+## before then.
+phrase_map <- character(0)
 
+cleanText <- function(x) collapsePhrases(prepText(x), phrase_map)
 
-## ---- dictionary runner ----------------------------------------------
-runDictionary <- function(
-    dataA,        # input data
-    word,         # column to be searched
-    dictionaryA) {# dictionary of terms to search for
+cleanTerms <- function(terms) {
+  out <- collapsePhrases(prepText(terms, keep_glob = TRUE), phrase_map)
+  out <- unique(out[nzchar(out)])
+  stray <- out[stringr::str_detect(out, " ")]
+  if (length(stray)) {
+    message(crayon::yellow(paste0(
+      "  ! multi-word term(s) not in the phrase map: ",
+      paste(stray, collapse = " | "))))
+  }
+  out
+}
 
-  tictoc::tic()
+## ---- glob cheat sheet ------------------------------------------------
+## quanteda matches dictionary terms against WHOLE TOKENS using globs:
+##   "vote"      matches the token "vote" only
+##   "vot*"      matches vote, voter, voting, votes
+##   "*environ*" matches environment, lenvironnement, denvironnement
+## The leading * matters in French: "l'environnement" cleans to
+## "lenvironnement", one token, so "environ*" alone would miss it.
+##
+## Because matching is by token and not by substring, the short CES21
+## patterns that were quietly matching inside other words are safe here:
+## "ei", "65", "oas", "cpp", "ltc", "na" only fire when they are the whole
+## token. The CES21 patterns that CANNOT be rescued ("ev" for EV, "19" for
+## covid, "no" for a non-answer) are hashed out with a note where they
+## would have gone.
 
+## =====================================================================
+## 2. THE VOCABULARY - one list, one place to edit
+## =====================================================================
+## Sources for every category: the CES25 dictionaries you already had,
+## PLUS every pattern from the matching CES21 category in ces21_recode.R.
+## Multi-word entries are fine anywhere - they are handled automatically.
+
+mip_terms <- list(
+
+  ## -- 1. Environment --------------------------------------------------
+  enviro = c(
+    ## stems. The leading * matters in French: "l'environnement" cleans to
+    ## the single token "lenvironnement".
+    "*envir*", "emviron*", "enviorn*", "enviourn*", "envion*", "envrion*",
+    "eniron*", "environnemen*", "environnment", "enviroment*", "enviornment",
+    ## climate
+    "climat*", "*climatiq*", "climate change", "changement climatique",
+    "changements climatiques", "changement*", "cl8mate change",
+    "climet chang", "clkmatique", "warming", "global warming",
+    "rechauffement*", "rechauffement climatique",
+    ## ecology, pollution, planet
+    "*ecolog*", "cologie", "lcologie", "ecology",
+    "pollution", "polluer", "pollute", "polluting", "pollue*",
+    "planet*", "planete*", "earth", "terre",
+    ## emissions and carbon
+    "carbon", "carbone", "carbon tax*", "co2", "ges", "gaz a effet de serre",
+    "ev", "evs", "electric vehicle*", "vehicule electrique*",
+    "greenhouse gas", "greenhouse gases", "emission*", "empreinte carbone",
+    ## green, sustainability, nature
+    "green", "greener", "verte", "vert", "sustainability", "sustainable",
+    "developpement durable", "biodiversity", "biodiversite", "deforestation",
+    "pesticide*", "recycling", "recyclage", "plastic*", "conservation",
+    "nature", "wildlife", "oceans",
+    ## water, air, weather
+    "water", "drinking water", "eau potable", "lair", "air quality",
+    "qualite de lair", "wildfire*", "feux de foret", "flood*", "inondation*",
+    "secheresse"
+    ## "ev" ## HASHED (CES21): as a substring it fired on every response
+    ##      containing "ev" - even/never/level. Add "evs" if you want EVs.
+    ## "61" ## HASHED (CES21): a stray code, not a word.
+  ),
+
+  ## -- 2. Crime --------------------------------------------------------
+  crime = c(
+    "crime*", "*crimin*", "criminalite", "delinquance", "*delinqu*",
+    "police", "policing", "policier*", "rcmp", "grc",
+    "gun*", "gun crime", "gun violence", "gun control", "firearm*", "fire arm*",
+    "armes a feu", "arme a feu",
+    "violence", "violent", "safe", "safety", "unsafe", "securitaire",
+    "theft*", "car theft", "auto theft", "stealing", "robbery", "break ins",
+    "murder*", "homicide*", "shooting*", "stabbing*",
+    "gang*", "justice", "prison*", "jail", "*jail*", "incarceration",
+    "bail", "bail reform", "catch and release", "sentencing", "repeat offenders",
+    "protests", "vandalism", "vandalisme", "trafficking", "traficking",
+    "fentanyl", "opioid*", "overdose*", "drug crime", "hard drugs",
+    "law", "laws", "law and order", "victimes", "victims",
+    ## CES21 files security / terrorism under crime as well as foreign
+    "security", "securite", "securit*", "terroris*", "terrorisme"
+  ),
+
+  ## -- 3. Ethics and Government ----------------------------------------
+  ethics = c(
+    ## honesty, corruption, integrity
+    "honest*", "honesty", "honnet*", "honntet*", "dishonest*", "dishonesty",
+    "integrity", "integrite", "lintegrite", "integretity", "intgrit*",
+    "corrupt*", "corupt*", "coruption", "ethic*", "ethical", "ethique*",
+    "truth", "verite*", "lie", "lies", "lying", "lieing", "liar*",
+    "menteur*", "mensonge*", "crook*", "hypocrisy", "hypocrite*",
+    "moral*", "morality", "morals", "decency", "trust", "trustworthy",
+    "mistrust", "distrust", "credibility", "credibilite", "greed",
+    "scandal*", "scandale*", "promise*", "promesse*", "broken promises",
+    "bad behavior", "in jail",
+    ## fairness, accountability, representation
+    "fair", "fairly", "fairness", "unfair", "equite", "accountability",
+    "accountable", "accountibility", "responsibility", "responsible",
+    "responsible government", "transparency", "transparence", "transparent",
+    "represented",
+    ## the "and Government" half
+    "government", "governments", "*gouvernement*", "gouvernement*",
+    "governance", "gouvernance", "bureaucracy", "bureaucratie", "red tape",
+    "mismanagement", "incompetence", "incompetent", "waste of money"
+    ## NOTE "rights" now lives in socio_cultural (CES21 files it there).
+    ## NOTE "justice" is in crime. ces21_recode.R also lists it under
+    ##      ethics - add it back here if you want the CES21 count exactly.
+    ## NOTE "*integr*" is deliberately NOT used: it would fire on
+    ##      "integration" (immigration) and on "integrite territoriale".
+  ),
+
+  ## -- 4. Education ----------------------------------------------------
+  education = c(
+    "educ", "educat*", "*education*", "educational", "ducation*", "leducation",
+    "deducation", "school*", "ecole*", "schooling", "student*", "etudiant*",
+    "*etudiant*", "university", "universities", "universite*", "college*",
+    "cegep*", "tuition", "tuitition", "frais de scolarite", "scolarite",
+    "student loan*", "student debt", "student funding", "student issue*",
+    "loans and grants", "teacher*", "enseignant*", "literacy",
+    "post secondary", "postsecondary", "curriculum", "class sizes"
+  ),
+
+  ## -- 5. Energy -------------------------------------------------------
+  ## Split out of the environment dictionary so it matches CES21.
+  energy = c(
+    "energy", "*energi*", "energie*", "energetique*", "nergtiques",
+    "pipeline*", "pipe", "oil", "oil and gas", "oil sands", "oilsands",
+    "sables bitumineux", "petrol*", "petrole*", "gas", "gaz", "lng",
+    "fossil*", "fossiles", "fuel*", "carburant*", "refinery", "refineries",
+    "nuclear", "nucleaire", "hydro", "hydroelectric*", "electricity",
+    "electricite", "power grid", "renewable*", "renouvelable*",
+    "solar", "solaire", "wind power", "eolien*",
+    "energy security", "energy prices", "keystone", "trans mountain"
+  ),
+
+  ## -- 6. Jobs ---------------------------------------------------------
+  jobs = c(
+    "job*", "*emplo*", "unemployment", "unemployed", "emploi*", "emploie*",
+    "chomage", "*chomage*", "work", "works", "working", "worker*",
+    "travail", "travailleur*", "career*", "carriere*",
+    "salar*", "salaire*", "wage*", "minimum wage*", "salaire minimum",
+    "income", "incomes", "low income", "revenu*", "labour", "labor",
+    "labour shortage*", "main doeuvre", "doeuvre", "penurie de main doeuvre",
+    "personnel", "staffing", "hiring", "layoffs", "job losses",
+    "job security", "job creation", "creation demplois"
+  ),
+
+  ## -- 7. Economy ------------------------------------------------------
+  ## Everything about jobs / taxes / debt / prices has been moved to its
+  ## own category, the way CES21 splits them.
+  economy = c(
+    "*econom*", "*conomi*", "*conomiq*", "econ*", "ecomom*", "ecomon*",
+    "econam*", "ecenom*", "ecnomic*", "econics", "evonomy", "enconomie",
+    "exonom*",
+    "financ*", "*financ*", "money", "argent", "*argent*",
+    "wealth", "richesse*", "la richesse", "recovery", "economic recovery",
+    "growth", "croissance", "industry", "industrie*", "manufacturing",
+    "manufacturier", "business*", "small business*", "business concern*",
+    "commerce*", "commerciale*", "entreprise*", "pme",
+    "market*", "marche*", "stock market*", "recession", "*recession*",
+    "productivity", "productivite", "gdp", "pib", "dollar*", "loonie",
+    "interest rate*", "taux dinteret", "banks", "banques",
+    "middle class", "classe moyenne", "the classes", "rich and the rest",
+    "inequality", "inegalite*", "wealth gap",
+    "infrastructure*", "developpement*", "investment*", "investissement*",
+    "trade", "trading", "free trade", "libre echange", "supply chain*",
+    "pay increase*", "raises", "big tech", "fighting big tech", "monopolies"
+    ## "con" ## HASHED: it was a fragment of "economie", but on its own it
+    ##       is a French insult and an abbreviation for "conservative".
+    ## NOTE CES21 also codes a bare "$" here; punctuation is stripped, so a
+    ##      response of "$" ends up empty and is counted as a non-answer.
+  ),
+
+  ## -- 8. Health and Health Care ---------------------------------------
+  health = c(
+    "*health*", "healthcare", "healtcare", "heathcare", "hralthcare",
+    "heath*", "helath*", "heaalthcare", "heaith care", "heakth caew",
+    "health care", "mental health", "sante mentale", "public health",
+    "sant", "sant*", "sante*", "la sante", "soin*", "soins de sante",
+    "medical*", "medecin*", "medicine", "medicament*", "medicare",
+    "medicaid", "medicade", "pharma*", "pharmacare", "prescription*",
+    "prescript*", "doctor*", "docteur*", "nurse*", "infirmier*",
+    "hospital*", "hopital*", "hopitaux", "urgence*", "emergency room*",
+    "wait times", "wait time", "waiting lists", "temps dattente",
+    "long term care", "longterm care", "long term*", "soins de longue duree",
+    "mental", "addiction*", "dependance", "opioid*", "opiod*", "overdose*",
+    "drug*", "dental", "dentaire", "optometr*", "bill 124",
+    "disability", "disabilities", "disabl*", "handicap*",
+    "bien etre", "bienetre", "wellbeing", "well being",
+    "quality of life", "qualite de vie", "palliative"
+    ## "care" ## HASHED: on its own it also fires on "child care", "daycare",
+    ##        "I don't care". The care phrases above are matched instead.
+    ## "life" ## HASHED: fired on "life is expensive", "cost of life".
+  ),
+
+  ## -- 9. Taxes --------------------------------------------------------
+  taxes = c(
+    "tax", "taxes", "taxs", "taxe*", "taxed", "taxing", "taxation", "tqxes",
+    "*impot*", "impts", "impt", "income tax*", "carbon tax*", "taxe carbone",
+    "capital gains", "gst", "hst", "tps", "tvq", "sales tax*", "property tax*",
+    "tax cuts", "tax breaks", "baisse dimpot", "fiscalite",
+    "taxpayer*", "contribuable*", "overtaxed"
+    ## NOTE "tax*" is not used because it also matches "taxi".
+  ),
+
+  ## -- 10. Debt and Deficit (incl. government spending) ----------------
+  debt = c(
+    "debt", "debts", "dept", "debit", "national debt", "public debt",
+    "dette*", "*dette*", "la dette", "dette publique", "endettement",
+    "lendettement", "deficit*", "defic*", "dficit*", "defec*",
+    "budget*", "budgetaire*", "budgtaire", "budjet*", "bugdet*", "buget",
+    "balanced budget*", "balanced", "surplus", "fiscal*",
+    "fiscal responsibility", "austerity", "austerite",
+    "spending", "spend*", "overspending", "government spending",
+    "government waste", "wasteful spending", "gaspillage",
+    "depense*", "dpense*", "depenses publiques", "cost cutting", "cuts"
+  ),
+
+  ## -- 11. Democracy (electoral reform, elections, institutions) -------
+  democracy = c(
+    "*democr*", "demovracy", "demo0cr5atic", "democratie*",
+    "elect", "elected", "electing", "election*", "*election*", "electoral*",
+    "electoral reform", "reforme electorale", "lection*",
+    "vote", "vote*", "*vote*", "voting", "voter*", "ballot*", "scrutin",
+    "referendum*", "constitution*", "charter", "charte",
+    "parliament*", "parlement*", "senate", "senat", "house of commons",
+    "proportional", "proportionnelle", "first past the post",
+    "representation", "gerrymander*", "election interference",
+    "voter turnout", "minority government*", "majority government*",
+    "coalition", "term limits"
+    ## "elect*" ## deliberately NOT used - it also matches electricity.
+    ## "vot*"   ## deliberately NOT used - it also matches French "votre".
+    ## "federal" ## CES21 files it here; in CES25 it is in brokerage.
+  ),
+
+  ## -- 12. Foreign Affairs (replaces the old "security" category) ------
+  foreign = c(
+    "war", "wars", "peace", "paix", "guerre*", "ukraine", "russia", "russie",
+    "chin*", "chinese", "israel", "israeli", "gaza", "palestin*",
+    "middle east", "moyen orient", "iran", "north korea",
+    "foreign", "foreign policy", "foreign affairs", "affaires etrangeres",
+    "etranger*", "international*", "relations", "relations internationales",
+    "global", "geopolitic*", "geopolitiques", "diplomacy", "diplomatie",
+    "defence", "defense", "defens*", "military", "militaire*",
+    "armed forces", "armee*", "troops", "nato", "otan",
+    "united nations", "onu", "weapons", "armes", "nuclear weapons",
+    "security", "national security", "securite", "securite nationale",
+    "segurity", "scurit", "terroris*", "terrorisme",
+    "interference", "ingerence", "foreign interference", "espionage",
+    "foreign aid", "aide internationale", "travel restriction*"
+    ## NOTE CES21 files "jew*" here; antisemitism sits in socio_cultural.
+    ## NOTE "border" and "usa" are CES21 foreign-affairs terms. In CES25
+    ##      they belong to the borders category - see 23 below.
+  ),
+
+  ## -- 13. Immigration -------------------------------------------------
+  immigration = c(
+    "*immigr*", "*imigr*", "*migrat*", "*migrant*", "inmigr*", "imagrat*",
+    "immagr*", "immegrant*", "immgration", "emigration",
+    "refugee*", "refugie*", "refudgee", "asylum", "asile",
+    "demandeurs dasile", "visa*", "sponsor", "newcomers",
+    "nouveaux arrivants", "illegal immigration", "illegals", "illegale*",
+    "illgale", "clandestin*", "third world people",
+    "temporary foreign workers", "tfw", "international students",
+    "immigration levels", "population growth", "overpopulation"
+    ## NOTE "minority" and "discrimination" moved to socio_cultural,
+    ##      "foreign" to foreign affairs, "frontiere" to borders.
+  ),
+
+  ## -- 14. Socio-Cultural ----------------------------------------------
+  ## women's issues + abortion + race + indigenous + rights + LGBTQ,
+  ## following the CES21 socio_cultural category.
+  socio_cultural = c(
+    ## rights and freedoms
+    ## NOTE not "droit*" - that also matches "droite", the political right
+    "right", "rights", "human rights", "charter rights", "droit", "droits",
+    "droits humains", "freedom*", "libert*", "liberte dexpression",
+    "free speech", "censorship", "censure",
+    "equality", "equal*", "egalite*", "equity", "inclusiv*", "inclusion",
+    "diversity", "divers*", "accessibility", "accommodation",
+    ## gender, sexuality, abortion
+    "gay", "gay rights", "lgbt*", "2slgbtq*", "queer", "homosexual*",
+    "trans", "transgender*", "trans rights", "gender*", "gender identity",
+    "identite de genre", "sexual orientation",
+    "abort*", "avortement*", "pro life", "prolife", "pro choice", "unborn",
+    "reproductive*", "anatiabortion",
+    "women", "womens", "woman", "womans", "femme*", "feminis*", "feminine",
+    "maternity", "maternite", "childbirth",
+    ## race, religion, minorities
+    "race", "races", "racis*", "raciste*", "black", "white",
+    "minority", "minorit*", "visible minorities", "discrimination",
+    "prejudice", "hate", "hate crime*", "haine",
+    "antisemitism", "anti semitism", "antisemitisme", "jewish", "jew",
+    "islamophobia", "islamophoby", "islamaphobia", "islamophobie", "muslim*",
+    "religion", "religious freedom",
+    ## indigenous
+    "indigenous", "indig*", "*indigen*", "indeginous", "aboriginal", "native",
+    "autochtone*", "first nations", "first nation", "reconciliation",
+    "reconcil*", "treaty", "treaties", "trc", "residential school*",
+    "land agreement*", "land claims", "clean drinking water",
+    ## culture, values, information
+    "culture", "cultur*", "values", "valeurs", "identity", "identite",
+    "canadian identity", "woke", "wokeism", "cancel culture",
+    "political correctness", "media", "medias", "social media",
+    "fake news", "fake information", "false information", "misinformation",
+    "desinformation", "disinformation", "credible information",
+    "arts", "animal*", "youth issue*", "family issue*", "family values",
+    ## firearms (CES21 files them here; they are also in crime)
+    "gun*", "firearm*", "weapons ownership", "gun control", "gun violence",
+    "arme a feu", "armes a feu",
+    "c21", "c71", "c6"
+  ),
+
+  ## -- 15. Social Programs (welfare + seniors) -------------------------
+  social = c(
+    ## welfare and transfers
+    "welfare", "aide sociale", "social aid", "programs sociale",
+    "programmes sociaux", "social", "sociale*", "sociaux", "social programs",
+    "social services", "services sociaux", "social assistance",
+    "assistance", "assistance sociale",
+    "safety net", "redistribution", "universal basic income", "basic income",
+    "universal basic", "revenu de base", "ubi", "guaranteed income",
+    "benefits", "prestations", "funding", "funds", "fonds", "soutien",
+    "family support", "public services", "services publics",
+    ## children and families
+    "child", "children", "childrens", "child care", "childcare", "daycare",
+    "day care", "garderie*", "garde denfants", "enfant*", "famille*",
+    "familiale*", "family", "families", "parental", "parental leave",
+    "conge parental", "ccb", "allocation familiale", "autis*", "youth",
+    ## poverty
+    "poverty", "poor", "pauvre*", "pauvret*", "impoverish*",
+    "under privileged", "underprivileged", "food bank*",
+    "banques alimentaires", "hunger", "food insecurity",
+    ## seniors and retirement
+    "senior*", "senoir*", "seanor", "aine*", "ainee*", "elderly", "elder*",
+    "old", "older", "old people", "personnes agees", "agee*", "age", "ages",
+    "aging", "aging population", "vieillisse*", "vieillissement",
+    "vieillesse", "viellesse", "vielliesse", "veillesse", "vieux",
+    "retirement", "retraite*", "retired", "retirees", "retir*",
+    "pension*", "pesion", "cpp", "oas", "old age security", "rrq", "gis",
+    "65", "60 ans", "long term care", "longterm care", "ltc", "chsld",
+    "nursing homes", "care homes", "retirement homes",
+    ## disability, veterans, other
+    "disability", "disabl*", "handicap*", "odsp", "ei", "wsib",
+    "veteran*", "anciens combattants", "sick leave", "reserve*",
+    "la population"
+    ## NOTE cerb / pcu / pcre are dropped with the covid category.
+    ## NOTE these short tokens ("ei", "65", "oas", "ltc", "cpp") are safe
+    ##      here because quanteda matches whole tokens, not substrings.
+  ),
+
+  ## -- 16. Brokerage (Quebec, federal-provincial) ----------------------
+  brokerage = c(
+    "*quebec*", "qubec", "qiebec", "quebecois*", "qc",
+    "province*", "provincial*", "provinciale*", "provinciaux",
+    "province jurisdiction", "jurisdiction*", "juridiction*",
+    "federal*", "federalis*", "fed prov", "ottawa",
+    "national unity", "unity", "unite", "unite nationale",
+    "separatism", "separatiste*", "separation", "secession", "souverainisme",
+    "quebec sovereignty", "souverainete du quebec", "quebec separation",
+    "distinct society",
+    "francophone*", "franco*", "francais*", "french", "langue*", "language*",
+    "bilingual*", "bilinguisme",
+    "loi 21", "bill 21", "loi 96", "bill 96", "laicite", "laicit", "lacit",
+    "secularism", "religious symbols",
+    "alberta", "western alienation", "equalization", "perequation",
+    "interprovincial"
+    ## "21"  ## HASHED: on its own it also matched ages, dates and codes.
+    ##       "loi 21" / "bill 21" are matched as phrases instead.
+    ## "ubi" ## moved to social programs (CES21 had it here by accident).
+    ## NOTE "constitution" is in democracy, not here.
+  ),
+
+  ## -- 18. Inflation (cost of living) ----------------------------------
+  inflation = c(
+    "*inflation*", "cost of living", "cost", "costs", "cout*", "couts",
+    "lecout", "cout de la vie", "prix", "price", "prices",
+    "pricing", "afford*", "aford*", "affort*", "afgord*", "afforability",
+    "unaffordable", "expensive",
+    "cher", "trop cher", "living", "standard of living", "niveau de vie",
+    "purchasing power", "pouvoir dachat", "grocer*", "groceries",
+    "food", "food prices", "epicerie*", "panier depicerie", "nourriture",
+    "gas prices", "prix de lessence", "essence", "base rate",
+    "phone plan*", "utility bills", "bills", "wage*", "salaire*",
+    "cost of everything"
+    ## NOTE CES21 puts "wage*" in inflation AND in jobs; kept in both.
+  ),
+
+  ## -- 19. Housing -----------------------------------------------------
+  housing = c(
+    "*housing*", "housing crisis", "affordable housing",
+    "*logement*", "crise du logement",
+    "rent", "rents", "rental*", "renting", "renters", "loyer*", "rent control",
+    "home", "homes", "house", "houses", "maison*", "hpmes", "dwelling*",
+    "condo*", "mortgage*", "hypotheque*", "propriet*", "proprio*",
+    "landlord*", "eviction*", "homeless*", "sans abri*", "sansabri*",
+    "itinerance", "shelter*", "abri*", "hebergement", "first time buyers",
+    "zoning", "inflationhousingrenting", "unaffordable", "affordable"
+    ## NOTE "propri*" (CES21) also matched "propre"; narrowed to "propriet*".
+  ),
+
+  ## -- 21. Trump -------------------------------------------------------
+  trump = c(
+    "trump*", "turmp", "dtrump", "bufoontrump", "usatrump", "donald",
+    "president*", "maga"
+  ),
+
+  ## -- 22. Tariffs -----------------------------------------------------
+  tariff = c(
+    "*tarif*", "tariff*", "tarrif*", "terrif*", "thariff", "taxestariffs",
+    "economytariffs", "trade war*", "guerre commerciale", "trade dispute*",
+    "big beautiful bill", "protectionism", "protectionnisme",
+    "buy canadian", "counter tariffs", "droits de douane"
+    ## "economist" / "economiste" ## HASHED: economy words that had been
+    ## pasted into the tariff dictionary and were inflating the count.
+  ),
+
+  ## -- 23. Borders / US relations --------------------------------------
+  borders = c(
+    "border*", "frontiere*", "*frontier*", "annex*", "annexion",
+    ## sovereignty is spelled a dozen different ways in the responses
+    "sove*", "sover*", "sovr*", "sovre*", "souver*", "soveir*",
+    "51st", "51st state", "51e etat",
+    "us", "usa", "america", "american*", "americain*", "states",
+    "the states", "etats unis", "etat unis", "etatsunis", "etatunis", "etasunis",
+    "united states", "canada us relations", "us relations",
+    "*independ*", "*independan*",
+    "autonomie", "autonomy", "integrite territoriale",
+    "lintegrite territoriale", "canadian identity", "keeping canada",
+    "neighbours", "neighbors", "trump"
+    ## NOTE "us" also matches the English pronoun. It is kept because in
+    ## short MIP answers it is nearly always "U.S."; drop it if you would
+    ## rather be conservative - "usa"/"america*"/"states" still fire.
+  ),
+
+  ## -- 24. Leaders -----------------------------------------------------
+  leaders = c(
+    "carney", "carnay", "mark", "marc", "poilievre", "poliviere", "pierre",
+    "singh", "jagmeet", "blanchet", "trudeau*", "justin", "scheer", "sheer",
+    "otoole", "toole", "bernier", "ford", "may", "paul", "andrew",
+    "libera*", "libral", "liberaux",
+    "conservative*", "conservateur*", "conservatrice*", "tory", "tories",
+    "ndp", "npd", "bloc", "green party", "parti vert",
+    "leader*", "leadership", "prime minister*", "premier ministre", "pm",
+    "politician*", "politicien*", "parties", "party", "partis",
+    "candidate*", "candidat*"
+    ## NOTE "green" on its own stays in the environment dictionary;
+    ##      "green party" is matched as a phrase here.
+  ),
+
+  ## -- Non-answers -----------------------------------------------------
+  idk = c(
+    "99", "unsure", "not sure", "dont know", "don t know", "do not know",
+    "dunno", "dnk", "d k", "idk", "no idea", "no clue", "no comment",
+    "no opinion", "no issue*", "no interest", "not interested",
+    "undecided", "havent decided", "hard to pick", "not applicable",
+    "dont care", "don t care", "dont have one", "dont have",
+    "doesnt matter", "does it really matter", "no point", "wont matter",
+    "dont see the point", "no strong feeling", "no choice", "no matters",
+    "no particular issue", "i do not have one", "dont knoe", "dont mnow",
+    "prefer not", "prefer not to say", "not a citizen", "neutral", "neutre",
+    "nothing", "none", "nil", "na", "nan", "rien", "aucun", "aucune",
+    "je ne sais pas", "je sais pas", "sais pas", "ne sait pas", "je c po",
+    "jai pas de reponse", "pas de reponse", "je men fou", "sans opinion",
+    "unknown", "uninterested"
+    ## "no"  ## HASHED: it fired on "no jobs", "no housing", "no doctors".
+    ## "pas" ## HASHED (CES21): it fired on every French negation.
+    ## Junk strings ("xxx", "asdbf", keyboard mash) are handled by the
+    ## exact-match list further down, not here.
+  )
+)
+
+## =====================================================================
+## 3. BUILD THE PHRASE MAP, CLEAN THE RESPONSES, BUILD THE DICTIONARIES
+## =====================================================================
+
+## Phrases that have to be glued together even though no category codes
+## them. Without this, "far right" hands the loose token "right" to
+## socio-cultural and a response about ideology gets counted as a rights
+## response. CES21 leaves ideology uncoded (its "rights" pattern never
+## matched "far right"), so these stay uncoded here too - move any of them
+## into a category below if you would rather they counted somewhere.
+ideology_phrases <- c("far right", "far left", "right wing", "left wing",
+                      "alt right", "extreme right", "extreme left",
+                      "right leaning", "left leaning",
+                      "la droite", "la gauche", "extreme droite",
+                      "extreme gauche")
+
+## Every multi-word entry above, plus these, becomes a single token.
+phrase_map <- buildPhraseMap(mip_terms, extra = ideology_phrases)
+message(crayon::silver(sprintf("phrase map: %d multi-word patterns collapsed",
+                               length(phrase_map))))
+
+## The raw response column is left alone. CES21 calls the cleaned column
+## mip_lower, so CES25 does too.
+## FIX: the old script overwrote ces25$cps25_imp_iss in place, so re-running
+##      any part of it cleaned already-cleaned text.
+ces25$mip_lower <- cleanText(ces25$cps25_imp_iss)
+
+## FIX (kept from the previous clean-up): the old script had a line
+##   sub("^(\\w+)\\s+(\\w+)$", "\\2 \\1", ...)
+## that reversed the word order of every two-word response
+## ("climate change" -> "change climate"). It is gone for good.
+
+## one quanteda dictionary per category
+mip_dicts <- lapply(names(mip_terms), function(k) {
+  quanteda::dictionary(stats::setNames(list(cleanTerms(mip_terms[[k]])), k))
+})
+names(mip_dicts) <- names(mip_terms)
+
+## Trump + tariffs + borders, built as the union of its parts so it can
+## never drift away from them.
+mip_dicts$combined <- quanteda::dictionary(list(combined = unique(c(
+  cleanTerms(mip_terms$trump),
+  cleanTerms(mip_terms$tariff),
+  cleanTerms(mip_terms$borders)))))
+
+## the CES21 numbering, so the two waves line up.
+## 17 (Free Trade) and 20 (COVID) are deliberately left empty.
+mip_codes <- c(enviro = 1, crime = 2, ethics = 3, education = 4, energy = 5,
+               jobs = 6, economy = 7, health = 8, taxes = 9, debt = 10,
+               democracy = 11, foreign = 12, immigration = 13,
+               socio_cultural = 14, social = 15, brokerage = 16,
+               inflation = 18, housing = 19,
+               trump = 21, tariff = 22, borders = 23, leaders = 24)
+
+issue_cols <- names(mip_codes)   ## the substantive categories
+
+## =====================================================================
+## 4. THE DICTIONARY RUNNER
+## =====================================================================
+
+## the lookup itself: text in, one count per response out
+lookupCounts <- function(txt, dictionaryA) {
   key  <- names(dictionaryA)[1]
-  ## FIX: pull() instead of mutate(word = {{word}}) - the old version
-  ##      overwrote any existing column called "word", and choked on
-  ##      haven_labelled columns
-  txt  <- dataA %>% dplyr::pull({{ word }}) %>% as.character() %>%
-    tidyr::replace_na("")
-
+  txt  <- tidyr::replace_na(as.character(txt), "")
   toks <- quanteda::tokens(txt)
   dfmA <- quanteda::dfm(
-    quanteda::tokens_lookup(toks, dictionaryA, nested_scope = "dictionary"))
-
+    quanteda::tokens_lookup(toks, dictionaryA,
+                            valuetype = "glob",     ## FIX: stated, not assumed
+                            nested_scope = "dictionary"))
   ## FIX: guarantees the key column exists even when nothing matches.
   ##      Previously a zero-match dictionary returned a data.frame with no
   ##      such column, so dataB$key was NULL and the assignment failed.
   dfmA <- quanteda::dfm_match(dfmA, features = key)
+  as.integer(quanteda::convert(dfmA, to = "data.frame")[[key]])
+}
 
-  dataB <- quanteda::convert(dfmA, to = "data.frame")
-
-  ## FIX: real feedback instead of the progress bar
+## same call signature as the old runDictionary(): data, column, dictionary
+runDictionary <- function(
+    dataA,          # input data
+    word,           # column to be searched
+    dictionaryA) {  # dictionary of terms to search for
+  tictoc::tic()
+  key <- names(dictionaryA)[1]
+  ## FIX: pull() instead of mutate(word = {{word}}) - the old version
+  ##      overwrote any existing column called "word" and choked on
+  ##      haven_labelled columns
+  hits <- lookupCounts(dataA %>% dplyr::pull({{ word }}), dictionaryA)
   message(crayon::green(sprintf(
-    "%s: %d of %d responses matched", key, sum(dataB[[key]] >= 1), length(txt))))
+    "%-15s %5d of %d responses matched (%.1f%%)",
+    key, sum(hits >= 1), length(hits), 100 * mean(hits >= 1))))
   tictoc::toc()
-
-  return(dataB)
+  stats::setNames(data.frame(seq_along(hits), hits), c("doc_id", key))
 }
 
-
-## ---- Environment ------------------------------------------------------
-dictionaryenviro <- dictionary(list(enviro = cleanTerms(c(
-  "climate", "change", "envi", "pipelines", "oil", "carbon",
-  "pipeline", "environnement", "environmental", "environment",
-  #"climate change",                                        ## HASHED
-  "warming",
-  "l'environnement", "climatiques", "lenvironement", "ges",
-  "rechauffement", "gas", "enviroment", "water",
-  "sustainability", "enviromental", "environnement",
-  "écologie", "l'envéronnement", "l'ecologie",
-  "l'environnemen", "l'environnemenr", "l'environnent",
-  "emvironnement", "environnemen5", "ecology", "co2", "polluer",
-  "pollute", "pollution", "planet", "nergtiques", "energy",
-  "carbone", "greener", "green", "climatique", "environnment",
-  "enviournment", "climat", "envioroment", "earth", "cologie",
-  "environnementaux", "ecologie", "enviornment", "enviro",
-  "enviormental", "enironment", "fossiles", "fossil",
-  "environement", "environmentalism", "l'cologie",
-  "l'environement", "pipe", "lenvironnement", "lenrironnement",
-  "environnemental"))))
-
-ces25.enviro <- runDictionary(ces25, cps25_imp_iss, dictionaryenviro)
-ces25$enviro <- ces25.enviro$enviro
-ces25 <- ces25 %>% mutate(enviro.dum = ifelse(enviro >= 1, 1, 0))
-
-
-## ---- Security / Defence and International Relations ------------------
-dictionnarysecurity <- dictionary(list(security = cleanTerms(c(
-  "security", "defense", "international", "china", "defence",
-  "war", "wars", "relations", "global", "israel",
-  #"u.s.",                     ## HASHED: strips to "us", which collides with
-  ## the ordinary English pronoun; it is already covered in the borders dict
-  "segurity", "scurit", "military", "palestin", "palestine",
-  "interference", "ingérence", "défense",
-  "terrorism", "sécurité", "géopolitiques", "armes",
-  "weapons", "gaza",
-  "nationalsecurity"))))       ## FIX: the pre-processing collapses
-## "national security" -> "nationalsecurity", but that token was in no dictionary
-
-ces25.security <- runDictionary(ces25, cps25_imp_iss, dictionnarysecurity)
-ces25$security <- ces25.security$security
-ces25 <- ces25 %>% mutate(security.dum = ifelse(security >= 1, 1, 0))
-
-
-## ---- Ethics ----------------------------------------------------------
-dictionnaryethics <- dictionary(list(ethics = cleanTerms(c(
-  "gouvernement", "corruption", "honesty", "ethics",
-  "transparency", "accountability", "responsibility", "truth",
-  "lies", "lying", "ethical", "transparent", "integretity",
-  "corrupt", "trustworthy", "dishonesty", "liar",
-  "transparence", "moral", "integrity", "honest", "trust",
-  "corruptions", "coruption", "credibility", "greed",
-  "promesses", "honestly", "honnetete", "honntet", "morality",
-  "morals", "accountable", "accountibility",
-  "rights", "represented", "fairness", "governance",
-  #"responsible government",                                ## HASHED
-  "responsiblegovernment"))))
-
-ces25.ethics <- runDictionary(ces25, cps25_imp_iss, dictionnaryethics)
-ces25$ethics <- ces25.ethics$ethics
-ces25 <- ces25 %>% mutate(ethics.dum = ifelse(ethics >= 1, 1, 0))
-
-
-## ---- Education -------------------------------------------------------
-dictionnaryeducation <- dictionary(list(education = cleanTerms(c(
-  "education", "ducation", "school", "schools",
-  "educational", "university", "tuition", "student",
-  "students", "schooling", "l'ducation", "l'education",
-  "deducation", "Éducation"))))
-
-ces25.education <- runDictionary(ces25, cps25_imp_iss, dictionnaryeducation)
-ces25$education <- ces25.education$education
-ces25 <- ces25 %>% mutate(education.dum = ifelse(education >= 1, 1, 0))
-
-
-## ---- Economy ---------------------------------------------------------
-dictionaryeco <- dictionary(list(economy = cleanTerms(c(
-  "economy", "jobs", "employment", "tax", "taxs", "taxes",
-  "job", "conomie", "con", "l'conomie", "economie",
-  "conomique", "dette", "debt", "deficit", "impts", "finances",
-  "finance", "impot", "dficits", "budget", "conomiques",
-  "economics", "balanced", "dollars", "deficits", "evonomy",
-  #"low income", "middle class", "cost of", "rising cost",  ## HASHED
-  "lowincome", "middleclass", "costofliving",               ## FIX: collapsed forms
-  "spending", "trade", "depenses", "déficit",
-  "dpense", "taxing", "wage", "wages",
-  "economic", "budgets", "taxation",
-  "fiscal", "market", "recession", "growth", "loans",
-  "budgétaire", "leconomie", "argent",
-  "l'endettement", "living", "cost", "money",
-  "inequality", "prices", "inflation", "poor",
-  "enconomie", "ecomomie", "econamy", "emploi", "ecomomy",
-  "econics", "unemployment", "impots", "affordability",
-  "d'impot", "d'impo", "d'impt", "emploie", "economique",
-  "ecomony", "work", "unemployed", "taxe", "taxed", "dficit",
-  "financial", "budgtaire", "l'economie", "economist",
-  "économiste", "coût", "prix",
-  "léconomie", "cout", "expensive", "industry", "industrie",
-  "commerciale", "Économie", "afforability",
-  "afford", "financière", "largent",
-  "léconomique", "impôts", "dimpôts",
-  "investments", "investment", "investissements", "économique",
-  "income", "lecout", "trading"))))
-
-ces25.econ <- runDictionary(ces25, cps25_imp_iss, dictionaryeco)
-ces25$economy <- ces25.econ$economy
-ces25 <- ces25 %>% mutate(economy.dum = ifelse(economy >= 1, 1, 0))
-
-
-## ---- Healthcare ------------------------------------------------------
-dictionnaryhealthcare <- dictionary(list(healthcare = cleanTerms(c(
-  "health", "health-care", "care", "sant", "soins", "life",
-  "mental", "disability", "pharmacare", "disabled", "drugs",
-  "drug", "medicare", "santé", "medical", "heath",
-  "prescriptions", "doctors", "sante", "soin",
-  "santè", "docteur", "healthcare", "healtcare",
-  "heathcare", "hospitals", "medicine",
-  #"bien être",                                             ## HASHED
-  "bienetre", "wellbeing", "hralthcare", "medicade", "medicaid"))))
-
-ces25.healthcare <- runDictionary(ces25, cps25_imp_iss, dictionnaryhealthcare)
-ces25$healthcare <- ces25.healthcare$healthcare
-ces25 <- ces25 %>% mutate(healthcare.dum = ifelse(healthcare >= 1, 1, 0))
-
-
-## ---- Electoral Reform ------------------------------------------------
-dictionnaryelection <- dictionary(list(election = cleanTerms(c(
-  "election", "electoral", "voting", "voter",
-  "representation", "democracy",
-  #"first past the post",                                   ## HASHED
-  "firstpastthepost", "proportional", "vote"))))
-
-ces25.election <- runDictionary(ces25, cps25_imp_iss, dictionnaryelection)
-ces25$election <- ces25.election$election
-ces25 <- ces25 %>% mutate(election.dum = ifelse(election >= 1, 1, 0))
-
-
-## ---- Crime -----------------------------------------------------------
-## FIX: crime.dum was used in tbl_summary() but no crime dictionary
-##      existed anywhere in the script, so the summary errored out.
-##      Terms below are a starting point - tune before you report.
-dictionnarycrime <- dictionary(list(crime = cleanTerms(c(
-  "crime", "crimes", "criminal", "criminals", "criminality",
-  "criminalité", "criminalite", "police", "policing", "gun", "guns",
-  "violence", "violent", "safety", "theft", "thefts", "murder",
-  "gang", "gangs", "justice", "prison", "prisons", "jail",
-  "délinquance", "delinquance", "sécuritaire", "securitaire",
-  "vandalism", "trafficking", "fentanyl", "overdose"))))
-
-ces25.crime <- runDictionary(ces25, cps25_imp_iss, dictionnarycrime)
-ces25$crime <- ces25.crime$crime
-ces25 <- ces25 %>% mutate(crime.dum = ifelse(crime >= 1, 1, 0))
-
-
-## ---- Trump -----------------------------------------------------------
-dictionnarytrump <- dictionary(list(trump = cleanTerms(c(
-  "trump", "turmp", "donald", "president", "président",
-  "trumps", "dtrump", "bufoontrump", "usatrump"))))
-
-ces25.trump <- runDictionary(ces25, cps25_imp_iss, dictionnarytrump)
-ces25$trump <- ces25.trump$trump
-ces25 <- ces25 %>% mutate(trump.dum = ifelse(trump >= 1, 1, 0))
-
-
-## ---- Tariffs ---------------------------------------------------------
-dictionnarytariff <- dictionary(list(tariff = cleanTerms(c(
-  "tariff", "tariffs", "tarif", "tarifs",
-  #"economist", "économiste",   ## HASHED: these are economy words that had
-  ## been pasted into the tariff dictionary and were inflating the count
-  #"big beautiful bill",                                    ## HASHED
-  "bigbeautifulbill",
-  "tarriffs", "terrifs", "economytariffs", "tarrifs",
-  "taxestariffs", "thariff"))))
-
-ces25.tariff <- runDictionary(ces25, cps25_imp_iss, dictionnarytariff)
-ces25$tariff <- ces25.tariff$tariff
-ces25 <- ces25 %>% mutate(tariff.dum = ifelse(tariff >= 1, 1, 0))
-
-
-## ---- Borders / US relations ------------------------------------------
-dictionnaryborders <- dictionary(list(borders = cleanTerms(c(
-  "soveriegnty", "border", "souveraineté", "frontière",
-  "annex", "annexation", "annexion", "trump", "sovereignty",
-  "us",   ## NOTE: this also catches the English pronoun "us". Consider
-  ## hashing it - "usa"/"america"/"american" already cover the concept.
-  "usa", "states",
-  #"the states", "les état unis", "États unis", "etats unis",  ## HASHED
-  #"lintégrité territoriale", "canadian identity", "keeping canada", ## HASHED
-  "etatsunis", "etasunis", "lintegriteterritoriale",
-  "canadianidentity", "keepingcanada",
-  "america", "americans", "états-unis", "américain", "americain",
-  "américains", "americains", "frontières", "indépendance",
-  "independence", "sovreignty", "independent", "indépendant",
-  "autonomie", "autonomy", "51st", "américaines", "american",
-  "souverainté", "neighbours"))))
-
-ces25.borders <- runDictionary(ces25, cps25_imp_iss, dictionnaryborders)
-ces25$borders <- ces25.borders$borders
-ces25 <- ces25 %>% mutate(borders.dum = ifelse(borders >= 1, 1, 0))
-
-
-## ---- Trump + Tariffs + Borders combined ------------------------------
-## FIX: built as the union of the three component dictionaries instead of
-##      a fourth hand-typed copy. The old copy had already drifted
-##      (e.g. it contained "Étasunis"/"Étatsunis", which borders did not).
-dictionnarycombined <- dictionary(list(combined = unique(c(
-  as.list(dictionnarytrump)$trump,
-  as.list(dictionnarytariff)$tariff,
-  as.list(dictionnaryborders)$borders))))
-
-ces25.combined <- runDictionary(ces25, cps25_imp_iss, dictionnarycombined)
-ces25$combined <- ces25.combined$combined
-ces25 <- ces25 %>% mutate(combined.dum = ifelse(combined >= 1, 1, 0))
-
-
-## ---- Immigration -----------------------------------------------------
-dictionaryimmigration <- dictionary(list(immigration = cleanTerms(c(
-  "immigration", "illgale", "illégale", "minority",
-  "discrimination", "immigrants", "immigrant", "langue",
-  "l'imigration", "d'immigrant", "foreign", "immigrations",
-  "imagration", "imigration", "immegrants",
-  "l'immigration", "emigration", "refugee", "refugees",
-  "immagration", "immgration", "imigrant", "limmigration"))))
-
-ces25.immigration <- runDictionary(ces25, cps25_imp_iss, dictionaryimmigration)
-ces25$immigration <- ces25.immigration$immigration
-ces25 <- ces25 %>% mutate(immigration.dum = ifelse(immigration >= 1, 1, 0))
-
-
-## ---- Women's Issues and Abortion -------------------------------------
-dictionnarywomen <- dictionary(list(women = cleanTerms(c(
-  "women", "women's", "abortion", "abortions", "woman",
-  "woman's", "unborn", "reproductive", "femme", "femmes",
-  "gender", "maternity", "womens", "anatiabortion"))))
-
-ces25.women <- runDictionary(ces25, cps25_imp_iss, dictionnarywomen)
-ces25$women <- ces25.women$women
-ces25 <- ces25 %>% mutate(women.dum = ifelse(women >= 1, 1, 0))
-
-
-## ---- Race ------------------------------------------------------------
-dictionnaryrace <- dictionary(list(race = cleanTerms(c(
-  "race", "racism", "racist", "black", "white", "antisemitism",
-  "islamophoby", "islamaphobia", "islamophobia"))))
-
-ces25.race <- runDictionary(ces25, cps25_imp_iss, dictionnaryrace)
-ces25$race <- ces25.race$race
-ces25 <- ces25 %>% mutate(race.dum = ifelse(race >= 1, 1, 0))
-
-
-## ---- Indigenous ------------------------------------------------------
-dictionnaryindigenous <- dictionary(list(indigenous = cleanTerms(c(
-  "indigenous", "aboriginal", "reconciliation",
-  #"first nations", "first nation",                         ## HASHED
-  "firstnations", "firstnation",
-  "indeginous", "native"))))
-
-ces25.indigenous <- runDictionary(ces25, cps25_imp_iss, dictionnaryindigenous)
-ces25$indigenous <- ces25.indigenous$indigenous
-ces25 <- ces25 %>% mutate(indigenous.dum = ifelse(indigenous >= 1, 1, 0))
-
-
-## ---- Other Welfare ---------------------------------------------------
-dictionnarywelfare <- dictionary(list(welfare = cleanTerms(c(
-  "childcare", "children", "daycare", "dental", "welfare",
-  "social", "family", "families", "famille", "child",
-  "children's", "basicincome", "familiale", "familles",
-  "poverty", "assistance", "public", "pauvret",
-  "service", "services", "parental", "redistribution",
-  #"aide sociale", "social aid",                            ## HASHED
-  "aidesociale", "socialaid", "programssociale"))))
-
-ces25.welfare <- runDictionary(ces25, cps25_imp_iss, dictionnarywelfare)
-ces25$welfare <- ces25.welfare$welfare
-ces25 <- ces25 %>% mutate(welfare.dum = ifelse(welfare >= 1, 1, 0))
-
-
-## ---- Seniors ---------------------------------------------------------
-dictionnaryseniors <- dictionary(list(seniors = cleanTerms(c(
-  "pension", "pensions", "seniors", "senior", "aines", "ages",
-  "cpp", "elderly", "oas", "aging", "senior's", "retirement",
-  "âgées", "ainés", "65", "vieillisse", "viellesse",
-  "vielliesse", "vieux", "ainees", "aine", "vieillissement",
-  "veillesse", "pesion", "age",
-  #"old people",                                            ## HASHED
-  "oldpeople", "retirees", "retraite", "retired", "senoir"))))
-
-ces25.seniors <- runDictionary(ces25, cps25_imp_iss, dictionnaryseniors)
-ces25$seniors <- ces25.seniors$seniors
-ces25 <- ces25 %>% mutate(seniors.dum = ifelse(seniors >= 1, 1, 0))
-
-
-## ---- Leaders ---------------------------------------------------------
-dictionnaryleaders <- dictionary(list(leaders = cleanTerms(c(
-  "carney", "mark", "libéral", "libral", "liberals",
-  "leadership", "leader", "justin", "conservatives", "parties",
-  "leaders", "pm", "andrew", "sheer", "singh", "blanchet", "ndp",
-  "bloc", "green", "paul", "may", "otoole", "trudeau",
-  "toole", "bernier", "politician", "trudeau's", "o'toole",
-  "libéraux", "ford", "scheer",
-  #"prime minister",                                        ## HASHED
-  "primeminister",
-  "candidate", "candidates", "liberal", "pierre", "poilievre",
-  "conservateurs", "conservateur", "carnay", "marc",
-  "conservatrices", "poliviere", "conservative"))))
-
-ces25.leaders <- runDictionary(ces25, cps25_imp_iss, dictionnaryleaders)
-ces25$leaders <- ces25.leaders$leaders
-ces25 <- ces25 %>% mutate(leaders.dum = ifelse(leaders >= 1, 1, 0))
-
-
-## ---- Quebec ----------------------------------------------------------
-dictionnaryquebec <- dictionary(list(quebec = cleanTerms(c(
-  "quebec", "21", "qubec", "francophone", "lacit", "laicit",
-  "laicite", "québec", "québécois"))))
-
-ces25.quebec <- runDictionary(ces25, cps25_imp_iss, dictionnaryquebec)
-ces25$quebec <- ces25.quebec$quebec
-ces25 <- ces25 %>% mutate(quebec.dum = ifelse(quebec >= 1, 1, 0))
-
-
-## ---- Housing ---------------------------------------------------------
-dictionnaryhousing <- dictionary(list(housing = cleanTerms(c(
-  "housing", "affordable", "rent", "homeless", "rental",
-  "unaffordable", "renting", "home", "homes", "dwelling",
-  "loyer", "maisons", "sans-abris", "logement", "logements",
-  "rents", "homelessness", "housingaffordability",
-  "itinérance", "inflationhousingrenting"))))
-
-ces25.housing <- runDictionary(ces25, cps25_imp_iss, dictionnaryhousing)
-ces25$housing <- ces25.housing$housing
-ces25 <- ces25 %>% mutate(housing.dum = ifelse(housing >= 1, 1, 0))
-
-
-## ---- Non-answers -----------------------------------------------------
-dictionnaryidk <- dictionary(list(idk = cleanTerms(c(
-  "99", "unsure", "dontknow", "jenesaispas", "idk",
-  #"prefer not",                                            ## HASHED
-  "prefernot",
-  #"no",   ## HASHED: "no" matched any response containing the word
-  ## ("no jobs", "no housing"), badly over-counting non-answers
-  "nothing", "none", "na", "jesaispas", "jaipasdereponse"))))
-
-ces25.idk <- runDictionary(ces25, cps25_imp_iss, dictionnaryidk)
-ces25$idk <- ces25.idk$idk
-ces25 <- ces25 %>% mutate(idk.dum = ifelse(idk >= 1, 1, 0))
-
-
-## ---- Summary of the results ------------------------------------------
-ces25 %>%
-  tbl_summary(
-    include = c(economy.dum, enviro.dum, immigration.dum,
-                healthcare.dum, housing.dum, seniors.dum, leaders.dum,
-                ethics.dum, education.dum, crime.dum, indigenous.dum,
-                welfare.dum, election.dum, women.dum, security.dum,
-                idk.dum, quebec.dum, race.dum, combined.dum,
-                tariff.dum, trump.dum, borders.dum),
-    label = list(
-      economy.dum     ~ "The Economy",
-      enviro.dum      ~ "The Environment",
-      immigration.dum ~ "Immigration",   ## FIX: was "=" instead of "~"
-      healthcare.dum  ~ "Healthcare",
-      housing.dum     ~ "Housing",
-      seniors.dum     ~ "Seniors",
-      leaders.dum     ~ "Party Leaders",
-      ethics.dum      ~ "Ethical Concerns",
-      education.dum   ~ "Education",
-      crime.dum       ~ "Crime",
-      indigenous.dum  ~ "Indigenous Issues and Reconciliation",
-      welfare.dum     ~ "Welfare",
-      election.dum    ~ "Electoral Reform",
-      women.dum       ~ "Women's Issues",
-      security.dum    ~ "Security and International Relations",
-      idk.dum         ~ "Don't know / did not answer",
-      quebec.dum      ~ "Quebec",
-      race.dum        ~ "Race",
-      combined.dum    ~ "US Relations, Trump and Tariffs",
-      tariff.dum      ~ "Tariffs",
-      trump.dum       ~ "Trump",
-      borders.dum     ~ "US Relations"))
-
-
-
-
-
-
-
-
-
-
-## =====================================================================
-## CES 2025 - Most Important Problem (cps25_imp_iss)
-## Dictionary coding ALIGNED TO THE 2021 CODING SCHEME
-##
-## Two problems are solved here.
-##
-## (1) MULTI-WORD PHRASES
-##     You write "first nations" normally in the term list. The script
-##     scans every term list, finds everything that is still multi-word
-##     after normalisation, and auto-generates the collapsing rule
-##     ("first nations" -> "firstnations"), then applies the identical
-##     rule to the survey responses before tokenising. Nothing is hashed
-##     out and there is no hand-maintained phrase_map to keep in sync.
-##     It is now impossible to add a phrase to a dictionary and have it
-##     silently fail to match.
-##
-## (2) 2021 ALIGNMENT
-##     Category names, numeric codes and value labels are taken from the
-##     2021 val_labels() block. The 2025 categories have been split and
-##     merged to fit. The `issue_scheme` object below is the single place
-##     where a category's name, code, label and terms live together, so
-##     they cannot drift apart.
-##
-## CROSSWALK 2025 script -> 2021 scheme
-## ---------------------------------------------------------------------
-##  2021 code / label          <- 2025 source
-##   1 Environment             <- enviro, minus the energy terms
-##   2 Crime                   <- crime + domestic-security half of `security`
-##   3 Ethics                  <- ethics
-##   4 Education               <- education
-##   5 Energy                  <- SPLIT OUT of enviro (pipeline/oil/gas/fossil)
-##   6 Jobs                    <- SPLIT OUT of economy
-##   7 Economy                 <- economy, after 6/9/10/18 are removed
-##   8 Health                  <- healthcare
-##   9 Taxes                   <- SPLIT OUT of economy
-##  10 Deficit_Debt            <- SPLIT OUT of economy
-##  11 Democracy               <- election
-##  12 Foreign_Affairs         <- international half of `security`
-##  13 Immigration             <- immigration
-##  14 Socio_Cultural          <- women + race + indigenous
-##  15 Social_Programs         <- welfare + seniors
-##  16 Brokerage               <- quebec
-##  17 Free_Trade              <- tariff   (2021 code 17 existed but was
-##                                          never assigned; tariffs fit it)
-##  18 Inflation               <- SPLIT OUT of economy (cost of living etc.)
-##  19 Housing                 <- housing
-##  20 COVID19                 <- kept for structural comparability; expect ~0
-##  21 US_Relations  ** NEW ** <- borders
-##  22 Trump         ** NEW ** <- trump
-##  23 Party_Leaders ** NEW ** <- leaders (2021 had no such code; these
-##                                         responses fell into Other)
-##   0 Other                   <- nothing matched
-##     mip_missing             <- idk (NOT a category; mirrors 2021)
-##
-## For a strict 2021-comparable series, pool 12 + 17 + 21 + 22 into
-## Foreign_Affairs and fold 23 back into Other. `mip21` at the bottom
-## does exactly that.
-## =====================================================================
-
-## ---- packages --------------------------------------------------------
-library(tidyverse)
-library(here)
-library(haven)
-library(labelled)
-library(quanteda)
-library(crayon)
-library(tictoc)
-library(gtsummary)
-library(stringi)
-
-data("ces25")
-
-RESP <- "cps25_imp_iss"   ## the open-ended column being coded
-
-
-## =====================================================================
-## SECTION 1 - THE CODING SCHEME
-##
-## One entry per category: name -> code, label, terms.
-##
-## Terms may use:
-##   * glob wildcards, exactly as in the 2021 str_detect() calls
-##     ("environ*", "democr*"). quanteda's tokens_lookup() uses
-##     valuetype = "glob" by default, so these work unchanged.
-##   * multi-word phrases ("cost of living", "first nations"), which are
-##     auto-collapsed - see Section 2.
-##   * accents, apostrophes, hyphens - all normalised away.
-##
-## IMPORTANT DIFFERENCE FROM 2021: matching is now per-TOKEN, not
-## substring. In 2021 str_detect(mip_lower, "ev") fired on "everything"
-## and "development"; str_detect(mip_lower, "na") fired on hundreds of
-## unrelated words; "old*" fired on "gold". Those are gone. If you rerun
-## 2021 through this machinery the counts WILL move, and they will move
-## in the right direction. Wildcards still give you the 2021 reach:
-## "environ*" matches the token "environnement" but not "unenvironed".
-## =====================================================================
-
-issue_scheme <- list(
-
-  ## ---- 1 Environment -------------------------------------------------
-  enviro = list(code = 1, label = "Environment", terms = c(
-    ## 2021 terms
-    "environ*", "climat*", "changement*", "climatiques", "ecolog*",
-    "écolog*", "pollution", "planet*", "planète", "drinking water",
-    "carbon", "carbone", "envion*", "envrion*", "ev", "emviron*", "verte",
-    "eniron*", "envirron*", "l'envér*", "l'air", "envir*", "clkmatique",
-    "pesticide*", "gaz a effet de serre", "nuclear", "cl8mate change",
-    "climet chang",
-    ## 2025 additions
-    "climate change", "warming", "rechauffement", "ges", "water",
-    "sustainability", "enviroment*", "enviorment*", "enviournment",
-    "enviornment", "enioroment", "envioroment", "co2", "polluer",
-    "pollute", "earth", "ecology", "greener", "environmentalism",
-    "lenvironnement", "lenrironnement", "lenvironement", "l'cologie",
-    "l'ecologie", "l'environnement")),
-  ## NOTE "green" is NOT here. In 2021 it sat in Environment; in 2025 it
-  ## collides with the Green Party (category 23). Left in neither -
-  ## decide which you want and put it in exactly one.
-
-  ## ---- 2 Crime -------------------------------------------------------
-  crime = list(code = 2, label = "Crime", terms = c(
-    ## 2021 terms
-    "crime*", "crimin*", "safe*", "law", "catch and release", "protests",
-    "terroris*",
-    ## 2021 put "security"/"securité" here; the international senses live
-    ## in category 12. See the overlap audit in Section 5.
-    "security", "securite", "securité", "sécuritaire", "securitaire",
-    ## 2025 additions
-    "criminalit*", "police", "policing", "gun", "guns", "violence",
-    "violent", "theft", "thefts", "murder", "gang", "gangs", "prison",
-    "prisons", "jail", "delinquance", "délinquance", "vandalism",
-    "trafficking", "fentanyl", "overdose")),
-
-  ## ---- 3 Ethics ------------------------------------------------------
-  ethics = list(code = 3, label = "Ethics", terms = c(
-    ## 2021 terms
-    "honest*", "honnet*", "honnête*", "honnêteté", "integrity", "integre*",
-    "intégri*", "ethic*", "éthique", "l'éthique", "corrupt*", "corupt*",
-    "truth", "vérité*", "justice", "trust", "fair*", "lying", "lieing*",
-    "liar*", "lie*", "crook*", "hypocrisy", "l'honn*", "l'intégr*",
-    "ėquité", "équité", "moral*", "decency", "promise*", "promesses",
-    "bad behavior", "in jail",
-    ## 2025 additions
-    "transparen*", "accountab*", "accountibility", "responsibility",
-    "responsible government", "governance", "trustworthy", "dishonesty",
-    "integretity", "credibility", "greed", "rights", "represented",
-    "gouvernement")),
-  ## NOTE "rights" also reads as Socio_Cultural (14) - see overlap audit.
-
-  ## ---- 4 Education ---------------------------------------------------
-  education = list(code = 4, label = "Education", terms = c(
-    "educat*", "éducat*", "educ", "ducation", "l'educat*", "l'ducation",
-    "deducation", "school", "schools", "schooling", "university",
-    "tuition", "tuitition", "student", "students", "student loan*",
-    "student funding", "student issue*", "loans and grants")),
-
-  ## ---- 5 Energy ------------------------------------------------------
-  ## SPLIT OUT of the 2025 enviro dictionary to restore the 2021 code 5.
-  energy = list(code = 5, label = "Energy", terms = c(
-    "pipeline*", "pipe", "energy", "energie", "énergie", "nergtiques",
-    "énergétique*", "energetique*", "oil", "petrole", "pétrole", "gas",
-    "fossil", "fossiles", "fuel", "electricity", "electricite",
-    "électricité", "hydro")),
-
-  ## ---- 6 Jobs --------------------------------------------------------
-  ## SPLIT OUT of the 2025 economy dictionary to restore the 2021 code 6.
-  jobs = list(code = 6, label = "Jobs", terms = c(
-    "job*", "employ*", "emploi*", "emploie", "income", "lowincome",
-    "low income", "d'oeuvre", "personnel", "work", "career", "salar*",
-    "unempl*", "unemployed", "unemployment", "travail")),
-  ## NOTE 2021 put "wage*" in Inflation (18), not Jobs. Kept there.
-
-  ## ---- 7 Economy -----------------------------------------------------
-  economy = list(code = 7, label = "Economy", terms = c(
-    ## 2021 terms
-    "econom*", "écon*", "ècon*", "ecnomic", "ecenomy", "ecomony",
-    "éconmique", "recovery", "economic recovery", "financ*", "money",
-    "l'argent", "argent", "largent", "wealth", "richesse*", "la richesse",
-    "interest rate*", "industry", "industrie", "growth", "développemen*",
-    "business concern*", "small business*", "commerces", "commerciale",
-    "middle class", "classe moyenne", "the classes", "rich and the rest",
-    "pay increase*", "raises", "fighting big tech", "infrastructure*",
-    ## 2025 additions
-    "enconomie", "ecomomie", "econamy", "ecomomy", "econics", "evonomy",
-    "leconomie", "l'economie", "l'conomie", "conomi*", "con",
-    "market", "recession", "trade", "trading", "loans", "dollars",
-    "investment*", "investissements", "inequality", "poor")),
-  ## NOTE "poor" is also Social_Programs in 2021. See overlap audit.
-
-  ## ---- 8 Health ------------------------------------------------------
-  health = list(code = 8, label = "Health", terms = c(
-    ## 2021 terms
-    "health*", "heath*", "helath", "heaalthcare", "heaith care",
-    "heakth caew", "hralthcare", "healtcare", "sant*", "pharma*",
-    "long term*", "longterm care", "medical*", "medicine", "medicare",
-    "medicaid", "medicade", "opioid", "opiod", "overdose", "drug*",
-    "doctor*", "docteur", "prescript*", "optometr*", "bill 124",
-    ## 2025 additions
-    "care", "soin", "soins", "life", "mental", "disability", "disabled",
-    "hospitals", "bien etre", "bien être", "wellbeing")),
-
-  ## ---- 9 Taxes -------------------------------------------------------
-  ## SPLIT OUT of the 2025 economy dictionary to restore the 2021 code 9.
-  taxes = list(code = 9, label = "Taxes", terms = c(
-    "tax", "tax*", "taxe*", "taxs", "taxation", "tqxes", "impot*",
-    "impôt*", "impts", "d'impot", "d'impôt*", "d'impo", "d'impt")),
-
-  ## ---- 10 Deficit / Debt ---------------------------------------------
-  ## SPLIT OUT of the 2025 economy dictionary to restore the 2021 code 10.
-  debt = list(code = 10, label = "Deficit_Debt", terms = c(
-    "debt", "dept", "debit", "dette*", "la dette", "l'endettement",
-    "deficit*", "défic*", "defic*", "defec*", "dficit*", "budget*",
-    "budjet*", "bugdet*", "budgè*", "buget", "budgtaire", "budgétaire",
-    "fiscal*", "spend*", "government spend*", "government waste",
-    "depense*", "dépense*", "dpense", "austerity", "balanced")),
-
-  ## ---- 11 Democracy --------------------------------------------------
-  democracy = list(code = 11, label = "Democracy", terms = c(
-    "democr*", "démocr*", "demovracy", "demo0cr5atic", "elect*", "élect*",
-    "vot*", "ballot*", "scrutin", "constitution", "representation",
-    "first past the post", "proportional")),
-  ## NOTE 2021 also had a bare "federal" here, which duplicated
-  ## "fédéral*" in Brokerage. Dropped - it belongs in 16.
-
-  ## ---- 12 Foreign Affairs --------------------------------------------
-  foreign = list(code = 12, label = "Foreign_Affairs", terms = c(
-    ## 2021 terms
-    "peace", "war", "wars", "chin*", "foreign", "foreign policy",
-    "defence", "defense", "défense", "armed force*", "israel", "jew*",
-    "gaza", "travel restriction*",
-    ## 2025 additions
-    "international", "relations", "global", "military", "armes",
-    "weapons", "palestin*", "interference", "ingerence", "ingérence",
-    "geopolitique*", "géopolitique*", "national security", "nato", "otan",
-    "ukraine", "russia", "russie")),
-  ## NOTE 2021 put "border" and "usa" here. In 2025 those carry a
-  ## different meaning (annexation / 51st state) and live in code 21.
-
-  ## ---- 13 Immigration ------------------------------------------------
-  immigration = list(code = 13, label = "Immigration", terms = c(
-    "immigr*", "imigr*", "inmigr*", "imagrat*", "immagr*", "immegrants",
-    "immgration", "l'immigr*", "l'imigr*", "limmigration", "d'immigrant",
-    "emigration", "émigrat*", "refugee*", "refudgee", "réfugiés",
-    "third world people", "visa*", "sponsor", "illegal*", "illégale",
-    "illgale")),
-  ## NOTE 2021 had "frontiere" here; in 2025 border language is code 21.
-
-  ## ---- 14 Socio-Cultural ---------------------------------------------
-  socio_cultural = list(code = 14, label = "Socio_Cultural", terms = c(
-    ## 2021 terms
-    "trans", "identity", "values", "equal*", "equity", "égalité", "human*",
-    "indig*", "indigenous*", "indeginous", "aboriginal", "native",
-    "autochtone*", "minorit*", "rights", "droit*", "gun*", "firearm*",
-    "fire arm*", "weapons ownership", "abort*", "unborn", "freedom",
-    "libert*", "liberté", "free speech", "accessibility", "anti-semitism",
-    "antisemitism", "divers*", "lgbt*", "woke", "c-6", "c-71",
-    "cancel-culture", "inclusiv*", "cultur*", "women*", "woman*",
-    "feministe", "feminine", "islamophob*", "islamaphobia", "race",
-    "racis*", "animal", "arts", "treaty", "trc", "reconcil*",
-    "false information", "fake information", "fake news", "misinformation",
-    "desinformation", "credible information", "media", "land agreement*",
-    "family issue*", "youth issue*",
-    ## 2025 additions
-    "first nations", "first nation", "abortions", "reproductive",
-    "maternity", "femme", "femmes", "gender", "discrimination", "black",
-    "white", "langue")),
-  ## NOTE 2021 had "racis*" in Social_Programs. That was a
-  ## mis-assignment; moved here. 2021 also had "reconcil*" in BOTH
-  ## Socio_Cultural and Brokerage - now here only.
-
-  ## ---- 15 Social Programs --------------------------------------------
-  social = list(code = 15, label = "Social_Programs", terms = c(
-    ## 2021 terms
-    "poverty", "pauvr*", "pauvreté", "impoverish*", "poor", "child*",
-    "enfant*", "homeless*", "senior*", "senoir*", "seanor", "old*",
-    "old people", "elder*", "age*", "agee*", "agée*", "âgé*", "âgées",
-    "ainé*", "ainee*", "aine*", "aîné*", "vieill*", "viell*", "vieux",
-    "retir*", "retrait*", "retraités", "retirees", "pension*", "pesion",
-    "universal basic*", "basic income", "ubi", "day*", "daycare",
-    "childcare", "social*", "disab*", "sick leave", "reserve*", "cerb",
-    "pcre", "pcu", "ccb", "cpp", "oas", "odsp", "ltc", "ei", "wsib",
-    "autis*", "veteran*", "65", "60 ans", "under-privileged", "benefits",
-    "family support", "funding", "funds", "la population", "famille*",
-    "soutien", "fonds", "garde*",
-    ## 2025 additions
-    "dental", "welfare", "family", "families", "assistance", "service",
-    "services", "parental", "redistribution", "aide sociale",
-    "social aid", "programs sociale", "programmes sociaux", "familiale",
-    "vieillissement")),
-  ## NOTE "ubi" was in Brokerage in 2021 - clearly a typo-level error,
-  ## moved here. 2021's "ei" and "65" were substring-matched and fired
-  ## constantly; as tokens they are now safe.
-
-  ## ---- 16 Brokerage --------------------------------------------------
-  brokerage = list(code = 16, label = "Brokerage", terms = c(
-    "provinc*", "provincia*", "juridiction*", "jurisdiction",
-    "province jurisdiction", "federalis*", "fédéral*", "federal",
-    "quebec", "québec", "qubec", "qiebec", "québécois", "quebecois",
-    "franc*", "français", "francais", "franco*", "francophone",
-    "autonomie", "unity", "unité", "bill 96", "loi 21", "bill 21",
-    "laicit*", "laïcit*", "lacit")),
-  ## NOTE the 2025 script had a bare "21" here for loi 21. As a token
-  ## that matches any stray "21"; replaced with the phrases above.
-
-  ## ---- 17 Free Trade / Tariffs ---------------------------------------
-  ## Code 17 was defined in the 2021 val_labels but never assigned.
-  ## Reused rather than inventing a new number.
-  tariff = list(code = 17, label = "Free_Trade", terms = c(
-    "tariff*", "tarriff*", "tarrif*", "tarif*", "terrifs", "thariff",
-    "economytariffs", "taxestariffs", "trade war", "big beautiful bill",
-    "protectionis*", "usmca", "cusma", "nafta", "aceum")),
-  ## NOTE "economist"/"économiste" were in the 2025 tariff dictionary.
-  ## They are economy words and were inflating this count. Removed.
-
-  ## ---- 18 Inflation --------------------------------------------------
-  ## SPLIT OUT of the 2025 economy dictionary to restore the 2021 code 18.
-  inflation = list(code = 18, label = "Inflation", terms = c(
-    "inflation", "price*", "prix", "cost", "costs", "cout", "coût",
-    "lecout", "cost of living", "costofliving", "rising cost",
-    "afford*", "affordability", "afforability", "unaffordable",
-    "expensive", "living", "wage*", "base rate", "food", "grocer*",
-    "epicerie", "épicerie", "phone plan*")),
-
-  ## ---- 19 Housing ----------------------------------------------------
-  housing = list(code = 19, label = "Housing", terms = c(
-    "housing", "housingaffordability", "inflationhousingrenting",
-    "logement*", "rent", "rents", "rental", "renting", "loyer", "home",
-    "homes", "hpmes", "house*", "dwelling", "maison*", "propri*",
-    "homeless*", "sans-abris", "sans abris", "itinerance", "itinérance")),
-
-  ## ---- 20 COVID-19 ---------------------------------------------------
-  ## Kept so the 2021 and 2025 tables have the same rows. Expect ~0 in
-  ## 2025. Note "19" alone is useless post-normalisation because
-  ## "covid-19" collapses to the single token "covid19".
-  covid = list(code = 20, label = "COVID19", terms = c(
-    "covid", "covid19", "covid 19", "co-vid", "co vid", "convid", "copid",
-    "covic", "cobid", "covit", "cvid", "civid", "covis", "pandem*",
-    "pandém*", "pandè*", "pendé*", "pendemie", "pa ndemic", "pandémie",
-    "epidemic", "épidémie", "vaccine*", "vax*", "corona*", "virus",
-    "lockdown*", "return to normal", "retour normal", "normalité",
-    "get a shot")),
-
-  ## ---- 21 US Relations / Sovereignty  ** NEW ** -----------------------
-  us_relations = list(code = 21, label = "US_Relations", terms = c(
-    "border", "borders", "frontiere*", "frontière*", "annex*", "annexion",
-    "sovereignty", "sovreignty", "soveriegnty", "souverain*",
-    "souveraineté", "souverainté", "independen*", "indépend*",
-    "independance", "indépendance", "autonomy", "51st",
-    "us", "usa", "u.s.", "states", "the states", "etats unis",
-    "les etats unis", "états-unis", "etats-unis", "etatsunis", "etasunis",
-    "america", "american*", "americain*", "américain*", "neighbours",
-    "canadian identity", "keeping canada",
-    "l'intégrité territoriale", "lintegrite territoriale")),
-  ## NOTE bare "us" also catches the English pronoun. It is kept because
-  ## it was in the 2025 dictionary, but the audit in Section 5 will show
-  ## you how much it is doing. Strongly consider deleting it.
-
-  ## ---- 22 Trump  ** NEW ** -------------------------------------------
-  trump = list(code = 22, label = "Trump", terms = c(
-    "trump", "trumps", "trump's", "turmp", "dtrump", "bufoontrump",
-    "usatrump", "donald", "president", "président", "maga")),
-
-  ## ---- 23 Party Leaders  ** NEW ** -----------------------------------
-  ## 2021 had no leaders code; these responses fell into Other.
-  leaders = list(code = 23, label = "Party_Leaders", terms = c(
-    "carney", "carnay", "mark", "marc", "poilievre", "poliviere", "pierre",
-    "singh", "blanchet", "trudeau", "trudeau's", "justin", "scheer",
-    "sheer", "o'toole", "otoole", "toole", "bernier", "ford", "may",
-    "paul", "andrew", "leader*", "leadership", "pm", "prime minister",
-    "candidate*", "politician*", "parties", "liberal*", "libéral*",
-    "libéraux", "libral", "conservative*", "conservateur*",
-    "conservatrices", "ndp", "npd", "bloc"))
-)
-
-
-## ---- Non-answers (NOT a category - mirrors 2021's mip_missing) -------
-## `terms` are token/glob matches; `exact` are whole-response matches
-## (2021 used mip_lower == "x" for these). After normalisation every
-## punctuation-only response ("?", "...", "-") becomes "", so the single
-## exact entry "" covers all of them.
-missing_terms <- c(
-  "nothing", "nothinh", "nothibg", "nth", "none", "nil", "nul", "rien",
-  "aucun", "unsure", "unknown", "uninterested", "not sure",
-  "don't know", "dont know", "i don't know", "i do not know",
-  "don't knoe", "dnk", "d/k", "dunno", "idk", "sais pas", "ne sait pas",
-  "je ne sais pas", "je sais pas", "j'ai pas de reponse",
-  "no comment", "no issue", "no opinion", "no clue", "no interest",
-  "no point", "no particular issue", "no strong feeling", "undecided",
-  "neutral", "neutre", "netural", "not applicable", "n/a",
-  "don't care", "dont care", "don't have", "dont have",
-  "doesn't matter", "won't matter", "hard to pick", "not a citizen",
-  "prefer not", "prefer not to say", "-99", "99")
-## NOTE deliberately dropped from the 2021 list: bare "na", "pas",
-## "non", "oui", "good", "no", "hm", "ei". Under substring matching
-## they swallowed enormous numbers of real answers ("pas de logement",
-## "no jobs"). Genuine one-word junk is caught by `missing_exact`.
-
-missing_exact <- c(
-  "", "no", "n", "yes", "y", "oui", "non", "na", "nope", "not", "the",
-  "0", "1", "as", "f", "g", "j", "u", "x", "xxx", "ish", "oo", "td",
-  "cul", "yup", "good", "hm", "very nice", "bye felicia", "fuck off",
-  "i'm neutral", "je c po", "je men fou", "no ne", "no choice",
-  "no matters", "not interested", "don't have one", "do not have one",
-  "asdbf", "dssgdsdhsdg", "fghhjg", "gdfg", "gtghhgh", "gvfhyg", "hdfg",
-  "hgg", "hiouoi", "hohgj", "ijhiojlkuty7", "jjdjr", "rhrhrh", "sdfvfx",
-  "sfasegs", "sfdg", "tdfyfgj", "tyfytfyutiuyi", "t8a1z3", "ygggg",
-  "yfghgkjj", "gosrimtne", "heqlyhcate", "ha")
-
-
-## =====================================================================
-## SECTION 2 - NORMALISATION + AUTOMATIC PHRASE COLLAPSING
-## =====================================================================
-
-## Character-level normalisation. `keep_glob = TRUE` preserves the "*"
-## wildcards in dictionary terms; responses are cleaned without it.
-##   é -> e | "don't" -> "dont" | "health-care" -> "healthcare"
-##   "covid-19" -> "covid19" | "u.s." -> "us"
-normalizeText <- function(x, keep_glob = FALSE) {
-  punct <- if (keep_glob) "[^[:alnum:][:space:]*]" else "[^[:alnum:][:space:]]"
-  x %>%
-    as.character() %>%
-    tidyr::replace_na("") %>%
-    stringi::stri_trans_general("Latin-ASCII") %>%
-    stringr::str_to_lower() %>%
-    stringr::str_replace_all(punct, "") %>%
-    stringr::str_squish()
-}
-
-## Every term the script knows about, in one vector.
-all_raw_terms <- c(
-  unlist(lapply(issue_scheme, `[[`, "terms"), use.names = FALSE),
-  missing_terms, missing_exact)
-
-## The phrase set: anything still multi-word after normalisation.
-## Stored WITHOUT globs, because that is the form the responses take.
-phrase_set <- {
-  n <- normalizeText(all_raw_terms, keep_glob = TRUE)
-  p <- n[stringr::str_detect(n, "\\s")]
-  p <- stringr::str_squish(stringr::str_remove_all(p, "\\*"))
-  unique(p[nchar(p) > 0])
-}
-
-## Longest first, so "first past the post" is consumed before
-## "first nation", and "les etats unis" before "etats unis".
-phrase_set <- phrase_set[order(
-  -stringr::str_count(phrase_set, "\\S+"), -nchar(phrase_set))]
-
-## Replacement map applied to RESPONSES.
-## Leading \\b only: omitting the trailing boundary lets "student loans"
-## and "middle classes" collapse too, which is what you want given the
-## glob terms on the dictionary side.
-phrase_map <- stats::setNames(
-  stringr::str_remove_all(phrase_set, "\\s"),
-  paste0("\\b", phrase_set))
-
-message(crayon::cyan(sprintf(
-  "Auto-detected %d multi-word phrase(s) across %d categories.",
-  length(phrase_map), length(issue_scheme))))
-print(utils::head(data.frame(
-  phrase = phrase_set,
-  token  = unname(phrase_map),
-  row.names = NULL), 60))
-
-## Responses: normalise, then collapse phrases.
-cleanText <- function(x) {
-  out <- normalizeText(x, keep_glob = FALSE)
-  if (length(phrase_map) > 0) out <- stringr::str_replace_all(out, phrase_map)
-  stringr::str_squish(out)
-}
-
-## Dictionary terms: normalise keeping globs, then collapse the whole
-## term to one token if (glob-stripped) it is a known phrase.
-cleanTerms <- function(terms) {
-  n    <- normalizeText(terms, keep_glob = TRUE)
-  bare <- stringr::str_squish(stringr::str_remove_all(n, "\\*"))
-  out  <- ifelse(bare %in% phrase_set, stringr::str_remove_all(n, "\\s"), n)
-  unique(out[nchar(out) > 0])
-}
-
-
-## ---- clean the responses --------------------------------------------
-## The old 2025 script contained
-##   sub("^(\\w+)\\s+(\\w+)$", "\\2 \\1", ces25$cps25_imp_iss)
-## which silently REVERSED the word order of every two-word response
-## ("climate change" -> "change climate"). It is gone. Do not reinstate.
-ces25$mip_lower <- cleanText(ces25[[RESP]])
-
-
-## =====================================================================
-## SECTION 3 - RUN THE DICTIONARIES
-## =====================================================================
-
-toks <- quanteda::tokens(ces25$mip_lower)
-
-runDictionary <- function(toks, terms, key) {
-  d <- quanteda::dictionary(stats::setNames(list(cleanTerms(terms)), key))
-  m <- quanteda::dfm(quanteda::tokens_lookup(
-    toks, d, valuetype = "glob", nested_scope = "dictionary"))
-  m <- quanteda::dfm_match(m, features = key)
-  as.integer(quanteda::convert(m, to = "data.frame")[[key]])
-}
-
-tictoc::tic("all dictionaries")
-for (nm in names(issue_scheme)) {
-  hits <- runDictionary(toks, issue_scheme[[nm]]$terms, nm)
-  ces25[[paste0(nm, "_mip")]] <- as.integer(hits >= 1)
+## adds both the count (enviro) and the dummy (enviro.dum).
+## `word` here is the column NAME as a string, so nothing has to be
+## forwarded through tidy evaluation inside the loop below.
+codeCategory <- function(dataA, word, dictionaryA) {
+  key  <- names(dictionaryA)[1]
+  hits <- lookupCounts(dataA[[word]], dictionaryA)
+  dataA[[key]]                  <- hits
+  dataA[[paste0(key, ".dum")]]  <- as.integer(hits >= 1)
   message(crayon::green(sprintf(
-    "%-15s (code %2d) %5d responses  %5.1f%%",
-    issue_scheme[[nm]]$label, issue_scheme[[nm]]$code,
-    sum(hits >= 1), 100 * mean(hits >= 1))))
+    "%-15s %5d of %d responses matched (%.1f%%)",
+    key, sum(hits >= 1), length(hits), 100 * mean(hits >= 1))))
+  dataA
 }
-tictoc::toc()
 
-## Non-answers. Named mip_missing, and deliberately NOT ending in "_mip",
-## so it stays out of the rowSums() below - same convention as 2021.
-mm_hits <- runDictionary(toks, missing_terms, "missing")
-ces25$mip_missing <- as.integer(
-  mm_hits >= 1 | ces25$mip_lower %in% cleanText(missing_exact))
+## =====================================================================
+## 5. CODE EVERY CATEGORY
+## =====================================================================
+for (k in names(mip_dicts)) {
+  ces25 <- codeCategory(ces25, "mip_lower", mip_dicts[[k]])
+}
+
+## ---- how many issues did each respondent get coded into? -------------
+## combined is a union of trump/tariff/borders and idk is not an issue,
+## so neither counts towards the total.
+ces25$mip_total <- rowSums(as.data.frame(ces25[paste0(issue_cols, ".dum")]))
+
+## ---- non-answers -----------------------------------------------------
+## The CES21 script also lists dozens of exact junk strings; the ones that
+## survive cleaning are here, plus anything that cleans to nothing at all
+## ("?", "...", "$", "-") and any one- or two-character response that no
+## dictionary caught.
+mip_junk <- cleanText(c(
+  "", "?", "??", "???", ".", "...", ".....", "-", "$", "0", "1", "no", "non",
+  "oui", "yes", "yup", "n", "x", "xxx", "y", "u", "f", "g", "j", "as", "the",
+  "hm", "ish", "nul", "nth", "no ne", "nope", "nothinh", "nothibg", "cul",
+  "dnk", "d/k", "n/a", "na", "unknown", "netural", "very nice", "ha!",
+  "good", "bad", "blah", "click", "clicks", "asdasd", "all", "everything",
+  "bye felicia", "fuck off", "i'm neutral", "je c po", "je men fou"))
+
+ces25 <- ces25 %>%
+  mutate(idk.dum = as.integer(
+    idk >= 1 |
+      mip_lower %in% mip_junk |
+      (mip_total == 0 & nchar(mip_lower) <= 2)))
+
 message(crayon::green(sprintf(
-  "%-15s          %5d responses  %5.1f%%", "Non-answer",
-  sum(ces25$mip_missing), 100 * mean(ces25$mip_missing))))
-
-## Supplementary 2025-only composite: Trump + Tariffs + US Relations.
-## Built as the union of its components rather than a fourth hand-typed
-## copy that can drift. Named *_dum, NOT *_mip, so it cannot double-count
-## in mip_total.
-ces25$us_combined_dum <- as.integer(
-  ces25$trump_mip + ces25$tariff_mip + ces25$us_relations_mip >= 1)
-
+  "non-answers: %d of %d (%.1f%%)",
+  sum(ces25$idk.dum), nrow(ces25), 100 * mean(ces25$idk.dum))))
 
 ## =====================================================================
-## SECTION 4 - THE 2021 mip PIPELINE
-## Same logic as 2021: count how many issues each respondent triggered,
-## keep the single-issue respondents, map them onto the numeric scheme.
+## 6. WHAT IS STILL UNCODED
 ## =====================================================================
-
-ces25 <- ces25 %>%
-  mutate(mip_total = rowSums(across(ends_with("_mip")), na.rm = TRUE))
-
-## How many respondents triggered 0, 1, 2, ... categories
-table(ces25$mip_total)
-
-## 2021 defined a "single" respondent as mip_total == 1
-ces25 <- ces25 %>% mutate(mip_single = as.integer(mip_total == 1))
-
-## mip2: the category NAME, for single-issue respondents only.
-mip_cols <- paste0(names(issue_scheme), "_mip")
-M <- as.matrix(ces25[, mip_cols])
-ces25$mip2 <- ifelse(
-  rowSums(M, na.rm = TRUE) == 1,
-  names(issue_scheme)[max.col(M, ties.method = "first")],
-  NA_character_)
-
-## mip: the numeric code. Built by lookup from issue_scheme, so the
-## numbers cannot drift from the labels the way a hand-written
-## case_when() chain does.
-code_lookup  <- vapply(issue_scheme, `[[`, numeric(1), "code")
-ces25$mip    <- unname(code_lookup[ces25$mip2])
-## Everyone who answered something codeable but matched nothing -> Other
-ces25$mip[is.na(ces25$mip) & ces25$mip_total == 0 & ces25$mip_missing == 0] <- 0
-
-label_lookup <- vapply(issue_scheme, `[[`, character(1), "label")
-val_labels(ces25$mip) <- stats::setNames(
-  c(0, unname(code_lookup)), c("Other", unname(label_lookup)))
-
-table(as_factor(ces25$mip), useNA = "ifany")
-
-## ---- strict 2021-comparable collapse ---------------------------------
-## Pools the three 2025-only US codes into Foreign_Affairs and folds
-## Party_Leaders back into Other, so the series lines up with 2021.
-ces25 <- ces25 %>%
-  mutate(mip21 = case_when(
-    mip %in% c(17, 21, 22) ~ 12,
-    mip == 23              ~ 0,
-    TRUE                   ~ mip))
-val_labels(ces25$mip21) <- c(
-  Other = 0, Environment = 1, Crime = 2, Ethics = 3, Education = 4,
-  Energy = 5, Jobs = 6, Economy = 7, Health = 8, Taxes = 9,
-  Deficit_Debt = 10, Democracy = 11, Foreign_Affairs = 12,
-  Immigration = 13, Socio_Cultural = 14, Social_Programs = 15,
-  Brokerage = 16, Free_Trade = 17, Inflation = 18, Housing = 19,
-  COVID19 = 20)
-
-table(as_factor(ces25$mip21), useNA = "ifany")
-
-
-## =====================================================================
-## SECTION 5 - AUDITS. Run these before you report anything.
-## =====================================================================
-
-## (a) OVERLAP. A term in two categories pushes respondents to
-##     mip_total == 2, which sets mip to NA and DESTROYS the case.
-##     This was doing real damage in 2021 ("reconcil*" in both
-##     Socio_Cultural and Brokerage, "sécurité" in both Crime and
-##     Foreign_Affairs, "poor" in both Economy and Social_Programs).
-overlapTerms <- function(scheme) {
-  long <- purrr::imap_dfr(scheme, ~ tibble::tibble(
-    category = .y, term = cleanTerms(.x$terms)))
-  long %>%
-    group_by(term) %>%
-    filter(n() > 1) %>%
-    summarise(categories = paste(sort(category), collapse = " + "),
-              .groups = "drop") %>%
-    arrange(categories, term)
-}
-overlaps <- overlapTerms(issue_scheme)
-message(crayon::yellow(sprintf(
-  "%d term(s) appear in more than one category.", nrow(overlaps))))
-print(overlaps, n = 200)
-
-## (b) DEAD TERMS. Terms that match nothing in the data - usually
-##     typos-of-typos carried over from a previous wave.
-deadTerms <- function(scheme, cleaned_responses) {
-  toks_seen <- unique(unlist(stringr::str_split(cleaned_responses, "\\s+")))
-  toks_seen <- toks_seen[nchar(toks_seen) > 0]
-  purrr::imap_dfr(scheme, function(x, nm) {
-    cl   <- cleanTerms(x$terms)
-    live <- vapply(cl, function(t)
-      any(grepl(utils::glob2rx(t), toks_seen)), logical(1))
-    if (all(live)) return(NULL)
-    tibble::tibble(category = nm, term = cl[!live])
-  })
-}
-dead <- deadTerms(issue_scheme, ces25$mip_lower)
-message(crayon::yellow(sprintf(
-  "%d dictionary term(s) match nothing in the data.", nrow(dead))))
-print(dead, n = 300)
-
-## (c) UNCODED. The 2021 workflow: look at what fell through, add terms,
-##     rerun. Repeat until the tail is genuinely idiosyncratic.
+## Run this, look at the top of the list, add the words you see to the
+## right category in mip_terms, re-run. This is the CES21 workflow.
 ces25 %>%
-  filter(mip_total == 0, mip_missing == 0) %>%
+  filter(mip_total < 1, idk.dum < 1) %>%
   count(mip_lower, sort = TRUE) %>%
   print(n = 200)
 
-ces25 %>% filter(mip_total == 0, mip_missing == 0) %>% nrow()
-
-## (d) How much work is bare "us" doing in US_Relations? If most of these
-##     are the pronoun, delete "us" from that term list.
 ces25 %>%
-  filter(us_relations_mip == 1, stringr::str_detect(mip_lower, "\\bus\\b")) %>%
+  filter(mip_total < 1, idk.dum < 1) %>%
   count(mip_lower, sort = TRUE) %>%
-  print(n = 50)
-
+  write_csv("2025_mip_uncoded.csv")
 
 ## =====================================================================
-## SECTION 6 - SUMMARY TABLE
+## 7. SUMMARY OF THE RESULTS
 ## =====================================================================
-
-tbl_labels <- stats::setNames(
-  as.list(unname(label_lookup)), paste0(names(issue_scheme), "_mip"))
-
+## Percentages add to well over 100: a response can be coded into more
+## than one category, exactly as in CES21.
 ces25 %>%
   tbl_summary(
-    include = c(all_of(mip_cols), mip_missing, us_combined_dum),
-    label   = c(tbl_labels, list(
-      mip_missing     ~ "Don't know / did not answer",
-      us_combined_dum ~ "US Relations, Trump and Tariffs (composite)")))
+    include = c(economy.dum, inflation.dum, housing.dum, health.dum,
+                jobs.dum, taxes.dum, debt.dum, enviro.dum, energy.dum,
+                immigration.dum, crime.dum, ethics.dum, education.dum,
+                democracy.dum, foreign.dum, socio_cultural.dum, social.dum,
+                brokerage.dum, leaders.dum, combined.dum, trump.dum,
+                tariff.dum, borders.dum, idk.dum),
+    label = list(
+      economy.dum        ~ "The Economy",
+      inflation.dum      ~ "Inflation and Cost of Living",
+      housing.dum        ~ "Housing",
+      health.dum         ~ "Health and Health Care",
+      jobs.dum           ~ "Jobs",
+      taxes.dum          ~ "Taxes",
+      debt.dum           ~ "Debt and Deficit",
+      enviro.dum         ~ "The Environment",
+      energy.dum         ~ "Energy",
+      immigration.dum    ~ "Immigration",
+      crime.dum          ~ "Crime",
+      ethics.dum         ~ "Ethics and Government",
+      education.dum      ~ "Education",
+      democracy.dum      ~ "Democracy and Electoral Reform",
+      foreign.dum        ~ "Foreign Affairs",
+      socio_cultural.dum ~ "Socio-Cultural Issues",
+      social.dum         ~ "Social Programs",
+      brokerage.dum      ~ "Brokerage (Quebec, Fed-Prov)",
+      leaders.dum        ~ "Party Leaders",
+      combined.dum       ~ "US Relations, Trump and Tariffs",
+      trump.dum          ~ "Trump",
+      tariff.dum         ~ "Tariffs",
+      borders.dum        ~ "US Relations",
+      idk.dum            ~ "Don't know / did not answer"))
+
+## =====================================================================
+## 8. SINGLE-ISSUE VARIABLE (the CES21 mip / mip2 construction)
+## =====================================================================
+## Respondents coded into exactly one category get that category; anyone
+## coded into two or more is NA, as in ces21_recode.R.
+dum_mat <- as.matrix(as.data.frame(ces25[paste0(issue_cols, ".dum")]))
+
+ces25$mip_single <- as.integer(ces25$mip_total == 1)
+
+which_one <- apply(dum_mat, 1, function(r) {
+  w <- which(r == 1)
+  if (length(w) == 1) w else NA_integer_
+})
+
+ces25$mip2 <- issue_cols[which_one]
+ces25$mip  <- unname(mip_codes[ces25$mip2])
+
+## coded into nothing and not a refusal -> Other
+ces25$mip[ces25$mip_total == 0 & ces25$idk.dum == 0] <- 0
+
+## the CES21 label set, minus COVID, plus the 2025 additions
+val_labels(ces25$mip) <- c(
+  Other = 0, Environment = 1, Crime = 2, Ethics = 3, Education = 4,
+  Energy = 5, Jobs = 6, Economy = 7, Health = 8, Taxes = 9,
+  Deficit_Debt = 10, Democracy = 11, Foreign_Affairs = 12, Immigration = 13,
+  Socio_Cultural = 14, Social_Programs = 15, Brokerage = 16, Free_Trade = 17,
+  Inflation = 18, Housing = 19, COVID19 = 20,
+  Trump = 21, Tariffs = 22, US_Relations = 23, Leaders = 24)
+
+table(ces25$mip2)
+table(as_factor(ces25$mip))
+table(ces25$mip_total)
+
+## =====================================================================
+## 9. SELF TEST - confirms the pipeline still does what it says
+## =====================================================================
+## Run mip_selftest() after editing mip_terms. Every probe is a response
+## that must land in the category named beside it; the multi-word probes
+## are the ones that check the phrase map.
+mip_selftest <- function() {
+  probes <- c(
+    "cost of living"        = "inflation",
+    "Le coût de la vie" = "inflation",
+    "climate change"        = "enviro",
+    "l'environnement"       = "enviro",
+    "pipelines and oil"     = "energy",
+    "not enough jobs"       = "jobs",
+    "the economy"           = "economy",
+    "l'économie"       = "economy",
+    "health care"           = "health",
+    "santé"            = "health",
+    "taxes are too high"    = "taxes",
+    "government spending"   = "debt",
+    "electoral reform"      = "democracy",
+    "first past the post"   = "democracy",
+    "the war in Ukraine"    = "foreign",
+    "national security"     = "foreign",
+    "immigration"           = "immigration",
+    "gay rights"            = "socio_cultural",
+    "abortion"              = "socio_cultural",
+    "First Nations"         = "socio_cultural",
+    "women's issues"        = "socio_cultural",
+    "basic income"          = "social",
+    "old people"            = "social",
+    "Québec"           = "brokerage",
+    "loi 21"                = "brokerage",
+    "affordable housing"    = "housing",
+    "Trump"                 = "trump",
+    "tariffs"               = "tariff",
+    "the 51st state"        = "borders",
+    "Carney"                = "leaders",
+    "je ne sais pas"        = "idk",
+    "don't know"            = "idk",
+    ## regression probes - each of these was a real bug at some point
+    "freedom"               = "socio_cultural",
+    "la liberte"            = "socio_cultural",
+    "cost of living/taxes"  = "inflation",
+    "U.S. tariffs"          = "tariff",
+    "Canada-US relationship" = "borders",
+    "canadian sovereignity" = "borders")
+
+  txt <- cleanText(names(probes))
+  hit <- vapply(seq_along(probes), function(i) {
+    lookupCounts(txt[i], mip_dicts[[unname(probes[i])]]) >= 1
+  }, logical(1))
+
+  out <- data.frame(response = names(probes), expected = unname(probes),
+                    matched = hit, row.names = NULL)
+  print(out, row.names = FALSE)
+  if (all(hit)) {
+    message(crayon::green(sprintf("all %d probes matched", length(hit))))
+  } else {
+    message(crayon::red(paste("FAILED:",
+                              paste(names(probes)[!hit], collapse = " | "))))
+  }
+  invisible(out)
+}
+
+mip_selftest()
