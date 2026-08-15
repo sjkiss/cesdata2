@@ -21,9 +21,10 @@
 ##    8 Health                (17 Free Trade - not coded, as in CES21)
 ##    9 Taxes                  18 Inflation         <- cost of living
 ##   10 Debt and Deficit       19 Housing
-##                            (20 COVID - DROPPED for 2025)
+##                             20 is unused - no covid category in 2025
 ##   CES25-only additions:
 ##   21 Trump  22 Tariffs  23 US Relations / Borders  24 Leaders
+##   25 Multiple issues (respondent would not pick one)
 ##
 ## CHANGES FROM THE PREVIOUS CES25 SCRIPT
 ## --------------------------------------
@@ -50,6 +51,20 @@
 ##  * Multi-word patterns ("cost of living", "basic income", "free speech",
 ##    "first past the post", ...) are handled automatically - see the
 ##    phrase-map section below.
+##
+## CODING DECISIONS TAKEN ON THE 2025 UNCODED LIST
+## -----------------------------------------------
+##  * Canada-under-threat answers ("stand up for canada", "strong canada",
+##    "proteger le canada") -> borders, alongside "keeping canada" and
+##    "canadian identity", which were already there. Bare "canada" is NOT
+##    coded - it would fire on "canada needs housing".
+##  * Democratic-backsliding words (fascism, dictatorship, authoritarian,
+##    extremism, tyranny, rule of law) -> democracy. Ideology POSITION
+##    words (far right, la droite) stay uncoded, as in CES21.
+##  * Natural resources / ring of fire / Bill C-69 -> energy. Bare
+##    "resource*" is NOT coded - "more resources for schools" is education.
+##  * "Would not pick one issue" answers -> new code 25, kept OUT of the
+##    non-answer list because these are engaged responses, not refusals.
 ##
 ## HOW TO EDIT: every category's vocabulary lives in ONE place, the
 ## mip_terms list in part 2. Add a word there and everything downstream
@@ -93,7 +108,9 @@ prepText <- function(x, keep_glob = FALSE) {
     tidyr::replace_na("") %>%
     stringi::stri_trans_general("Latin-ASCII") %>%   ## e -> e, o -> o
     stringr::str_to_lower() %>%
-    stringr::str_remove_all("[’'`.]") %>%       ## elisions and u.s.
+    ## the \u2019 escape keeps this file pure ASCII, so nothing here can
+    ## break if the script is ever saved in a non-UTF-8 encoding
+    stringr::str_remove_all("['\u2019`.]") %>%   ## elisions and u.s.
     stringr::str_replace_all(sep, " ") %>%
     stringr::str_squish()
 }
@@ -123,8 +140,7 @@ buildPhraseMap <- function(term_list, extra = character()) {
 ##      alternation, not as 300 successive str_replace_all() calls. Applied
 ##      one after another they cascade: "le cout de la vie" was being cut
 ##      to "lecout de la vie" by an earlier pattern before the longer
-##      "cout de la vie" could match it. The trailing \\w* lets a phrase
-##      absorb its own plural, so "student loans" -> "studentloans".
+##      "cout de la vie" could match it.
 collapsePhrases <- function(x, map) {
   if (length(map) == 0) return(x)
   ## FIX: a phrase absorbs its own plural ("student loans" -> studentloans)
@@ -170,7 +186,7 @@ cleanTerms <- function(terms) {
 ## patterns that were quietly matching inside other words are safe here:
 ## "ei", "65", "oas", "cpp", "ltc", "na" only fire when they are the whole
 ## token. The CES21 patterns that CANNOT be rescued ("ev" for EV, "19" for
-## covid, "no" for a non-answer) are hashed out with a note where they
+## covid-19, "no" for a non-answer) are hashed out with a note where they
 ## would have gone.
 
 ## =====================================================================
@@ -210,8 +226,9 @@ mip_terms <- list(
     "water", "drinking water", "eau potable", "lair", "air quality",
     "qualite de lair", "wildfire*", "feux de foret", "flood*", "inondation*",
     "secheresse"
-    ## "ev" ## HASHED (CES21): as a substring it fired on every response
-    ##      containing "ev" - even/never/level. Add "evs" if you want EVs.
+    ## NOTE CES21's "ev" fired on every response containing those two
+    ##      letters (even/never/level). Token matching makes it safe, so
+    ##      "ev"/"evs" are live terms above.
     ## "61" ## HASHED (CES21): a stray code, not a word.
   ),
 
@@ -238,7 +255,8 @@ mip_terms <- list(
     ## honesty, corruption, integrity
     "honest*", "honesty", "honnet*", "honntet*", "dishonest*", "dishonesty",
     "integrity", "integrite", "lintegrite", "integretity", "intgrit*",
-    "corrupt*", "corupt*", "coruption", "ethic*", "ethical", "ethique*",
+    "corrupt*", "corupt*", "curupt*", "coruption", "bribe*", "bribery",
+    "conflict of interest", "ethic*", "ethical", "ethique*",
     "truth", "verite*", "lie", "lies", "lying", "lieing", "liar*",
     "menteur*", "mensonge*", "crook*", "hypocrisy", "hypocrite*",
     "moral*", "morality", "morals", "decency", "trust", "trustworthy",
@@ -282,7 +300,12 @@ mip_terms <- list(
     "nuclear", "nucleaire", "hydro", "hydroelectric*", "electricity",
     "electricite", "power grid", "renewable*", "renouvelable*",
     "solar", "solaire", "wind power", "eolien*",
-    "energy security", "energy prices", "keystone", "trans mountain"
+    "energy security", "energy prices", "keystone", "trans mountain",
+    ## -- resource development (2025). Deliberately NOT bare "resource*":
+    ##    "more resources for schools" is education, not energy.
+    "natural resource*", "ressources naturelles", "ressource naturelle",
+    "resource development", "developing our resources", "our resources",
+    "ring of fire", "bill c69", "c69"
   ),
 
   ## -- 6. Jobs ---------------------------------------------------------
@@ -379,7 +402,16 @@ mip_terms <- list(
     "proportional", "proportionnelle", "first past the post",
     "representation", "gerrymander*", "election interference",
     "voter turnout", "minority government*", "majority government*",
-    "coalition", "term limits"
+    "coalition", "term limits",
+    ## -- democratic backsliding (2025). The POSITION words (far right,
+    ##    left wing) stay uncoded in ideology_phrases; the THREAT words
+    ##    code here. "communism"/"capitalism"/"nationalism" are left out -
+    ##    they are diffuse, not claims about democratic institutions.
+    "fascism", "fascist*", "fascisme", "antifascism", "anti fascism",
+    "dictatorship*", "dictature", "dictator*", "authoritarian*",
+    "autoritaire", "autocracy", "autocratie", "totalitarian*",
+    "extremism", "extremist*", "extremisme", "tyranny", "oligarchy",
+    "rule of law", "democratic backsliding"
     ## "elect*" ## deliberately NOT used - it also matches electricity.
     ## "vot*"   ## deliberately NOT used - it also matches French "votre".
     ## "federal" ## CES21 files it here; in CES25 it is in brokerage.
@@ -395,7 +427,7 @@ mip_terms <- list(
     "global", "geopolitic*", "geopolitiques", "diplomacy", "diplomatie",
     "defence", "defense", "defens*", "military", "militaire*",
     "armed forces", "armee*", "troops", "nato", "otan",
-    "united nations", "onu", "weapons", "armes", "nuclear weapons",
+    "united nations", "onu", "weapons", "armes", "armement*", "nuclear weapons",
     "security", "national security", "securite", "securite nationale",
     "segurity", "scurit", "terroris*", "terrorisme",
     "interference", "ingerence", "foreign interference", "espionage",
@@ -410,7 +442,7 @@ mip_terms <- list(
     "*immigr*", "*imigr*", "*migrat*", "*migrant*", "inmigr*", "imagrat*",
     "immagr*", "immegrant*", "immgration", "emigration",
     "refugee*", "refugie*", "refudgee", "asylum", "asile",
-    "demandeurs dasile", "visa*", "sponsor", "newcomers",
+    "demandeurs dasile", "demandeur dasile", "visa*", "sponsor", "newcomers",
     "nouveaux arrivants", "illegal immigration", "illegals", "illegale*",
     "illgale", "clandestin*", "third world people",
     "temporary foreign workers", "tfw", "international students",
@@ -510,6 +542,7 @@ mip_terms <- list(
     "national unity", "unity", "unite", "unite nationale",
     "separatism", "separatiste*", "separation", "secession", "souverainisme",
     "quebec sovereignty", "souverainete du quebec", "quebec separation",
+    "souverainis*", "souverainiste*",
     "distinct society",
     "francophone*", "franco*", "francais*", "french", "langue*", "language*",
     "bilingual*", "bilinguisme",
@@ -553,7 +586,8 @@ mip_terms <- list(
 
   ## -- 21. Trump -------------------------------------------------------
   trump = c(
-    "trump*", "turmp", "dtrump", "bufoontrump", "usatrump", "donald",
+    "*trump*", "trump*", "trumo", "turmp", "dtrump", "bufoontrump", "usatrump",
+    "donald",
     "president*", "maga"
   ),
 
@@ -571,15 +605,39 @@ mip_terms <- list(
   borders = c(
     "border*", "frontiere*", "*frontier*", "annex*", "annexion",
     ## sovereignty is spelled a dozen different ways in the responses
-    "sove*", "sover*", "sovr*", "sovre*", "souver*", "soveir*",
-    "51st", "51st state", "51e etat",
+    "sove*", "sover*", "sovr*", "sovre*", "soveir*",
+    "souverainete", "souverainte", "souvereignity", "souverainty",
+    ## NOT "souver*": that also swallows souverainisme / souverainiste,
+    ## which is Quebec sovereignty and belongs in brokerage
+    "51st", "51st state", "51 state", "51e etat",
+    "etat unien*", "etat unienne", "etats uniennes", "etatunien*",
     "us", "usa", "america", "american*", "americain*", "states",
     "the states", "etats unis", "etat unis", "etatsunis", "etatunis", "etasunis",
     "united states", "canada us relations", "us relations",
     "*independ*", "*independan*",
     "autonomie", "autonomy", "integrite territoriale",
     "lintegrite territoriale", "canadian identity", "keeping canada",
-    "neighbours", "neighbors", "trump"
+    "neighbours", "neighbors", "trump",
+    ## -- Canada-under-threat answers (2025). Borders already held
+    ##    "keeping canada" and "canadian identity"; these are the same
+    ##    construct. Bare "canada" is deliberately NOT here - it would fire
+    ##    on "canada needs housing" - so the handful of responses that are
+    ##    only the word "canada" stay in Other.
+    "stand up for canada", "standing up for canada", "stand up to trump",
+    "strong canada", "strengthening canada", "canada strength",
+    "building canada", "building a strong canada", "prosperous canada",
+    "protecting canada", "protect canada", "proteger le canada",
+    "defending canada", "defend canada", "defendre le canada",
+    "defending our country", "sauver le canada", "canada first",
+    "canada staying canada", "canada remaining canada",
+    "canada remaining its own country", "canada remains a country",
+    "sovereign nation", "canadas survival",
+    ## NOT "own country": it fires on "immigrants should stay in their
+    ## own country", which is immigration
+    "canadian resilience", "americ*", "ameeric*",
+    ## self-sufficiency reads as independence from the US, not as energy
+    "self sufficiency", "self sufficient", "selfsufficien*",
+    "autosuffisance", "autosuffisant*"
     ## NOTE "us" also matches the English pronoun. It is kept because in
     ## short MIP answers it is nearly always "U.S."; drop it if you would
     ## rather be conservative - "usa"/"america*"/"states" still fire.
@@ -589,6 +647,7 @@ mip_terms <- list(
   leaders = c(
     "carney", "carnay", "mark", "marc", "poilievre", "poliviere", "pierre",
     "singh", "jagmeet", "blanchet", "trudeau*", "justin", "scheer", "sheer",
+    "po*evre", "po*ievre", "pollievre", "polievre",
     "otoole", "toole", "bernier", "ford", "may", "paul", "andrew",
     "libera*", "libral", "liberaux",
     "conservative*", "conservateur*", "conservatrice*", "tory", "tories",
@@ -598,6 +657,23 @@ mip_terms <- list(
     "candidate*", "candidat*"
     ## NOTE "green" on its own stays in the environment dictionary;
     ##      "green party" is matched as a phrase here.
+  ),
+
+  ## -- 25. Multiple issues ---------------------------------------------
+  ## Respondents who would not pick one issue. These are engaged answers,
+  ## not refusals, so they are kept OUT of the non-answer list and get
+  ## their own code. Only unambiguous phrases live here; the one-word
+  ## versions ("everything", "tout") are handled as whole-response
+  ## matches in section 5, because "everything is too expensive" is
+  ## inflation, not a multiple-issue answer.
+  multiple = c(
+    "all issues", "all issues are important", "all of the above",
+    "all of it", "all of them", "too many things", "too many to list",
+    "too many issues", "too many problems", "too many to choose",
+    "many issues", "many things", "several issues", "multiple issues",
+    "cant name just one", "plusieurs enjeux", "tous les enjeux",
+    "beaucoup de choses", "trop de choses", "plusieurs problemes"
+    ## NOT bare "too many": "too many immigrants" is immigration.
   ),
 
   ## -- Non-answers -----------------------------------------------------
@@ -668,13 +744,15 @@ mip_dicts$combined <- quanteda::dictionary(list(combined = unique(c(
   cleanTerms(mip_terms$borders)))))
 
 ## the CES21 numbering, so the two waves line up.
-## 17 (Free Trade) and 20 (COVID) are deliberately left empty.
+## There is no code 20: covid is not a 2025 category. 17 (Free Trade) is
+## uncoded here exactly as it is uncoded in CES21.
 mip_codes <- c(enviro = 1, crime = 2, ethics = 3, education = 4, energy = 5,
                jobs = 6, economy = 7, health = 8, taxes = 9, debt = 10,
                democracy = 11, foreign = 12, immigration = 13,
                socio_cultural = 14, social = 15, brokerage = 16,
                inflation = 18, housing = 19,
-               trump = 21, tariff = 22, borders = 23, leaders = 24)
+               trump = 21, tariff = 22, borders = 23, leaders = 24,
+               multiple = 25)
 
 issue_cols <- names(mip_codes)   ## the substantive categories
 
@@ -737,6 +815,15 @@ for (k in names(mip_dicts)) {
   ces25 <- codeCategory(ces25, "mip_lower", mip_dicts[[k]])
 }
 
+## ---- multiple-issue answers ------------------------------------------
+## The one-word versions only count when they ARE the whole response:
+## "everything" on its own means "I will not pick one", but "everything is
+## too expensive" is inflation. The phrases live in the dictionary.
+mip_multi_exact <- cleanText(c("everything", "all", "tout", "plusieurs",
+                               "all of them", "everything really"))
+ces25$multiple.dum <- as.integer(ces25$multiple >= 1 |
+                                   ces25$mip_lower %in% mip_multi_exact)
+
 ## ---- how many issues did each respondent get coded into? -------------
 ## combined is a union of trump/tariff/borders and idk is not an issue,
 ## so neither counts towards the total.
@@ -752,7 +839,7 @@ mip_junk <- cleanText(c(
   "oui", "yes", "yup", "n", "x", "xxx", "y", "u", "f", "g", "j", "as", "the",
   "hm", "ish", "nul", "nth", "no ne", "nope", "nothinh", "nothibg", "cul",
   "dnk", "d/k", "n/a", "na", "unknown", "netural", "very nice", "ha!",
-  "good", "bad", "blah", "click", "clicks", "asdasd", "all", "everything",
+  "good", "bad", "blah", "click", "clicks", "asdasd",
   "bye felicia", "fuck off", "i'm neutral", "je c po", "je men fou"))
 
 ces25 <- ces25 %>%
@@ -791,8 +878,8 @@ ces25 %>%
                 jobs.dum, taxes.dum, debt.dum, enviro.dum, energy.dum,
                 immigration.dum, crime.dum, ethics.dum, education.dum,
                 democracy.dum, foreign.dum, socio_cultural.dum, social.dum,
-                brokerage.dum, leaders.dum, combined.dum, trump.dum,
-                tariff.dum, borders.dum, idk.dum),
+                brokerage.dum, leaders.dum, multiple.dum, combined.dum,
+                trump.dum, tariff.dum, borders.dum, idk.dum),
     label = list(
       economy.dum        ~ "The Economy",
       inflation.dum      ~ "Inflation and Cost of Living",
@@ -813,10 +900,15 @@ ces25 %>%
       social.dum         ~ "Social Programs",
       brokerage.dum      ~ "Brokerage (Quebec, Fed-Prov)",
       leaders.dum        ~ "Party Leaders",
-      combined.dum       ~ "US Relations, Trump and Tariffs",
-      trump.dum          ~ "Trump",
-      tariff.dum         ~ "Tariffs",
-      borders.dum        ~ "US Relations",
+      multiple.dum       ~ "Would not pick one issue",
+      ## combined is the UNION of the next three rows, not a fourth
+      ## category - it is reported alongside its parts, as in the original
+      ## CES25 script. Drop the three indented rows if you only want the
+      ## roll-up, or drop combined.dum if you only want the parts.
+      combined.dum       ~ "US relations, Trump or tariffs (any of the 3)",
+      trump.dum          ~ "   ... Trump",
+      tariff.dum         ~ "   ... Tariffs",
+      borders.dum        ~ "   ... US relations and sovereignty",
       idk.dum            ~ "Don't know / did not answer"))
 
 ## =====================================================================
@@ -839,14 +931,20 @@ ces25$mip  <- unname(mip_codes[ces25$mip2])
 ## coded into nothing and not a refusal -> Other
 ces25$mip[ces25$mip_total == 0 & ces25$idk.dum == 0] <- 0
 
-## the CES21 label set, minus COVID, plus the 2025 additions
+## The CES21 label set with COVID removed, plus the 2025 additions.
+## 20 is simply absent - there is no covid dictionary, so nothing could
+## ever be coded 20 and declaring the label would only invite confusion.
+## Free_Trade = 17 is kept because it is a real CES21 category (it is
+## uncoded in 2021 too); drop that line as well if you want the label set
+## to contain only codes that can actually occur.
 val_labels(ces25$mip) <- c(
   Other = 0, Environment = 1, Crime = 2, Ethics = 3, Education = 4,
   Energy = 5, Jobs = 6, Economy = 7, Health = 8, Taxes = 9,
   Deficit_Debt = 10, Democracy = 11, Foreign_Affairs = 12, Immigration = 13,
   Socio_Cultural = 14, Social_Programs = 15, Brokerage = 16, Free_Trade = 17,
-  Inflation = 18, Housing = 19, COVID19 = 20,
-  Trump = 21, Tariffs = 22, US_Relations = 23, Leaders = 24)
+  Inflation = 18, Housing = 19,
+  Trump = 21, Tariffs = 22, US_Relations = 23, Leaders = 24,
+  Multiple_Issues = 25)
 
 table(ces25$mip2)
 table(as_factor(ces25$mip))
@@ -861,15 +959,15 @@ table(ces25$mip_total)
 mip_selftest <- function() {
   probes <- c(
     "cost of living"        = "inflation",
-    "Le coût de la vie" = "inflation",
+    "Le co\u00fbt de la vie"   = "inflation",
     "climate change"        = "enviro",
     "l'environnement"       = "enviro",
     "pipelines and oil"     = "energy",
     "not enough jobs"       = "jobs",
     "the economy"           = "economy",
-    "l'économie"       = "economy",
+    "l'\u00e9conomie"        = "economy",
     "health care"           = "health",
-    "santé"            = "health",
+    "sant\u00e9"             = "health",
     "taxes are too high"    = "taxes",
     "government spending"   = "debt",
     "electoral reform"      = "democracy",
@@ -883,7 +981,7 @@ mip_selftest <- function() {
     "women's issues"        = "socio_cultural",
     "basic income"          = "social",
     "old people"            = "social",
-    "Québec"           = "brokerage",
+    "Qu\u00e9bec"            = "brokerage",
     "loi 21"                = "brokerage",
     "affordable housing"    = "housing",
     "Trump"                 = "trump",
@@ -898,7 +996,11 @@ mip_selftest <- function() {
     "cost of living/taxes"  = "inflation",
     "U.S. tariffs"          = "tariff",
     "Canada-US relationship" = "borders",
-    "canadian sovereignity" = "borders")
+    "canadian sovereignity" = "borders",
+    "stand up for canada"   = "borders",
+    "rising fascism"        = "democracy",
+    "natural resources"     = "energy",
+    "too many to list"      = "multiple")
 
   txt <- cleanText(names(probes))
   hit <- vapply(seq_along(probes), function(i) {
