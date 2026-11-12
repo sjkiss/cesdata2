@@ -585,6 +585,12 @@ ces84 %>%
 #recode Income (VAR442 and VAR443)
 #recode Income (VAR442 and VAR443)
 # look_for(ces84, "income")
+# ces84$VAR442
+#
+# ces84 |>
+#   mutate(income_scale=case_when(
+#     VAR442
+#   ))
 ces84 %>%
   mutate(income=case_when(
     VAR442==1 | VAR443==1 ~ 1,
@@ -940,14 +946,126 @@ ces84 %>%
   slice_sample(n=100) %>% as_factor()
 
 ces84$mode<-rep("Phone", nrow(ces84))
-
+lookfor(ces84, "lose")
 #Is there a correlation between education and income inequality?
 #
 # with(ces84, cor(education_gini, income_gini))
 # ggplot(ces84, aes(x=education_gini, income_gini))+geom_point()+geom_smooth(method="lm")
 #Add Election
 ces84$election<-rep(1984, nrow(ces84))
-## Add income
+
+#### Objective social class (income + education) ####
+# GOAL: an "absolute-levels" objective class score that is comparable across
+# 1984 and 2025. We deliberately do NOT use quintiles/percentiles here: those
+# pin each year's mean to the middle by construction and would erase real change.
+# Instead each component is scored on a FIXED 0-1 anchor scale, using the SAME
+# anchors in both survey years, then the two are averaged with equal weight.
+# Because the scales are fixed, the MEAN of obj_class is free to move across
+# years and captures (a) real income growth and (b) educational upgrading.
+# The identical block (same anchors/parameters) is used in ces25_recode.R.
+
+## --- Parameters (edit here; identical values must be used in the 2025 script) ---
+# Statistics Canada CPI, all-items, Canada, annual average (2002=100).
+# Source: StatsCan Table 18-10-0005-01.
+cpi_1983 <- 58.1     # 1984 CES income (VAR442/VAR443) is reported for the year 1983
+cpi_2024 <- 160.9    # 2025 CES income (cps25_income) is reported for the year 2024
+deflator_1983_to_2024 <- cpi_2024 / cpi_1983   # ~2.77: multiply 1983 $ to state them in 2024 $
+
+income_floor    <- 0        # equivalized real household income mapped to 0
+# income_ceiling: the equivalized real income mapped to 1 (values above are capped).
+# PROVENANCE: this is a tunable analyst choice, NOT derived from any income bracket.
+# Despite sharing the number, it is NOT the 2025 "$200,000+" top category: that bracket
+# is RAW household income, whereas this ceiling applies to EQUIVALIZED income
+# (household $ / sqrt(size)). The match is coincidental. $200k equivalized real 2024 $
+# is simply a high, round "top of scale" anchor, held identical in both years for
+# cross-year comparability. Lowering it raises income01 (rebalancing the income vs
+# education contribution to obj_class) and shifts the calibrated cutpoints -- so change
+# it deliberately, not casually.
+income_ceiling  <- 200000   # equivalized real household income (2024 $) mapped to 1 (higher is capped)
+educ_min_years  <- 0        # years of schooling mapped to 0 (no formal schooling)
+educ_max_years  <- 16       # years of schooling mapped to 1 (university graduate; 2025 master's/doctorate capped here to match 1984)
+top_bracket_mult <- 1.5     # open-ended TOP income bracket valued at this multiple of its lower bound
+
+## --- 1) Income bracket -> dollar midpoint (in 1983 $) ------------------------
+# Assign each family-income bracket its dollar midpoint. VAR442 is the reported
+# value and VAR443 the estimate; take whichever is a valid bracket (1-11),
+# mirroring the existing income recode above. Missing codes (96/97/98/99) fall
+# through case_when() to NA. The open-ended top bracket ($100,000+) is valued at
+# top_bracket_mult times its lower bound.
+ces84 %>%
+  mutate(income_dollars_1983=case_when(
+    VAR442==1  | VAR443==1  ~ 0,                    # Nothing
+    VAR442==2  | VAR443==2  ~ 2500,                 # Under $5,000
+    VAR442==3  | VAR443==3  ~ 7500,                 # $5,000-$9,999
+    VAR442==4  | VAR443==4  ~ 12500,                # $10,000-$14,999
+    VAR442==5  | VAR443==5  ~ 17500,                # $15,000-$19,999
+    VAR442==6  | VAR443==6  ~ 22500,                # $20,000-$24,999
+    VAR442==7  | VAR443==7  ~ 27500,                # $25,000-$29,999
+    VAR442==8  | VAR443==8  ~ 35000,                # $30,000-$39,999
+    VAR442==9  | VAR443==9  ~ 45000,                # $40,000-$49,999
+    VAR442==10 | VAR443==10 ~ 75000,                # $50,000-$99,999
+    VAR442==11 | VAR443==11 ~ 100000*top_bracket_mult,  # $100,000 & over (open-ended)
+  ))->ces84
+
+## --- 2) Deflate 1983 $ to constant 2024 $ -----------------------------------
+ces84$income_dollars_2024<-ces84$income_dollars_1983 * deflator_1983_to_2024
+
+## --- 3) Equivalize by household size (square-root scale) ---------------------
+# VAR365 = total family members in the household (a clean 1-13 count, no missing
+# codes). Dividing by sqrt(size) reflects that larger households need more income
+# for the same living standard, and corrects for shrinking household size 1983->2024.
+ces84$income_eq_2024<-ces84$income_dollars_2024 / sqrt(ces84$VAR365)
+
+## --- 4) Income on a fixed 0-1 anchor scale ----------------------------------
+# Linear (not log) rescale between the fixed floor/ceiling above, capped to [0,1].
+# The anchors are identical in both years, so a given dollar amount maps to the
+# same score in 1984 and 2025.
+ces84$income01<-(ces84$income_eq_2024 - income_floor) / (income_ceiling - income_floor)
+ces84$income01<-pmin(pmax(ces84$income01, 0), 1)   # censor to [0,1]
+#checks
+summary(ces84$income01)
+
+## --- 5) Education -> years of schooling -> fixed 0-1 ------------------------
+# Map the RAW education categories (VAR362) directly to years of schooling, rather
+# than the collapsed 5-category ces84$education. Years of schooling is the common
+# metric that makes the different 1984/2025 category schemes comparable: a given
+# credential is worth the same years in both years (absolute credential value).
+# Using raw levels preserves resolution the collapse discarded at the bottom
+# (no-schooling/elementary distinctions). At the TOP, 1984 has only "Grad.
+# university" (16 yrs, no master's/doctorate split), so to keep the same top-end
+# resolution in both years the 2025 script caps bachelor's/master's/doctorate all
+# at 16 (see cps25_education 9/10/11 there). Same year values across scripts.
+ces84 %>%
+  mutate(education_years=case_when(
+    VAR362==9 ~ 0,    # No formal schooling
+    VAR362==1 ~ 5,    # Some elementary
+    VAR362==2 ~ 8,    # Graduated elementary
+    VAR362==3 ~ 10,   # Some high school
+    VAR362==4 ~ 12,   # High school graduate
+    VAR362==5 ~ 13,   # Some technical
+    VAR362==6 ~ 14,   # Graduated technical
+    VAR362==7 ~ 15,   # Some university
+    VAR362==8 ~ 16,   # Graduated university
+    # VAR362==0 (Refused/DK) -> NA
+  ))->ces84
+# Fixed 0-1 anchor: educ_min_years (0 yrs) -> 0, educ_max_years (20 yrs) -> 1; same
+# anchors in both years. Cap to [0,1] for safety (nothing exceeds 20 or is below 0).
+ces84$education01<-(ces84$education_years - educ_min_years) / (educ_max_years - educ_min_years)
+ces84$education01<-pmin(pmax(ces84$education01, 0), 1)
+#checks
+summary(ces84$education01)
+
+## --- 6) Combine into objective social class (0-1) ---------------------------
+# Equal-weight mean of the two fixed-anchor components. Result is NA if either
+# component is missing (listwise). Fixed cross-year scales mean the mean of
+# obj_class is comparable across 1984 and 2025.
+ces84$obj_class<-(ces84$income01 + ces84$education01) / 2
+#checks
+summary(ces84$obj_class)
+### Add Variable labels
+var_label(ces84$obj_class)<-c("Objective measure of objective class from education and income")
+var_label(ces84$occupation_oesch)<-c("Oesch occupation code")
+var_label(ces84$occupation_oesch_5)<-c("5 category Oesch class")
 # Save the file
 save(ces84, file=here("data/ces84.rda"))
 # names(ces84)

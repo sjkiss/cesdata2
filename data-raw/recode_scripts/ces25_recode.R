@@ -147,7 +147,7 @@ ces25$party_close<-Recode(ces25$cps25_fed_id_str, "1=1; 2=0.5; 3=0; else=NA")
 table(ces25$cps25_fed_id_str , ces25$party_close, useNA = "ifany" )
 
 #### Create income ####
-lookfor(ces25, "income")
+
 # Matt - I moved tertile 3 down a category so those over $110K to match with ces21 and provides an even balance in respondents
 ces25 %>%
   mutate(income_tertile=case_when(
@@ -155,7 +155,6 @@ ces25 %>%
     cps25_income>3&cps25_income<6~2,
     cps25_income>5&cps25_income<9~3,
   ))->ces25
-table(ces25$income_tertile)
 
 #recode Income Quintile (cps21_income_cat & cps21_income_number)
 look_for(ces25, "income")
@@ -947,6 +946,117 @@ look_for(ces25, "women")
 ces25$stay_home<-Recode(as.numeric(ces25$pes25_womenhome), "1=0; 2=0.25; 3=0.5; 4=0.75; 5=1; else=NA")
 #checks
 table(ces25$stay_home, ces25$pes25_womenhome, useNA = "ifany")
+
+#### Objective social class (income + education) ####
+# GOAL: an "absolute-levels" objective class score that is comparable across
+# 1984 and 2025. We deliberately do NOT use quintiles/percentiles here: those
+# pin each year's mean to the middle by construction and would erase real change.
+# Instead each component is scored on a FIXED 0-1 anchor scale, using the SAME
+# anchors in both survey years, then the two are averaged with equal weight.
+# Because the scales are fixed, the MEAN of obj_class is free to move across
+# years and captures (a) real income growth and (b) educational upgrading.
+# The identical block (same anchors/parameters) is used in ces84_recode.R.
+
+## --- Parameters (edit here; MUST match the values used in ces84_recode.R) ---
+# CPI parameters are only actually used in the 1984 script (to deflate 1983 $).
+# The 2025 income question already asks about the year 2024, so no deflation is
+# needed here; the CPI lines are kept only so the two scripts read identically.
+cpi_1983 <- 58.1     # StatsCan CPI all-items annual average, 2002=100 (Table 18-10-0005-01)
+cpi_2024 <- 160.9    # StatsCan CPI all-items annual average, 2002=100 (Table 18-10-0005-01)
+deflator_1983_to_2024 <- cpi_2024 / cpi_1983   # ~2.77 (unused in this 2025 script)
+
+income_floor    <- 0        # equivalized real household income mapped to 0
+# income_ceiling: the equivalized real income mapped to 1 (values above are capped).
+# PROVENANCE: this is a tunable analyst choice, NOT derived from any income bracket.
+# Despite sharing the number, it is NOT the 2025 "$200,000+" top category: that bracket
+# is RAW household income, whereas this ceiling applies to EQUIVALIZED income
+# (household $ / sqrt(size)). The match is coincidental. $200k equivalized real 2024 $
+# is simply a high, round "top of scale" anchor, held identical in both years for
+# cross-year comparability. Lowering it raises income01 (rebalancing the income vs
+# education contribution to obj_class) and shifts the calibrated cutpoints -- so change
+# it deliberately, not casually.
+income_ceiling  <- 200000   # equivalized real household income (2024 $) mapped to 1 (higher is capped)
+educ_min_years  <- 0        # years of schooling mapped to 0 (no formal schooling)
+educ_max_years  <- 16       # years of schooling mapped to 1 (university graduate; master's/doctorate capped here to match 1984)
+top_bracket_mult <- 1.5     # open-ended TOP income bracket valued at this multiple of its lower bound
+
+## --- 1) Clean household size ------------------------------------------------
+# cps25_household = "how many people live in your household?" (a count). It carries
+# a -99 missing code and some impossible outliers (e.g. 30, 500, 1e+08 = data
+# errors). Set -99 and implausibly large values (> 15) to NA before equivalizing.
+ces25$hhsize<-ifelse(ces25$cps25_household == -99 | ces25$cps25_household > 15,
+                     NA, ces25$cps25_household)
+#checks
+table(ces25$hhsize, useNA = "ifany")
+
+## --- 2) Income bracket -> dollar midpoint (already in 2024 $) ----------------
+# Assign each household-income bracket its dollar midpoint. DK/refused (9) falls
+# through case_when() to NA. The open-ended top bracket ($200,000+) is valued at
+# top_bracket_mult times its lower bound. No deflation: these are already 2024 $.
+ces25 %>%
+  mutate(income_dollars_2024=case_when(
+    cps25_income==1 ~ 0,                        # No income
+    cps25_income==2 ~ 15000,                    # $1 to $30,000
+    cps25_income==3 ~ 45000,                    # $30,001 to $60,000
+    cps25_income==4 ~ 75000,                    # $60,001 to $90,000
+    cps25_income==5 ~ 100000,                   # $90,001 to $110,000
+    cps25_income==6 ~ 130000,                   # $110,001 to $150,000
+    cps25_income==7 ~ 175000,                   # $150,001 to $200,000
+    cps25_income==8 ~ 200000*top_bracket_mult,  # More than $200,000 (open-ended)
+  ))->ces25
+
+## --- 3) Equivalize by household size (square-root scale) ---------------------
+# Divide by sqrt(size) so larger households need more income for the same living
+# standard (same adjustment as the 1984 script, which uses VAR365).
+ces25$income_eq_2024<-ces25$income_dollars_2024 / sqrt(ces25$hhsize)
+
+## --- 4) Income on a fixed 0-1 anchor scale ----------------------------------
+# Linear (not log) rescale between the fixed floor/ceiling above, capped to [0,1].
+# Anchors are identical to the 1984 script, so a given real dollar amount maps to
+# the same score in both years.
+ces25$income01<-(ces25$income_eq_2024 - income_floor) / (income_ceiling - income_floor)
+ces25$income01<-pmin(pmax(ces25$income01, 0), 1)   # censor to [0,1]
+#checks
+summary(ces25$income01)
+
+## --- 5) Education -> years of schooling -> fixed 0-1 ------------------------
+# Map the RAW education categories (cps25_education) directly to years of schooling,
+# rather than the collapsed 5-category ces25$education. Years of schooling is the
+# common metric that makes the different 1984/2025 category schemes comparable, and
+# using raw levels preserves resolution the collapse discarded at the bottom.
+# At the TOP, bachelor's/master's/doctorate are ALL set to 16 (university graduate)
+# so the top-end resolution matches 1984, which has no graduate-degree category.
+# This sacrifices 2025's extra top detail for cross-year comparability of the
+# instrument. Same year values as the 1984 script.
+ces25 %>%
+  mutate(education_years=case_when(
+    cps25_education==1  ~ 0,    # No schooling
+    cps25_education==2  ~ 5,    # Some elementary
+    cps25_education==3  ~ 8,    # Completed elementary
+    cps25_education==4  ~ 10,   # Some secondary/high school
+    cps25_education==5  ~ 12,   # Completed secondary/high school
+    cps25_education==6  ~ 13,   # Some technical/college/CEGEP
+    cps25_education==7  ~ 14,   # Completed technical/college/CEGEP
+    cps25_education==8  ~ 15,   # Some university
+    cps25_education==9  ~ 16,   # Bachelor's degree
+    cps25_education==10 ~ 16,   # Master's degree -> capped at 16 to match 1984
+    cps25_education==11 ~ 16,   # Professional degree/doctorate -> capped at 16 to match 1984
+    # cps25_education==12 (DK/refused) -> NA
+  ))->ces25
+# Fixed 0-1 anchor: educ_min_years (0 yrs) -> 0, educ_max_years (20 yrs) -> 1; same
+# anchors in both years. Cap to [0,1] for safety.
+ces25$education01<-(ces25$education_years - educ_min_years) / (educ_max_years - educ_min_years)
+ces25$education01<-pmin(pmax(ces25$education01, 0), 1)
+#checks
+summary(ces25$education01)
+
+## --- 6) Combine into objective social class (0-1) ---------------------------
+# Equal-weight mean of the two fixed-anchor components. NA if either component is
+# missing (listwise). Fixed cross-year scales mean the mean of obj_class is
+# comparable across 1984 and 2025.
+ces25$obj_class<-(ces25$income01 + ces25$education01) / 2
+#checks
+summary(ces25$obj_class)
 
 #Add mode and election
 ces25$mode<-rep("Web", nrow(ces25))

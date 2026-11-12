@@ -217,7 +217,7 @@ source(here("data-raw/recode_scripts/ces19phone_noc_recode.R"))
 
 #recode Occupation (p52)
 # look_for(ces19phone, "occupation")
-ces19phone$NOC
+
 ces19phone$occupation<-Recode(as.numeric(ces19phone$NOC), "0:1099=2;
 1100:1199=1;
 2100:2199=1;

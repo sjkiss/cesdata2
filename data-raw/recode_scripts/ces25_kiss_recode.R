@@ -194,6 +194,103 @@ val_labels(ces25b$income)<-c(Lowest=1, Lower_Middle=2, Middle=3, Upper_Middle=4,
 val_labels(ces25b$income)
 table(ces25b$income)
 
+#### Objective social class (income + education) ####
+# Same construction as ces84_recode.R / ces25_recode.R. Built here on ces25b so
+# that obj_class sits alongside the subjective self-placement (sub_class, built
+# below) for the class-concordance analysis.
+#
+# The Kiss-module file has income (cps25_income) but NOT household size, which we
+# need to equivalize income. So we first merge household size in from the main
+# 2025 CES file, matching on cps25_ResponseId (unique in both files; all Kiss
+# respondents match, and ~2,805 of 2,872 have a usable household-size value).
+
+## --- Merge household size from the main 2025 CES file -----------------------
+ces25_hh <- read_dta(here("data-raw/2025 Canadian Election Study v1.dta")) %>%
+  dplyr::select(cps25_ResponseId, cps25_household)
+ces25b <- dplyr::left_join(ces25b, ces25_hh, by = "cps25_ResponseId")
+
+## --- Parameters (edit here; MUST match ces84_recode.R / ces25_recode.R) ------
+# No CPI/deflator needed: cps25_income is already reported in 2024 dollars.
+income_floor     <- 0        # equivalized real household income mapped to 0
+# income_ceiling: the equivalized real income mapped to 1 (values above are capped).
+# PROVENANCE: this is a tunable analyst choice, NOT derived from any income bracket.
+# Despite sharing the number, it is NOT the 2025 "$200,000+" top category: that bracket
+# is RAW household income, whereas this ceiling applies to EQUIVALIZED income
+# (household $ / sqrt(size)). The match is coincidental. $200k equivalized real 2024 $
+# is simply a high, round "top of scale" anchor, held identical in both years for
+# cross-year comparability. Lowering it raises income01 (rebalancing the income vs
+# education contribution to obj_class) and shifts the calibrated cutpoints -- so change
+# it deliberately, not casually.
+income_ceiling   <- 200000   # equivalized real household income (2024 $) mapped to 1 (higher is capped)
+educ_min_years   <- 0        # years of schooling mapped to 0 (no formal schooling)
+educ_max_years   <- 16       # years of schooling mapped to 1 (university graduate; master's/doctorate capped here to match 1984)
+top_bracket_mult <- 1.5      # open-ended TOP income bracket valued at this multiple of its lower bound
+
+## --- 1) Clean household size ------------------------------------------------
+# -99 is the missing code; some values are impossible outliers (data errors).
+# Set -99 and implausibly large values (> 15) to NA before equivalizing.
+ces25b$hhsize<-ifelse(ces25b$cps25_household == -99 | ces25b$cps25_household > 15,
+                      NA, ces25b$cps25_household)
+#checks
+table(ces25b$hhsize, useNA = "ifany")
+
+## --- 2) Income bracket -> dollar midpoint (already in 2024 $) ----------------
+# DK/refused (9) falls through case_when() to NA. Open-ended top bracket
+# ($200,000+) valued at top_bracket_mult times its lower bound.
+ces25b %>%
+  mutate(income_dollars_2024=case_when(
+    cps25_income==1 ~ 0,                        # No income
+    cps25_income==2 ~ 15000,                    # $1 to $30,000
+    cps25_income==3 ~ 45000,                    # $30,001 to $60,000
+    cps25_income==4 ~ 75000,                    # $60,001 to $90,000
+    cps25_income==5 ~ 100000,                   # $90,001 to $110,000
+    cps25_income==6 ~ 130000,                   # $110,001 to $150,000
+    cps25_income==7 ~ 175000,                   # $150,001 to $200,000
+    cps25_income==8 ~ 200000*top_bracket_mult,  # More than $200,000 (open-ended)
+  ))->ces25b
+
+## --- 3) Equivalize by household size (square-root scale) ---------------------
+ces25b$income_eq_2024<-ces25b$income_dollars_2024 / sqrt(ces25b$hhsize)
+
+## --- 4) Income on a fixed 0-1 anchor scale ----------------------------------
+# Linear rescale between the fixed floor/ceiling above, capped to [0,1]; same
+# anchors as the other two scripts.
+ces25b$income01<-(ces25b$income_eq_2024 - income_floor) / (income_ceiling - income_floor)
+ces25b$income01<-pmin(pmax(ces25b$income01, 0), 1)   # censor to [0,1]
+#checks
+summary(ces25b$income01)
+
+## --- 5) Education -> years of schooling -> fixed 0-1 ------------------------
+# Map the RAW education categories (cps25_education) directly to years of schooling,
+# rather than the collapsed 5-category ces25b$education. Same mapping as ces25_recode.R;
+# bachelor's/master's/doctorate all capped at 16 to match 1984's top-end resolution.
+ces25b %>%
+  mutate(education_years=case_when(
+    cps25_education==1  ~ 0,    # No schooling
+    cps25_education==2  ~ 5,    # Some elementary
+    cps25_education==3  ~ 8,    # Completed elementary
+    cps25_education==4  ~ 10,   # Some secondary/high school
+    cps25_education==5  ~ 12,   # Completed secondary/high school
+    cps25_education==6  ~ 13,   # Some technical/college/CEGEP
+    cps25_education==7  ~ 14,   # Completed technical/college/CEGEP
+    cps25_education==8  ~ 15,   # Some university
+    cps25_education==9  ~ 16,   # Bachelor's degree
+    cps25_education==10 ~ 16,   # Master's degree -> capped at 16 to match 1984
+    cps25_education==11 ~ 16,   # Professional degree/doctorate -> capped at 16 to match 1984
+    # cps25_education==12 (DK/refused) -> NA
+  ))->ces25b
+# Fixed 0-1 anchor: educ_min_years (0 yrs) -> 0, educ_max_years (20 yrs) -> 1. Cap to [0,1].
+ces25b$education01<-(ces25b$education_years - educ_min_years) / (educ_max_years - educ_min_years)
+ces25b$education01<-pmin(pmax(ces25b$education01, 0), 1)
+#checks
+summary(ces25b$education01)
+
+## --- 6) Combine into objective social class (0-1) ---------------------------
+# Equal-weight mean of the two fixed-anchor components; NA if either is missing.
+ces25b$obj_class<-(ces25b$income01 + ces25b$education01) / 2
+#checks
+summary(ces25b$obj_class)
+
 #### Create Class ####
 #Convert the 5 digit NOC code provided by CDEM to a number
 ces25b$NOC21_5<-as.numeric(ces25b$occupation_code)
@@ -448,15 +545,15 @@ NOC21_5==31120~13,
 NOC21_5==31200~13,
 #chiropractors, phsyiotherapists, occupational therapists
 NOC21_5>=31201&NOC21_5<=31209~13,
-#Nursing
-NOC21_5>=31300&NOC21_5<=31303~13,
+#Nursing (registered nurses -> semi-professional, class 14, per Oesch ISCO scheme)
+NOC21_5>=31300&NOC21_5<=31303~14,
 ##Major Group 41
 # Judges & lawyers
 NOC21_5>=41100&NOC21_5<=41101~9,
-#Teachers & Professors
+#elementary & kindergarten teachers (semi-professional, class 14) -- MUST precede the 41200-41229 range below (41221 = elementary; 41220 = secondary)
+NOC21_5==41221~14,
+#Teachers & Professors (university 41200, college 41210, secondary 41220)
 NOC21_5>=41200&NOC21_5<=41229~13,
-#elementary teachers
-NOC21_5==41220~14,
 #Social Work and counselling
 NOC21_5==41300|NOC21_5==41301~14,
 #Religious leaders
@@ -628,7 +725,7 @@ NOC21_5>=63220&NOC21_5<=63221~7,
 #concrete plastereres
 ## Major gruop 73
 NOC21_5>=73100&NOC21_5<=73102~7,
-NOC21_5>=73110&NOC21_5<=7313~7,
+NOC21_5>=73110&NOC21_5<=73130~7,
 NOC21_5==73200|NOC21_5==73202~7,
 NOC21_5==73201~15,
 NOC21_5==73209~7,
@@ -1261,7 +1358,11 @@ ces25b$cps25_ResponseId
 
 ces25b %>%
   rename(respid=cps25_ResponseId)->ces25b
-#crosstable(ces25b, as_factor(cps25_employment)~valid_oesch)
+
+### Add Variable labels
+var_label(ces25b$obj_class)<-c("Objective measure of objective class from education and income")
+var_label(ces25b$occupation_oesch)<-c("Oesch occupation code")
+var_label(ces25b$occupation_oesch_5)<-c("5 category Oesch class")
 #Write out the dataset
 # #### Resave the file in the .rda file
 save(ces25b, file=here("data/ces25b.rda"))
