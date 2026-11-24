@@ -214,7 +214,7 @@ mip_terms <- list(
     "pollution", "polluer", "pollute", "polluting", "pollue*",
     "planet*", "planete*", "earth", "terre",
     ## emissions and carbon
-    "carbon", "carbone", "carbon tax*", "co2", "ges", "gaz a effet de serre",
+    "carbon", "carbone", "co2", "ges", "gaz a effet de serre",
     "ev", "evs", "electric vehicle*", "vehicule electrique*",
     "greenhouse gas", "greenhouse gases", "emission*", "empreinte carbone",
     ## green, sustainability, nature
@@ -244,10 +244,8 @@ mip_terms <- list(
     "gang*", "justice", "prison*", "jail", "*jail*", "incarceration",
     "bail", "bail reform", "catch and release", "sentencing", "repeat offenders",
     "protests", "vandalism", "vandalisme", "trafficking", "traficking",
-    "fentanyl", "opioid*", "overdose*", "drug crime", "hard drugs",
-    "law", "laws", "law and order", "victimes", "victims",
-    ## CES21 files security / terrorism under crime as well as foreign
-    "security", "securite", "securit*", "terroris*", "terrorisme"
+    "fentanyl", "overdose*", "drug crime", "hard drugs",
+    "law", "laws", "law and order", "victim*", "victim*"
   ),
 
   ## -- 3. Ethics and Government ----------------------------------------
@@ -419,7 +417,11 @@ mip_terms <- list(
 
   ## -- 12. Foreign Affairs (replaces the old "security" category) ------
   foreign = c(
-    "war", "wars", "peace", "paix", "guerre*", "ukraine", "russia", "russie",
+    ## FIX: exact "guerre"/"guerres", NOT "guerre*". The glob matched the
+    ##      collapsed token "guerrecommerciale" and pulled trade-war responses
+    ##      into foreign; an exact token cannot reach inside that single token,
+    ##      so "guerre commerciale" now stays with tariff.
+    "war", "wars", "peace", "paix", "guerre", "guerres", "ukraine", "russia", "russie",
     "chin*", "chinese", "israel", "israeli", "gaza", "palestin*",
     "middle east", "moyen orient", "iran", "north korea",
     "foreign", "foreign policy", "foreign affairs", "affaires etrangeres",
@@ -488,12 +490,7 @@ mip_terms <- list(
     "political correctness", "media", "medias", "social media",
     "fake news", "fake information", "false information", "misinformation",
     "desinformation", "disinformation", "credible information",
-    "arts", "animal*", "youth issue*", "family issue*", "family values",
-    ## firearms (CES21 files them here; they are also in crime)
-    "gun*", "firearm*", "weapons ownership", "gun control", "gun violence",
-    "arme a feu", "armes a feu",
-    "c21", "c71", "c6"
-  ),
+    "arts", "animal*", "youth issue*", "family issue*", "family values" ),
 
   ## -- 15. Social Programs (welfare + seniors) -------------------------
   social = c(
@@ -524,8 +521,7 @@ mip_terms <- list(
     "pension*", "pesion", "cpp", "oas", "old age security", "rrq", "gis",
     "65", "60 ans", "long term care", "longterm care", "ltc", "chsld",
     "nursing homes", "care homes", "retirement homes",
-    ## disability, veterans, other
-    "disability", "disabl*", "handicap*", "odsp", "ei", "wsib",
+   "odsp", "ei", "wsib",
     "veteran*", "anciens combattants", "sick leave", "reserve*",
     "la population"
     ## NOTE cerb / pcu / pcre are dropped with the covid category.
@@ -541,7 +537,7 @@ mip_terms <- list(
     "federal*", "federalis*", "fed prov", "ottawa",
     "national unity", "unity", "unite", "unite nationale",
     "separatism", "separatiste*", "separation", "secession", "souverainisme",
-    "quebec sovereignty", "souverainete du quebec", "quebec separation",
+    "quebec sovereignty", "souverainete du quebec", "souveraineteduquebec","quebec separation",
     "souverainis*", "souverainiste*",
     "distinct society",
     "francophone*", "franco*", "francais*", "french", "langue*", "language*",
@@ -560,8 +556,18 @@ mip_terms <- list(
   inflation = c(
     "*inflation*", "cost of living", "cost", "costs", "cout*", "couts",
     "lecout", "cout de la vie", "prix", "price", "prices",
-    "pricing", "afford*", "aford*", "affort*", "afgord*", "afforability",
-    "unaffordable", "expensive",
+    "pricing",
+    ## FIX: affordability IN GENERAL stays in inflation, but is listed as
+    ##      whole tokens (NOT the old "afford*" glob) so that the collapsed
+    ##      phrase "affordablehousing" is no longer caught here -- that token
+    ##      belongs to housing. The misspelling globs below ("aford*" etc.)
+    ##      start with a single f and cannot match "afford...", so they stay.
+    "afford", "affords", "affording", "affordable", "affordably",
+    "affordability", "affordablity", "affordabilty", "afforability",
+    "unaffordable", "unaffordability",
+    "abordable", "abordables", "abordabilite",
+    "aford*", "affort*", "afgord*",
+    "expensive",
     "cher", "trop cher", "living", "standard of living", "niveau de vie",
     "purchasing power", "pouvoir dachat", "grocer*", "groceries",
     "food", "food prices", "epicerie*", "panier depicerie", "nourriture",
@@ -573,14 +579,22 @@ mip_terms <- list(
 
   ## -- 19. Housing -----------------------------------------------------
   housing = c(
-    "*housing*", "housing crisis", "affordable housing",
+    "*housing*", "housing crisis",
+    ## FIX: affordable housing IN PARTICULAR is housing, not inflation. These
+    ##      multi-word terms collapse to single tokens ("affordablehousing",
+    ##      "costofhousing", ...) that "*housing*"/"*logement*" catch and that
+    ##      inflation no longer matches. Bare "affordable"/"unaffordable" were
+    ##      moved OUT of housing to inflation (general affordability).
+    "affordable housing", "unaffordable housing", "housing affordability",
+    "cost of housing", "housing costs", "housing prices",
+    "logement abordable", "logements abordables",
     "*logement*", "crise du logement",
     "rent", "rents", "rental*", "renting", "renters", "loyer*", "rent control",
     "home", "homes", "house", "houses", "maison*", "hpmes", "dwelling*",
     "condo*", "mortgage*", "hypotheque*", "propriet*", "proprio*",
     "landlord*", "eviction*", "homeless*", "sans abri*", "sansabri*",
     "itinerance", "shelter*", "abri*", "hebergement", "first time buyers",
-    "zoning", "inflationhousingrenting", "unaffordable", "affordable"
+    "zoning", "inflationhousingrenting"
     ## NOTE "propri*" (CES21) also matched "propre"; narrowed to "propriet*".
   ),
 
@@ -594,7 +608,7 @@ mip_terms <- list(
   ## -- 22. Tariffs -----------------------------------------------------
   tariff = c(
     "*tarif*", "tariff*", "tarrif*", "terrif*", "thariff", "taxestariffs",
-    "economytariffs", "trade war*", "guerre commerciale", "trade dispute*",
+    "economytariffs", "trade war*", "guerre commerciale", "guerres commerciales", "trade dispute*",
     "big beautiful bill", "protectionism", "protectionnisme",
     "buy canadian", "counter tariffs", "droits de douane"
     ## "economist" / "economiste" ## HASHED: economy words that had been
@@ -616,14 +630,14 @@ mip_terms <- list(
     "united states", "canada us relations", "us relations",
     "*independ*", "*independan*",
     "autonomie", "autonomy", "integrite territoriale",
-    "lintegrite territoriale", "canadian identity", "keeping canada",
-    "neighbours", "neighbors", "trump",
+    "lintegrite territoriale",  "keeping canada",
+    "neighbours", "neighbors",
     ## -- Canada-under-threat answers (2025). Borders already held
     ##    "keeping canada" and "canadian identity"; these are the same
     ##    construct. Bare "canada" is deliberately NOT here - it would fire
     ##    on "canada needs housing" - so the handful of responses that are
     ##    only the word "canada" stay in Other.
-    "stand up for canada", "standing up for canada", "stand up to trump",
+    "stand up for canada", "standing up for canada",
     "strong canada", "strengthening canada", "canada strength",
     "building canada", "building a strong canada", "prosperous canada",
     "protecting canada", "protect canada", "proteger le canada",
@@ -853,6 +867,90 @@ message(crayon::green(sprintf(
   sum(ces25$idk.dum), nrow(ces25), 100 * mean(ces25$idk.dum))))
 
 ## =====================================================================
+## 5b. SINGLE PRIMARY ISSUE  (one mutually-exclusive issue per respondent)
+## =====================================================================
+## The .dum columns above let one response count in several categories at
+## once, exactly as CES21 does. This block adds ONE issue per respondent for
+## analyses that need a single outcome. The multi-coded dummies are kept; this
+## is an additional variable, not a replacement.
+##
+## RULE
+##   primary    : the category with the MOST matching tokens (the count
+##                columns written by codeCategory(), e.g. ces25$economy).
+##   tiebreaker : if >=2 categories tie at the top count, the one whose term
+##                is mentioned FIRST in the cleaned response wins, considering
+##                ONLY the tied categories (first-mention).
+##   residual   : if the earliest-mentioned token belongs to >=2 of the tied
+##                categories at once (overlapping vocabulary - e.g. "wage" is
+##                deliberately in both inflation and jobs), the tie cannot be
+##                broken; primary_issue is left NA and flagged
+##                "tied_unresolved".
+##   no match   : respondents with no substantive category (mip_total == 0,
+##                which includes the idk / non-answers) get NA, "uncoded".
+##
+## Candidates are issue_cols (the substantive categories); the combined
+## trump/tariff/borders union and idk are NOT candidates.
+##
+## WHY first-mention needs its own pass: lookupCounts() above returns a
+## bag-of-words count and throws token order away. tokens_lookup() with
+## exclusive = FALSE, capkeys = FALSE replaces a matched token with its
+## (lower-case) key IN PLACE, so the position of each category's first hit is
+## recoverable here.
+
+primary_issue  <- rep(NA_character_, nrow(ces25))
+primary_status <- rep("uncoded",     nrow(ces25))
+
+.cnt <- as.matrix(as.data.frame(ces25[issue_cols]))
+storage.mode(.cnt) <- "double"
+
+.toks <- quanteda::tokens(ces25$mip_lower)
+.pos  <- matrix(NA_integer_, nrow(.cnt), length(issue_cols),
+                dimnames = list(NULL, issue_cols))
+for (.k in issue_cols) {
+  .lk <- as.list(quanteda::tokens_lookup(.toks, mip_dicts[[.k]],
+           exclusive = FALSE, capkeys = FALSE, nested_scope = "dictionary"))
+  .pos[, .k] <- vapply(.lk, function(v) {
+    w <- which(v == .k); if (length(w)) w[1] else NA_integer_ }, integer(1))
+}
+
+for (.i in seq_len(nrow(.cnt))) {
+  .mx <- max(.cnt[.i, ])
+  if (.mx == 0) next                                     # uncoded -> NA
+  .tied <- which(.cnt[.i, ] == .mx)
+  if (length(.tied) == 1) {                              # clear count winner
+    primary_issue[.i]  <- issue_cols[.tied]
+    primary_status[.i] <- "clear"
+  } else {                                               # break by first mention
+    .p    <- .pos[.i, .tied]
+    .minp <- suppressWarnings(min(.p, na.rm = TRUE))
+    .win  <- .tied[which(.p == .minp)]
+    if (length(.win) == 1) {
+      primary_issue[.i]  <- issue_cols[.win]
+      primary_status[.i] <- "firstmention"
+    } else {
+      primary_status[.i] <- "tied_unresolved"            # same token, >=2 cats
+    }
+  }
+}
+
+ces25$primary_issue  <- factor(primary_issue, levels = issue_cols)
+ces25$primary_status <- factor(primary_status,
+  levels = c("clear", "firstmention", "tied_unresolved", "uncoded"))
+
+rm(.cnt, .toks, .pos, .lk, .k, .i, .mx, .tied, .p, .minp, .win)
+
+message(crayon::green(sprintf(
+  "primary_issue: %d of %d assigned a single issue (%d clear + %d first-mention); %d tied-unresolved (NA); %d uncoded (NA)",
+  sum(!is.na(ces25$primary_issue)), nrow(ces25),
+  sum(ces25$primary_status == "clear"),
+  sum(ces25$primary_status == "firstmention"),
+  sum(ces25$primary_status == "tied_unresolved"),
+  sum(ces25$primary_status == "uncoded"))))
+
+cat("\nprimary_issue distribution:\n")
+print(sort(table(ces25$primary_issue), decreasing = TRUE))
+
+## =====================================================================
 ## 6. WHAT IS STILL UNCODED
 ## =====================================================================
 ## Run this, look at the top of the list, add the words you see to the
@@ -1020,3 +1118,9 @@ mip_selftest <- function() {
 }
 
 mip_selftest()
+
+# ces25 |>
+#   select(mip_lower)
+ces25 |>
+  filter(str_detect(mip_lower, "souver")) |>
+  select(mip_lower) |> view()
