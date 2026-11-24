@@ -1062,6 +1062,9 @@ summary(ces25$obj_class)
 ces25$mode<-rep("Web", nrow(ces25))
 ces25$election<-rep(2025, nrow(ces25))
 
+##
+source(here('data-raw/recode_scripts/ces25_mip_recode.R'))
+
 #Write out the dataset
 # #### Resave the file in the .rda file
 save(ces25, file=here("data/ces25.rda"))
